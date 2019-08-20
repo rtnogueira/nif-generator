@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/nif-generator/static/css/main.31b27988.chunk.css",
+    "main.js": "/nif-generator/static/js/main.ccd52754.chunk.js",
+    "main.js.map": "/nif-generator/static/js/main.ccd52754.chunk.js.map",
+    "runtime~main.js": "/nif-generator/static/js/runtime~main.a77cd357.js",
+    "runtime~main.js.map": "/nif-generator/static/js/runtime~main.a77cd357.js.map",
+    "static/js/2.b4036808.chunk.js": "/nif-generator/static/js/2.b4036808.chunk.js",
+    "static/js/2.b4036808.chunk.js.map": "/nif-generator/static/js/2.b4036808.chunk.js.map",
+    "index.html": "/nif-generator/index.html",
+    "precache-manifest.4e6137a4513079815b9c7675b7503342.js": "/nif-generator/precache-manifest.4e6137a4513079815b9c7675b7503342.js",
+    "service-worker.js": "/nif-generator/service-worker.js",
+    "static/css/main.31b27988.chunk.css.map": "/nif-generator/static/css/main.31b27988.chunk.css.map",
+    "static/media/logo.png": "/nif-generator/static/media/logo.d25b0223.png"
+  }
+}
