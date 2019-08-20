@@ -16,6 +16,7 @@ import IconButton from '@material-ui/core/IconButton';
 import FileCopy from '@material-ui/icons/FileCopy';
 import Logo from '../images/logo.png';
 import nifTypes from '../constants/nifTypes';
+import { generateNif } from '../util/nif';
 
 const styles = theme => ({
     mainContainer: {
@@ -54,9 +55,20 @@ const styles = theme => ({
             margin: '20px 0',
         },
     },
+    resultContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        margin: '20px 0',
+    },
+    resultList: {     
+        maxWidth: '250px',
+    },
+    nif: {
+        marginRight: '20px',
+    }
 });
 
-const Home = (props) => {
+const NifGenerator = (props) => {
     const { classes } = props;
 
     const [inputValues, setinputValues] = useState({
@@ -73,41 +85,20 @@ const Home = (props) => {
         }));
     }
 
-    function handleClick() {
-        let nifListGenerated = [];
-        const startNum = inputValues.type.toString();
+    function handleGenerateClick() {
+        generateNifList();
+    }
 
-        const getRandomNum = (exp) => {
-            return Math.floor(Math.random() * Math.pow(9, exp)) + Math.pow(8, exp);
-        }
-        
-        const getCheckDigit = (num) => {
-            if (!num) return;
-        
-            let sum = 0;
-            let module11 = 0;
-        
-            num
-                .toString()
-                .split("")
-                .reverse()
-                .forEach((curr, index) => {
-                    sum += (parseInt(curr, 10) * (index + 2));
-                });
-        
-            module11 = sum % 11;
-        
-            return module11 < 2 ? 0 : 11 - module11;
-        };
+    function generateNifList() {
+        let newNifList = [];
 
         for (let i=0; i < inputValues.quantity; i++) {
-            const randomNum = getRandomNum(8-startNum.length);
-            const randomNif = startNum.toString() + randomNum.toString();
-            const checkDigit = getCheckDigit(randomNif);
-            nifListGenerated.push(randomNif.toString() + checkDigit.toString());
+            const randomNif = generateNif(inputValues.type);
+
+            newNifList.push(randomNif);
         }
 
-        setNifList(() => nifListGenerated)
+        setNifList(() => newNifList)
     }
     
     return (
@@ -118,7 +109,7 @@ const Home = (props) => {
                     NIF Generator
                 </Typography>
             </Grid>
-            <Grid item xs={12} className={classes.formContainer}>
+            <Grid item xs={12} className={ classes.formContainer }>
                 <FormControl className={`${classes.inputContainer} ${classes.typeContainer}`}>
                     <InputLabel htmlFor="type">
                         Type
@@ -157,17 +148,17 @@ const Home = (props) => {
                 <Button 
                     variant="contained" 
                     color="primary"
-                    onClick= {handleClick}
-                    className={classes.button}>
+                    onClick={ handleGenerateClick }
+                    className={ classes.button }>
                         Generate
                 </Button>
             </Grid>
-            <Grid item xs={12} className={classes.formContainer}>
-                <List>
+            <Grid item xs={12} className={ classes.resultContainer }>
+                <List className={ `${classes.resultList}` }>
                     {
                         nifList.map((nif) => (
-                            <ListItem key={nif}>
-                                <ListItemText primary={nif}/>
+                            <ListItem key={ nif } >
+                                <ListItemText primary={ nif } className={ `${classes.nif}` } />
                                 <ListItemSecondaryAction>
                                     <IconButton edge="end" aria-label="copy">
                                         <FileCopy />
@@ -182,4 +173,4 @@ const Home = (props) => {
     )
 }
 
-export default withStyles(styles)(Home);
+export default withStyles(styles)(NifGenerator);

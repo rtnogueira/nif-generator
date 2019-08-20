@@ -13,7 +13,7 @@ import store from './redux/store';
 import Navbar from './components/Navbar';
 
 // Pages
-import Home from './pages/home';
+import NifGenerator from './pages/NifGenerator';
 
 const theme = createMuiTheme(themeFile);
 
@@ -26,8 +26,8 @@ class App extends Component {
               <Navbar />
               <div className='container'>
                 <Switch>
-                  <Route exact path='/' component={ Home } />
-                  <Route component={ Home } />        
+                  <Route exact path='/' component={ NifGenerator } />
+                  <Route component={ NifGenerator } />        
                 </Switch>
               </div>
             </HashRouter>
