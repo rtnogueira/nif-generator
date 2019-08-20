@@ -101,7 +101,7 @@ const Home = (props) => {
         };
 
         for (let i=0; i < inputValues.quantity; i++) {
-            const randomNum = getRandomNum(9-startNum.length);
+            const randomNum = getRandomNum(8-startNum.length);
             const randomNif = startNum.toString() + randomNum.toString();
             const checkDigit = getCheckDigit(randomNif);
             nifListGenerated.push(randomNif.toString() + checkDigit.toString());
