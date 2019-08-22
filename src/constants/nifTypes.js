@@ -20,8 +20,16 @@ export default [
         value: '5',
     },
     {
+        name: 'Pessoa colectiva irregular ou número provisório',
+        value: '9',
+    },
+    {
         name: 'administração pública',
         value: '6',
+    },
+    {
+        name: 'empresário em nome individual (extinto)',
+        value: '8',
     },
     {
         name: 'herança indivisa',
@@ -42,10 +50,6 @@ export default [
     {
         name: 'regime excepcional',
         value: '79',
-    },
-    {
-        name: 'empresário em nome individual (extinto)',
-        value: '8',
     },
     {
         name: 'condominios e sociedades irregulares',

@@ -1,15 +1,10 @@
-import { createStore, combineReducers, compose } from 'redux';
-
-import uiReducer from './reducers/uiReducer';
+import { createStore, compose } from 'redux';
+import rootReducer from '../shared/state/root-reducer';
 
 const initialState = {};
 
-const reducers = combineReducers({
-    UI: uiReducer, 
-});
-
 const store = createStore(
-    reducers, 
+    rootReducer, 
     initialState, 
     compose(
         window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
