@@ -8,7 +8,7 @@ export default [
         value: '2',
     },
     {
-        name: 'pessoa singular',
+        name: 'pessoa singular (a partir de julho de 2019)',
         value: '3',
     },
     {
@@ -20,24 +20,24 @@ export default [
         value: '5',
     },
     {
-        name: 'Pessoa colectiva irregular ou número provisório',
-        value: '9',
-    },
-    {
-        name: 'administração pública',
+        name: 'administração pública (Central, Regional ou Local)',
         value: '6',
     },
     {
-        name: 'empresário em nome individual (extinto)',
-        value: '8',
+        name: 'pessoa colectiva não residente',
+        value: '71',
     },
     {
         name: 'herança indivisa',
         value: '70',
     },
     {
-        name: 'pessoa colectiva não residente',
-        value: '71',
+        name: 'herança indivisa',
+        value: '74',
+    },
+    {
+        name: 'herança indivisa',
+        value: '75',
     },
     {
         name: 'fundos de investimento',
@@ -48,8 +48,20 @@ export default [
         value: '77',
     },
     {
+        name: 'atribuição oficiosa não residentes (processo VAT REFUND)',
+        value: '78',
+    },
+    {
         name: 'regime excepcional',
         value: '79',
+    },
+    {
+        name: 'empresário em nome individual (extinto)',
+        value: '8',
+    },
+    {
+        name: 'pessoa colectiva irregular ou número provisório',
+        value: '9',
     },
     {
         name: 'condominios e sociedades irregulares',
@@ -60,11 +72,11 @@ export default [
         value: '91',
     },
     {
-        name: 'não residentes',
+        name: 'não residentes sem estabelecimento estável',
         value: '98',
     },
     {
-        name: 'sociedades civis',
+        name: 'sociedades civis sem personalidade jurídica',
         value: '99',
     },
 ];
