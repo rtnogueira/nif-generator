@@ -20,17 +20,17 @@ const theme = createMuiTheme(themeFile);
 class App extends Component {
   render() {
     return (
-      <MuiThemeProvider theme={ theme }>
-        <Provider store={ store }>
-            <HashRouter basename='/'>
-              <Navbar />
-              <div className='container'>
-                <Switch>
-                  <Route exact path='/' component={ NifGenerator } />
-                  <Route component={ NifGenerator } />        
-                </Switch>
-              </div>
-            </HashRouter>
+      <MuiThemeProvider theme={theme}>
+        <Provider store={store}>
+          <HashRouter basename='/'>
+            <Navbar />
+            <div className='container'>
+              <Switch>
+                <Route exact path='/' component={NifGenerator} />
+                <Route component={NifGenerator} />
+              </Switch>
+            </div>
+          </HashRouter>
         </Provider>
       </MuiThemeProvider>
     );
