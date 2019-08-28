@@ -9,6 +9,13 @@ cache:
 script:
   - yarn test
   - yarn run build
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  on:
+    branch: master
 after_success:
   - git config --global user.name "rtnogueira"
   - git config --global user.email "14441214+rtnogueira@users.noreply.github.com"
