@@ -12,6 +12,14 @@ export default [
         value: '3',
     },
     {
+        name: 'pessoa singular',
+        value: '38',
+    },
+    {
+        name: 'pessoa singular',
+        value: '39',
+    },
+    {
         name: 'pessoa singular não residente',
         value: '45',
     },

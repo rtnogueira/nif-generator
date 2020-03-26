@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 import { useSelector, useDispatch } from 'react-redux';
-import { actionsTypes as drawerActionsTypes } from '../shared/state/redux-drawer';
+import { actionsTypes as drawerActionsTypes } from '../../shared/state/redux-drawer';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -78,7 +78,7 @@ const useStyles = (drawerWidth) => makeStyles((theme) => {
     )
 });
 
-export default function Navbar() {
+const Navbar = () => {
     const drawer = useSelector(state => state.drawer);
     const dispatch = useDispatch()
     const classes = useStyles(drawer.width)();
@@ -142,3 +142,5 @@ export default function Navbar() {
         </div>
     );
 };
+
+export default Navbar;
