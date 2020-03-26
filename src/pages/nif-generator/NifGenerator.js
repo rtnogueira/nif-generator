@@ -1,5 +1,6 @@
 import { generateNif } from '../../util/nif';
 import { CopyToClipboard } from '../../components/copy-to-clipboard';
+import { ExportCSV } from '../../components/export-csv';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
@@ -56,8 +57,9 @@ const styles = theme => ({
     },
     resultContainer: {
         display: 'flex',
-        justifyContent: 'center',
+        alignItems: 'center',
         margin: '20px 0',
+        flexDirection: 'column',
     },
     resultList: {     
         maxWidth: '250px',
@@ -135,7 +137,7 @@ const NifGenerator = (props) => {
                         className={ classes.input }
                         input={<Input name="quantity" id="quantity" />}>
                         {
-                            [...Array(20)].map((e, i) => {
+                            [...Array(50)].map((e, i) => {
                                 i++;
                                 return (
                                     <MenuItem key={i} value={i}>{i}</MenuItem>
@@ -153,6 +155,7 @@ const NifGenerator = (props) => {
                 </Button>
             </Grid>
             <Grid item xs={12} className={ classes.resultContainer }>
+                { nifList && nifList.length > 0 && <ExportCSV csvData={nifList} fileName='nif-list' /> }
                 <List className={ `${classes.resultList}` }>
                     {
                         nifList.map((nif) => (
