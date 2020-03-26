@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { generateNif } from '../../util/nif';
+import { CopyToClipboard } from '../../components/copy-to-clipboard';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
@@ -12,11 +13,9 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import IconButton from '@material-ui/core/IconButton';
-import FileCopy from '@material-ui/icons/FileCopy';
-import Logo from '../images/logo.png';
-import nifTypes from '../constants/nifTypes';
-import { generateNif } from '../util/nif';
+import Logo from '../../images/logo.png';
+import nifTypes from '../../constants/nifTypes';
+import React, { useState } from 'react';
 
 const styles = theme => ({
     mainContainer: {
@@ -160,9 +159,7 @@ const NifGenerator = (props) => {
                             <ListItem key={ nif } >
                                 <ListItemText primary={ nif } className={ `${classes.nif}` } />
                                 <ListItemSecondaryAction>
-                                    <IconButton edge="end" aria-label="copy">
-                                        <FileCopy />
-                                    </IconButton>
+                                    <CopyToClipboard value={ nif } />
                                 </ListItemSecondaryAction>
                             </ListItem>
                         ))

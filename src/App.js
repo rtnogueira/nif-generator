@@ -12,10 +12,10 @@ import { Provider } from 'react-redux';
 import store from './store/configureStore';
 
 // Components
-import Navbar from './components/Navbar';
+import { NavBar } from './components/nav-bar';
 
 // Pages
-import NifGenerator from './pages/NifGenerator';
+import { NifGenerator } from './pages/nif-generator/';
 
 const theme = createMuiTheme(themeFile);
 
@@ -38,7 +38,7 @@ class App extends Component {
       <MuiThemeProvider theme={theme}>
         <Provider store={store}>
           <HashRouter basename='/'>
-            <Navbar />
+            <NavBar />
             <div className='container'>
               <Switch>
                 <Route exact path='/' component={NifGenerator} />
