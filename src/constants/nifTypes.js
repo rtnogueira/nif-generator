@@ -1,4 +1,4 @@
-export default [
+export const nifTypes = [
     {
         name: 'pessoa singular',
         value: '1',
@@ -88,3 +88,5 @@ export default [
         value: '99',
     },
 ];
+
+export default nifTypes;

@@ -1,19 +1,21 @@
-export default {
+const theme = {
     palette: {
         primary: {
-        light: '#33c9dc',
-        main: '#00bcd4',
-        dark: '#008394',
-        contrastText: '#fff',
+            light: '#6C757D',
+            main: '#495057',
+            dark: '#343A40',
+            contrastText: '#F8F9FA',
         },
         secondary: {
-        light: '#ff6333',
-        main: '#ff3d00',
-        dark: '#b22a00',
-        contrastText: '#fff',
+            light: '#DEE2E6',
+            main: '#CED4DA',
+            dark: '#ADB5BD',
+            contrastText: '#212529',
         },
     },
     typography: {
         useNextVariants: true,
     }
 };
+
+export default theme;
