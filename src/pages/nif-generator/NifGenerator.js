@@ -1,6 +1,7 @@
 import { generateNif } from '../../util/nif';
 import { CopyToClipboard } from '../../components/copy-to-clipboard';
 import { ExportCSV } from '../../components/export-csv';
+import { NifGeneratorStyles } from './NifGenerator.styles';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
@@ -18,61 +19,10 @@ import Logo from '../../images/logo.png';
 import nifTypes from '../../constants/nifTypes';
 import React, { useState } from 'react';
 
-const styles = theme => ({
-    mainContainer: {
-        textAlign: 'center',
-    },
-    image: {
-        margin: '20px auto',
-        width: '100px',
-    },
-    pageTitle: {
-        margin: '10px auto',
-    },
-    formContainer: {
-        display: 'flex',
-        justifyContent: 'center',
-        [theme.breakpoints.down('xs')]: {
-            flexDirection: 'column',
-        },
-    },
-    inputContainer: {
-        textAlign: 'left',
-        [theme.breakpoints.down('xs')]: {
-            minWidth: '100%',
-        },
-    },
-    typeContainer: {
-        [theme.breakpoints.up('xs')]: {
-            minWidth: '340px',
-        },
-    },
-    quantityContainer: {
-        [theme.breakpoints.up('xs')]: {
-            margin: '0 20px',
-        },
-        [theme.breakpoints.down('xs')]: {
-            margin: '20px 0',
-        },
-    },
-    resultContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        margin: '20px 0',
-        flexDirection: 'column',
-    },
-    resultList: {     
-        maxWidth: '250px',
-    },
-    nif: {
-        marginRight: '20px',
-    }
-});
-
 const NifGenerator = (props) => {
-    const { classes } = props;
+    const { classes: styles } = props;
 
-    const [inputValues, setinputValues] = useState({
+    const [inputValues, setInputValues] = useState({
         quantity: 1,
         type: 2,
     });
@@ -80,14 +30,10 @@ const NifGenerator = (props) => {
     const [nifList, setNifList] = useState([]);
 
     function handleChange(event) {
-        setinputValues(oldValues => ({
+        setInputValues(oldValues => ({
             ...oldValues,
             [event.target.name]: event.target.value,
         }));
-    }
-
-    function handleGenerateClick() {
-        generateNifList();
     }
 
     function generateNifList() {
@@ -99,26 +45,26 @@ const NifGenerator = (props) => {
             newNifList.push(randomNif);
         }
 
-        setNifList(() => newNifList)
+        setNifList(newNifList)
     }
     
     return (
-        <Grid container spacing={2} className={ classes.mainContainer }>
-            <Grid item xs={12} className={ classes.header }>
-                <img src={Logo} alt='app icon' className={ classes.image } />
-                <Typography variant='h4' className={ classes.pageTitle }>
+        <Grid container spacing={2} className={ styles.mainContainer }>
+            <Grid item xs={12} className={ styles.header }>
+                <img src={Logo} alt='app icon' className={ styles.image } />
+                <Typography variant='h4' className={ styles.pageTitle }>
                     NIF Generator
                 </Typography>
             </Grid>
-            <Grid item xs={12} className={ classes.formContainer }>
-                <FormControl className={`${classes.inputContainer} ${classes.typeContainer}`}>
+            <Grid item xs={12} className={ styles.formContainer }>
+                <FormControl className={`${styles.inputContainer} ${styles.typeContainer}`}>
                     <InputLabel htmlFor="type">
                         Type
                     </InputLabel>
                     <Select
                         value={inputValues.type}
                         onChange={handleChange}
-                        className={ classes.input }
+                        className={ styles.input }
                         input={<Input name="type" id="type" />}>
                             {
                                 nifTypes.map(nif => (
@@ -127,14 +73,14 @@ const NifGenerator = (props) => {
                             }
                     </Select>
                 </FormControl>
-                <FormControl className={`${classes.inputContainer} ${classes.quantityContainer}`}>
+                <FormControl className={`${styles.inputContainer} ${styles.quantityContainer}`}>
                     <InputLabel htmlFor="quantity">
                         Quantity
                     </InputLabel>
                     <Select
                         value={inputValues.quantity}
                         onChange={handleChange}
-                        className={ classes.input }
+                        className={ styles.input }
                         input={<Input name="quantity" id="quantity" />}>
                         {
                             [...Array(50)].map((e, i) => {
@@ -149,18 +95,18 @@ const NifGenerator = (props) => {
                 <Button 
                     variant="contained" 
                     color="primary"
-                    onClick={ handleGenerateClick }
-                    className={ classes.button }>
+                    onClick={ generateNifList }
+                    className={ styles.button }>
                         Generate
                 </Button>
             </Grid>
-            <Grid item xs={12} className={ classes.resultContainer }>
+            <Grid item xs={12} className={ styles.resultContainer }>
                 { nifList && nifList.length > 0 && <ExportCSV csvData={nifList} fileName='nif-list' /> }
-                <List className={ `${classes.resultList}` }>
+                <List className={ `${styles.resultList}` }>
                     {
                         nifList.map((nif) => (
                             <ListItem key={ nif } >
-                                <ListItemText primary={ nif } className={ `${classes.nif}` } />
+                                <ListItemText primary={ nif } className={ `${styles.nif}` } />
                                 <ListItemSecondaryAction>
                                     <CopyToClipboard value={ nif } />
                                 </ListItemSecondaryAction>
@@ -173,4 +119,4 @@ const NifGenerator = (props) => {
     )
 }
 
-export default withStyles(styles)(NifGenerator);
+export default withStyles(NifGeneratorStyles)(NifGenerator);
