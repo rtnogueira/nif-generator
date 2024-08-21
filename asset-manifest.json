@@ -1,21 +1,14 @@
 {
   "files": {
-    "main.css": "/nif-generator/static/css/main.e6ef2067.chunk.css",
-    "main.js": "/nif-generator/static/js/main.58338b19.chunk.js",
-    "main.js.map": "/nif-generator/static/js/main.58338b19.chunk.js.map",
-    "runtime-main.js": "/nif-generator/static/js/runtime-main.596d02ee.js",
-    "runtime-main.js.map": "/nif-generator/static/js/runtime-main.596d02ee.js.map",
-    "static/js/2.1fd02c33.chunk.js": "/nif-generator/static/js/2.1fd02c33.chunk.js",
-    "static/js/2.1fd02c33.chunk.js.map": "/nif-generator/static/js/2.1fd02c33.chunk.js.map",
+    "main.css": "/nif-generator/static/css/main.96e6310d.css",
+    "main.js": "/nif-generator/static/js/main.bf0440d1.js",
+    "static/media/logo.png": "/nif-generator/static/media/logo.65e0364a352c045abbe3.png",
     "index.html": "/nif-generator/index.html",
-    "static/css/main.e6ef2067.chunk.css.map": "/nif-generator/static/css/main.e6ef2067.chunk.css.map",
-    "static/js/2.1fd02c33.chunk.js.LICENSE.txt": "/nif-generator/static/js/2.1fd02c33.chunk.js.LICENSE.txt",
-    "static/media/logo.65e0364a.png": "/nif-generator/static/media/logo.65e0364a.png"
+    "main.96e6310d.css.map": "/nif-generator/static/css/main.96e6310d.css.map",
+    "main.bf0440d1.js.map": "/nif-generator/static/js/main.bf0440d1.js.map"
   },
   "entrypoints": [
-    "static/js/runtime-main.596d02ee.js",
-    "static/js/2.1fd02c33.chunk.js",
-    "static/css/main.e6ef2067.chunk.css",
-    "static/js/main.58338b19.chunk.js"
+    "static/css/main.96e6310d.css",
+    "static/js/main.bf0440d1.js"
   ]
 }
