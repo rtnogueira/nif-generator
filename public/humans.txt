@@ -1,0 +1,14 @@
+/* TEAM */
+Developer: NIF Generator Team
+Site: https://rtnogueira.github.io/nif-generator/
+Location: Portugal
+
+/* THANKS */
+React, Material-UI, Redux
+
+/* SITE */
+Last update: 2025/12/14
+Standards: HTML5, CSS3, JavaScript ES6+
+Components: React, Redux, Material-UI
+Software: Visual Studio Code, Node.js, pnpm
+
