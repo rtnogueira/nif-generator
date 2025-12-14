@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://rtnogueira.github.io/nif-generator/sitemap.xml
+
+# Crawl-delay (optional, in seconds)
+Crawl-delay: 1
+

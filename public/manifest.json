@@ -1,15 +1,27 @@
 {
   "short_name": "NIF Generator",
-  "name": "NIF Generator",
+  "name": "NIF Generator - Portuguese Tax Number Generator",
+  "description": "Free online tool to generate valid Portuguese NIF (Tax Identification Numbers) for QA testing and development purposes",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
+  "scope": "/nif-generator/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "categories": ["development", "utilities", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr"
 }
