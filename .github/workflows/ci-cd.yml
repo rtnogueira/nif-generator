@@ -9,9 +9,11 @@ on:
       - master
 
 jobs:
+  # Job for PRs: Install, Test, Build (blocks merge if fails)
   test:
-    name: Test
+    name: Test and Build
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     strategy:
       matrix:
         node-version: [18, 20]
@@ -40,11 +42,16 @@ jobs:
       - name: Build
         run: pnpm build
 
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: test
+  # Job for master branch: Install, Test, Build, Deploy
+  build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    
+    # Specify the GitHub Pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
@@ -74,6 +81,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test -- --watchAll=false
 
       - name: Build
         run: pnpm build
