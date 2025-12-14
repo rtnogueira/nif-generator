@@ -1,25 +1,23 @@
-sudo: false
 language: node_js
 node_js:
-  - stable
+  - 18
+  - 20
 cache:
-  bundle: true
   directories:
     - node_modules
+    - ~/.pnpm-store
+before_install:
+  - npm install -g pnpm
+install:
+  - pnpm install --frozen-lockfile
 script:
-  - yarn test
-  - yarn build
+  - pnpm test -- --watchAll=false
+  - pnpm build
 deploy:
   provider: pages
-  skip_cleanup: true
+  cleanup: false
   github_token: $GITHUB_TOKEN
   keep_history: true
   local_dir: build
   on:
     branch: master
-after_success:
-  - git config --global user.name "rtnogueira"
-  - git config --global user.email "14441214+rtnogueira@users.noreply.github.com"
-  - git remote rm origin
-  - git remote add origin https://rtnogueira:${$GITHUB_TOKEN}@github.com/rtnogueira/nif-generator.git
-  - yarn run deploy
