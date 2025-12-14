@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/rtnogueira/nif-generator.svg?branch=master)](https://travis-ci.org/rtnogueira/nif-generator)
+[![CI/CD](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml)
 
 # NIF Generator - Portuguese Tax Number Generator
 
