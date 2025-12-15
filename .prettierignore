@@ -1,0 +1,10 @@
+node_modules
+/pnpm-lock.yaml
+# Ignore artifacts:
+build
+coverage
+stats.html
+eslint.config.js
+setupTests.ts
+vite-env.d.ts
+vite.config.ts
