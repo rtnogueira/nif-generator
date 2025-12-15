@@ -13,7 +13,7 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({ value }) => {
 
   return (
     <IconButton edge="end" aria-label="copy" onClick={() => copyValue()}>
-      {isCopied ? <CheckCircle /> : <FileCopy />}
+      {isCopied ? <CheckCircle color="success" /> : <FileCopy />}
     </IconButton>
   )
 }

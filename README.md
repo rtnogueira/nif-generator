@@ -39,11 +39,15 @@ Perfect for:
 
 ## 🛠️ Technology Stack
 
-- **React** - UI library
-- **Redux** - State management
-- **Material-UI** - Component library
-- **React Router** - Navigation
+- **React 18** - UI library
+- **TypeScript** - Type-safe JavaScript
+- **Vite** - Build tool and dev server
+- **Zustand** - State management
+- **MUI (Material-UI) v7** - Component library
+- **TanStack Router** - Type-safe routing
+- **Vitest** - Testing framework
 - **File Saver** - CSV export
+- **XLSX** - Excel export support
 - **React GA** - Google Analytics
 
 ## 🚀 Getting Started

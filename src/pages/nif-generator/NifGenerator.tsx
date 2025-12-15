@@ -6,7 +6,6 @@ import Input from '@mui/material/Input'
 import InputLabel from '@mui/material/InputLabel'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
@@ -127,16 +126,13 @@ const NifGenerator: React.FC = () => {
           ) : null}
           <List>
             {nifList.map(nif => (
-              <ListItem key={nif}>
+              <ListItem key={nif} secondaryAction={<CopyToClipboard value={nif} />}>
                 <ListItemText
                   primary={nif}
                   sx={{
                     marginRight: '20px',
                   }}
                 />
-                <ListItemSecondaryAction>
-                  <CopyToClipboard value={nif} />
-                </ListItemSecondaryAction>
               </ListItem>
             ))}
           </List>
