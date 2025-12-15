@@ -14,13 +14,12 @@ const useCopy = (textToCopy: string, successDuration = 1000): [boolean, () => vo
     }
   }, [isCopied, successDuration])
 
-  return [
-    isCopied,
-    () => {
-      copyToClipboard(textToCopy)
-      setIsCopied(true)
-    },
-  ]
+  function handleCopyToClipboard() {
+    copyToClipboard(textToCopy)
+    setIsCopied(true)
+  }
+
+  return [isCopied, handleCopyToClipboard]
 }
 
 export default useCopy

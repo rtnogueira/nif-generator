@@ -16,10 +16,6 @@ const App: React.FC = () => {
   const location = useLocation()
 
   useEffect(() => {
-    ReactGA.pageview(window.location.pathname)
-  }, [])
-
-  useEffect(() => {
     ReactGA.set({ page: location.pathname })
     ReactGA.pageview(location.pathname)
   }, [location.pathname])
