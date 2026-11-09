@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { ReceiptTextIcon } from 'lucide-react'
+import { ReceiptTextIcon, ShieldCheckIcon } from 'lucide-react'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,6 +16,12 @@ const TOOLS = [
     label: 'Tax number generator',
     description: 'Valid Portuguese tax numbers (NIF) for testing.',
     icon: ReceiptTextIcon,
+  },
+  {
+    to: '/tax-number-validator',
+    label: 'Tax number validator',
+    description: 'Check EU VAT numbers and Portuguese NIFs.',
+    icon: ShieldCheckIcon,
   },
 ] as const
 

@@ -20,6 +20,12 @@ interface StaticPage {
 /** Routes other than `/` that need their own HTML file (so they return 200, not 404) and head tags. */
 const STATIC_PAGES: StaticPage[] = [
   {
+    path: 'tax-number-validator',
+    title: 'Tax Number Validator (EU VAT & NIF) | rtnogueira',
+    description:
+      'Free online VAT number validator. Check the official format of tax numbers from all 27 EU countries, Northern Ireland and the UK, and the check digit of Portuguese NIFs.',
+  },
+  {
     path: 'privacy',
     title: 'Privacy Policy | rtnogueira',
     description:
