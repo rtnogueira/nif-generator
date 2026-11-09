@@ -1,14 +1,28 @@
 import '@testing-library/jest-dom/vitest'
-import { afterEach, expect, vi, beforeEach } from 'vitest'
-import * as matchers from 'vitest-dom/matchers'
 import { cleanup } from '@testing-library/react'
-
-expect.extend(matchers)
-
-beforeEach(() => {
-  vi.clearAllMocks()
-})
+import { afterEach, vi } from 'vitest'
 
 afterEach(() => {
   cleanup()
+  vi.clearAllMocks()
 })
+
+// jsdom gaps used by next-themes and Radix primitives.
+const noop = () => undefined
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: noop,
+    removeEventListener: noop,
+    addListener: noop,
+    removeListener: noop,
+    dispatchEvent: () => false,
+  }),
+})
+Element.prototype.scrollIntoView = noop
+Element.prototype.hasPointerCapture = () => false
+Element.prototype.releasePointerCapture = noop
+window.scrollTo = noop

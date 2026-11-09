@@ -6,7 +6,17 @@
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Apply the saved/system theme before first paint (next-themes takes over after load). -->
+    <script>
+      try {
+        var t = localStorage.getItem('theme')
+        if (t === 'dark' || ((!t || t === 'system') && matchMedia('(prefers-color-scheme: dark)').matches))
+          document.documentElement.classList.add('dark')
+      } catch (_) {}
+    </script>
     
     <!-- Primary Meta Tags -->
     <title>NIF Generator - Portuguese Tax Number Generator for QA Testing</title>
@@ -69,13 +79,13 @@
         "name": "NIF Generator"
       },
       "browserRequirements": "Requires JavaScript. Requires HTML5.",
-      "softwareVersion": "0.1.0",
+      "softwareVersion": "1.0.0",
       "featureList": [
         "Generate Portuguese NIF numbers",
         "Support for individual tax numbers",
         "Support for corporate tax numbers",
         "Support for non-resident tax numbers",
-        "Export to CSV",
+        "Export to Excel (.xlsx)",
         "Copy to clipboard",
         "Generate multiple NIFs at once"
       ],
@@ -86,7 +96,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script type="module" src="/src/index.js"></script>
+    <script type="module" src="/src/index.tsx"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1797239821173252"
       crossorigin="anonymous"></script>
     <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="rubentiagor" data-description="Support me on Buy me a coffee!" data-message="If this tool has been been helpful to you, consider supporting the project. Your support helps keep the site online and allows me to improve and maintain it. ☕️" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>

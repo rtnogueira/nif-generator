@@ -1,21 +1,20 @@
-import React from 'react'
+import './index.css'
+import { RouterProvider } from '@tanstack/react-router'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
+import { initAnalytics, trackPageView } from './lib/analytics'
+import { createAppRouter } from './router'
 
-const router = createRouter({
-  routeTree,
-  basepath: import.meta.env.PROD ? '/nif-generator' : '/',
-})
+const router = createAppRouter()
+
+initAnalytics()
+router.subscribe('onResolved', ({ toLocation }) => trackPageView(toLocation.href))
 
 const rootElement = document.getElementById('root')
-if (!rootElement) {
-  throw new Error('Root element not found')
-}
+if (!rootElement) throw new Error('Root element not found')
 
-const root = createRoot(rootElement)
-root.render(
-  <React.StrictMode>
+createRoot(rootElement).render(
+  <StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </StrictMode>
 )

@@ -24,8 +24,9 @@ NIF (Número de Identificação Fiscal) is the Portuguese Tax Identification Num
   - Investment funds
   - And many more...
 - 🔢 Generate up to 50 NIFs at once
-- 📄 Export generated NIFs to CSV
-- 📋 Copy to clipboard functionality
+- 📄 Export generated NIFs to Excel (.xlsx)
+- 📋 Copy a single NIF or the whole list to the clipboard
+- 🌗 Light and dark mode
 - 🎨 Modern and responsive UI
 - 🚀 Fast and lightweight
 
@@ -39,23 +40,23 @@ Perfect for:
 
 ## 🛠️ Technology Stack
 
-- **React 18** - UI library
-- **TypeScript** - Type-safe JavaScript
+- **React 19** + **TypeScript**
 - **Vite** - Build tool and dev server
-- **Zustand** - State management
-- **MUI (Material-UI) v7** - Component library
-- **TanStack Router** - Type-safe routing
-- **Vitest** - Testing framework
-- **File Saver** - CSV export
-- **XLSX** - Excel export support
-- **React GA** - Google Analytics
+- **Tailwind CSS v4** + **shadcn/ui** (Radix primitives, lucide icons, sonner toasts)
+- **TanStack Router** - Type-safe file-based routing with automatic code splitting
+- **write-excel-file** - Excel export, lazy-loaded on demand
+- **Vitest** + **Testing Library** - Tests
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- pnpm (or npm/yarn)
+- Node.js 22.12 or higher
+- pnpm 10
+
+### Configuration
+
+Analytics is optional. To enable Google Analytics 4, set `VITE_GA_MEASUREMENT_ID` (e.g. `G-XXXXXXX`) in a `.env.local` file or in the build environment.
 
 ### Installation
 
@@ -72,7 +73,12 @@ pnpm install
 # Start development server
 pnpm start
 
-# Build for production
+# Run tests, type check and lint
+pnpm test
+pnpm tscheck
+pnpm lint
+
+# Build for production (ANALYZE=1 pnpm build, or pnpm analyze, for a bundle report)
 pnpm build
 
 # Deploy to GitHub Pages

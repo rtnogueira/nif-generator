@@ -24,3 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 
 stats.html
+# TanStack Router temp files
+.tanstack/
