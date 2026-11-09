@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { CoffeeIcon, HeartIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AUTHOR_NAME, AUTHOR_URL, BUY_ME_A_COFFEE_URL } from '@/lib/site'
@@ -20,6 +21,9 @@ export function SiteFooter() {
           </a>
         </p>
         <p>For QA testing purposes only. Not for fraudulent use.</p>
+        <Link to="/privacy" className="hover:text-foreground hover:underline">
+          Privacy policy
+        </Link>
         <Button variant="outline" size="sm" className="sm:ml-auto" asChild>
           <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noreferrer">
             <CoffeeIcon />
