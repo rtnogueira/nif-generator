@@ -4,7 +4,7 @@
 
 **Free online tool to generate valid Portuguese NIF (Número de Identificação Fiscal) for QA testing and development purposes.**
 
-🔗 **Live App:** https://rtnogueira.github.io/nif-generator/
+🔗 **Live App:** https://rtnogueira.com/
 
 ## 🇵🇹 What is a NIF?
 

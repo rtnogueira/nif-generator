@@ -1,6 +1,6 @@
 /* TEAM */
 Developer: Tiago Nogueira (rtnogueira)
-Site: https://rtnogueira.github.io/nif-generator/
+Site: https://rtnogueira.com/
 Location: Portugal
 
 /* THANKS */
