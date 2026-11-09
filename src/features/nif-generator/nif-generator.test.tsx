@@ -12,7 +12,7 @@ async function renderApp() {
   const user = userEvent.setup()
   const router = createAppRouter(createMemoryHistory({ initialEntries: ['/'] }))
   render(<RouterProvider router={router} />)
-  await screen.findByRole('heading', { name: 'NIF Generator' })
+  await screen.findByRole('heading', { name: 'Tax Number Generator' })
   return user
 }
 
@@ -21,6 +21,16 @@ const generatedNifs = () =>
   resultRows().map(button => (button.getAttribute('aria-label') ?? '').slice(5))
 
 describe('NIF generator page', () => {
+  it('links to the tax number generator from the Tools menu', async () => {
+    const user = await renderApp()
+
+    await user.click(screen.getByRole('button', { name: 'Tools' }))
+    expect(await screen.findByRole('link', { name: /Tax number generator/ })).toHaveAttribute(
+      'href',
+      '/'
+    )
+  })
+
   it('starts empty, with the default type and quantity', async () => {
     await renderApp()
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { generateNifs, type NifPrefix } from '@/lib/nif'
+import { NifAbout } from './nif-about'
 import { NifOptionsForm, type NifOptions } from './nif-options-form'
 import { NifResults } from './nif-results'
 
@@ -20,10 +21,12 @@ export function NifGenerator() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">NIF Generator</h1>
+        <p className="text-sm font-medium text-muted-foreground">Tools</p>
+        <h1 className="text-3xl font-bold tracking-tight">Tax Number Generator</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Generate valid Portuguese tax identification numbers (NIF) with a correct check digit, for
-          testing forms and systems.
+          Generate valid tax identification numbers with a correct check digit, for testing forms
+          and systems. Currently supports Portugal (NIF / número de contribuinte). Free, instant and
+          fully in your browser.
         </p>
       </div>
 
@@ -31,6 +34,8 @@ export function NifGenerator() {
         <NifOptionsForm onGenerate={handleGenerate} />
         <NifResults nifs={batch.nifs} prefix={batch.prefix} />
       </div>
+
+      <NifAbout />
     </div>
   )
 }

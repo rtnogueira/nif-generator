@@ -1,3 +1,4 @@
+export const SITE_NAME = 'rtnogueira'
 export const AUTHOR_NAME = 'rtnogueira'
 export const AUTHOR_URL = 'https://github.com/rtnogueira'
 export const GITHUB_REPO_URL = `${AUTHOR_URL}/nif-generator`
