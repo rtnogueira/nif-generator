@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { downloadXlsxColumn } from '@/lib/export-xlsx'
 import { isValidNif } from '@/lib/nif'
+import { validateVatNumber } from '@/lib/vat'
 import { createAppRouter } from '@/router'
 
 vi.mock('@/lib/export-xlsx', () => ({ downloadXlsxColumn: vi.fn(() => Promise.resolve()) }))
@@ -16,9 +17,9 @@ async function renderApp() {
   return user
 }
 
-const resultRows = () => screen.getAllByRole('button', { name: /^Copy \d{9}$/ })
-const generatedNifs = () =>
-  resultRows().map(button => (button.getAttribute('aria-label') ?? '').slice(5))
+const resultRows = (pattern = /^Copy \d{9}$/) => screen.getAllByRole('button', { name: pattern })
+const generatedNifs = (pattern?: RegExp) =>
+  resultRows(pattern).map(button => (button.getAttribute('aria-label') ?? '').slice(5))
 
 describe('NIF generator page', () => {
   it('links to the tax number generator from the Tools menu', async () => {
@@ -34,7 +35,8 @@ describe('NIF generator page', () => {
   it('starts empty, with the default type and quantity', async () => {
     await renderApp()
 
-    expect(screen.getByText('No NIFs yet')).toBeInTheDocument()
+    expect(screen.getByText('No numbers yet')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('Portugal')
     expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('Pessoa singular')
     expect(screen.getByLabelText('Quantity')).toHaveValue(1)
     expect(screen.queryByRole('button', { name: /export/i })).not.toBeInTheDocument()
@@ -92,13 +94,50 @@ describe('NIF generator page', () => {
     ).toBeNull()
   })
 
-  it('exports the generated NIFs to nif-list.xlsx', async () => {
+  it('exports the generated NIFs to tax-numbers-pt.xlsx', async () => {
     const user = await renderApp()
     await user.click(screen.getByRole('button', { name: 'Generate' }))
     const nifs = generatedNifs()
 
     await user.click(screen.getByRole('button', { name: 'Export .xlsx' }))
-    expect(downloadXlsxColumn).toHaveBeenCalledWith('NIF', nifs, 'nif-list')
+    expect(downloadXlsxColumn).toHaveBeenCalledWith('NIF', nifs, 'tax-numbers-pt')
+  })
+
+  it('generates VAT numbers for another country, with or without its prefix', async () => {
+    const user = await renderApp()
+
+    await user.click(screen.getByRole('combobox', { name: 'Country' }))
+    await user.click(await screen.findByRole('option', { name: /Germany/ }))
+    expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('USt-IdNr.')
+    const quantity = screen.getByLabelText('Quantity')
+    await user.clear(quantity)
+    await user.type(quantity, '5{Enter}')
+
+    const numbers = generatedNifs()
+    expect(numbers).toHaveLength(5)
+    expect(numbers.every(n => validateVatNumber(n, 'DE').status === 'valid')).toBe(true)
+    expect(screen.getAllByText('USt-IdNr.').length).toBeGreaterThan(1)
+
+    await user.click(screen.getByLabelText('Include the DE prefix'))
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+    const prefixed = generatedNifs(/^Copy DE\d{9}$/)
+    expect(prefixed).toHaveLength(5)
+    expect(prefixed.every(n => validateVatNumber(n).status === 'valid')).toBe(true)
+  })
+
+  it('offers every number type of the selected country', async () => {
+    const user = await renderApp()
+
+    await user.click(screen.getByRole('combobox', { name: 'Country' }))
+    await user.click(await screen.findByRole('option', { name: /Spain/ }))
+    await user.click(screen.getByRole('combobox', { name: 'Type' }))
+    const options = await screen.findAllByRole('option')
+    expect(options.map(option => option.textContent?.slice(0, 3))).toEqual(['DNI', 'NIE', 'CIF'])
+
+    await user.click(screen.getByRole('option', { name: /NIE/ }))
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+    const [nie] = generatedNifs(/^Copy [XYZ]\d{7}[A-Z]$/)
+    expect(validateVatNumber(nie, 'ES').status).toBe('valid')
   })
 
   it('renders the site chrome', async () => {

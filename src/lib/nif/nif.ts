@@ -1,3 +1,4 @@
+import { randomDigits } from '@/lib/random'
 import type { NifPrefix } from './nif-types'
 
 export const NIF_LENGTH = 9
@@ -14,14 +15,6 @@ function checkDigit(body: string): number {
   }
   const remainder = sum % 11
   return remainder < 2 ? 0 : 11 - remainder
-}
-
-function randomDigits(length: number): string {
-  // 32-bit values keep the modulo bias negligible (vs. Uint8, where 0–5 would be favoured).
-  const values = crypto.getRandomValues(new Uint32Array(length))
-  let digits = ''
-  for (const value of values) digits += value % 10
-  return digits
 }
 
 export function generateNif(prefix: NifPrefix): string {

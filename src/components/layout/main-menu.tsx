@@ -14,7 +14,7 @@ const TOOLS = [
   {
     to: '/',
     label: 'Tax number generator',
-    description: 'Valid Portuguese tax numbers (NIF) for testing.',
+    description: 'Valid Portuguese NIFs and EU VAT numbers for testing.',
     icon: ReceiptTextIcon,
   },
   {
