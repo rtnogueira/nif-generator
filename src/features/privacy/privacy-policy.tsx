@@ -46,9 +46,9 @@ export function PrivacyPolicy() {
 
       <Section title="Data you enter in the tools">
         <p>
-          The tools on this site run entirely in your browser. Tax numbers you generate, copy or
-          export to Excel are never sent to or stored on any server. There are no user accounts and
-          no forms that collect personal data.
+          The tools on this site run entirely in your browser. Tax numbers you generate, validate,
+          copy or export to Excel are never sent to or stored on any server. There are no user
+          accounts and no forms that collect personal data.
         </p>
       </Section>
 
