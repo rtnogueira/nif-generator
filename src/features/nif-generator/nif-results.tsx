@@ -14,18 +14,19 @@ import {
 } from '@/components/ui/table'
 import { useClipboard } from '@/hooks/use-clipboard'
 import { downloadXlsxColumn } from '@/lib/export-xlsx'
+import type { GeneratedBatch } from '@/lib/tax-id'
 
 interface NifResultsProps {
-  nifs: readonly string[]
-  prefix: string
+  batch: GeneratedBatch | null
 }
 
-const EXPORT_FILE_NAME = 'nif-list'
 const COPY_ALL_KEY = 'all'
+const NO_NUMBERS: readonly string[] = []
 
-export function NifResults({ nifs, prefix }: NifResultsProps) {
+export function NifResults({ batch }: NifResultsProps) {
   const { copied, copy } = useClipboard()
-  const hasResults = nifs.length > 0
+  const nifs = batch?.numbers ?? NO_NUMBERS
+  const hasResults = batch !== null && nifs.length > 0
   const allNifs = nifs.join('\n')
 
   return (
@@ -42,12 +43,12 @@ export function NifResults({ nifs, prefix }: NifResultsProps) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => copy(allNifs, `Copied ${nifs.length} NIFs`, COPY_ALL_KEY)}
+              onClick={() => copy(allNifs, `Copied ${nifs.length} numbers`, COPY_ALL_KEY)}
             >
               {copied === COPY_ALL_KEY ? <CheckIcon className="text-success" /> : <CopyIcon />}
               Copy all
             </Button>
-            <ExportButton nifs={nifs} />
+            <ExportButton batch={batch} />
           </CardAction>
         )}
       </CardHeader>
@@ -58,8 +59,8 @@ export function NifResults({ nifs, prefix }: NifResultsProps) {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12 pl-6">#</TableHead>
-                <TableHead>NIF</TableHead>
-                <TableHead>Prefix</TableHead>
+                <TableHead>{batch.type.name}</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead className="pr-6 text-right">
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -71,7 +72,7 @@ export function NifResults({ nifs, prefix }: NifResultsProps) {
                   key={nif}
                   index={index + 1}
                   nif={nif}
-                  prefix={prefix}
+                  badge={batch.type.badge}
                   copied={copied === nif}
                   onCopy={copy}
                 />
@@ -89,20 +90,20 @@ export function NifResults({ nifs, prefix }: NifResultsProps) {
 interface NifRowProps {
   index: number
   nif: string
-  prefix: string
+  badge: string
   copied: boolean
   onCopy: (nif: string, message: string) => void
 }
 
 /** Memoised so a copy only re-renders the rows whose `copied` flag changed. */
-const NifRow = memo(function NifRow({ index, nif, prefix, copied, onCopy }: NifRowProps) {
+const NifRow = memo(function NifRow({ index, nif, badge, copied, onCopy }: NifRowProps) {
   return (
     <TableRow>
       <TableCell className="pl-6 text-muted-foreground tabular-nums">{index}</TableCell>
       <TableCell className="font-mono text-[15px] tracking-wider">{nif}</TableCell>
       <TableCell>
         <Badge variant="outline" className="font-mono">
-          {prefix}
+          {badge}
         </Badge>
       </TableCell>
       <TableCell className="pr-6 text-right">
@@ -119,13 +120,17 @@ const NifRow = memo(function NifRow({ index, nif, prefix, copied, onCopy }: NifR
   )
 })
 
-function ExportButton({ nifs }: { nifs: readonly string[] }) {
+function ExportButton({ batch }: { batch: GeneratedBatch }) {
   const [exporting, setExporting] = useState(false)
 
   async function handleExport() {
     setExporting(true)
     try {
-      await downloadXlsxColumn('NIF', nifs, EXPORT_FILE_NAME)
+      await downloadXlsxColumn(
+        batch.type.name,
+        batch.numbers,
+        `tax-numbers-${batch.country.toLowerCase()}`
+      )
     } catch {
       toast.error('Export failed, please try again')
     } finally {
@@ -147,9 +152,9 @@ function EmptyState() {
       <span className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
         <HashIcon className="size-5" />
       </span>
-      <p className="font-semibold">No NIFs yet</p>
+      <p className="font-semibold">No numbers yet</p>
       <p className="max-w-xs text-sm text-muted-foreground">
-        Pick a type and quantity, then press Generate.
+        Pick a country, type and quantity, then press Generate.
       </p>
     </div>
   )

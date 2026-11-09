@@ -23,7 +23,8 @@ NIF (Número de Identificação Fiscal) is the Portuguese Tax Identification Num
   - Government entities
   - Investment funds
   - And many more...
-- 🔢 Generate up to 50 NIFs at once
+- 🌍 VAT numbers for all 27 EU member states, Northern Ireland and the UK (optionally with the country prefix), plus tax numbers from 14 more countries, all with a correct check digit. See [Supported countries](#-supported-countries)
+- 🔢 Generate up to 50 numbers at once
 - 📄 Export generated NIFs to Excel (.xlsx)
 - 📋 Copy a single NIF or the whole list to the clipboard
 - 🛡️ Tax number validator (`/tax-number-validator`): checks VAT numbers from all 27 EU member states, Northern Ireland and the UK against the official structure published by the European Commission ([VIES](https://ec.europa.eu/taxation_customs/vies/#/faq)), plus the Portuguese NIF check digit
@@ -103,9 +104,17 @@ The generator supports all official Portuguese NIF categories:
 - **98** - Non-residents without permanent establishment
 - **99** - Civil societies
 
+## 🌍 Supported Countries
+
+Besides every Portuguese NIF type, the generator creates VAT identification numbers for each country in the EU's VIES system: Austria, Belgium, Bulgaria, Croatia, Cyprus, Czechia, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, the Netherlands, Poland, Romania, Slovakia, Slovenia, Spain (DNI, NIE and CIF), Sweden, Northern Ireland and the United Kingdom.
+
+It also generates national tax numbers for Argentina (CUIT), Australia (ABN, TFN, ACN), Brazil (CPF, CNPJ), Canada (BN), Chile (RUT), Colombia (NIT), Japan (Corporate Number), New Zealand (IRD), Norway (organisasjonsnummer), Peru (RUC), South Africa (tax reference number), Switzerland (UID), Turkey (VKN, T.C. Kimlik No.) and Uruguay (RUT). Numbers without a check digit (e.g. the US SSN or EIN) are not included.
+
+The check-digit algorithms (`src/lib/tax-id/countries.ts`) are ported from [python-stdnum](https://github.com/arthurdejong/python-stdnum). They are tested against real, registered numbers taken from its test suite, and every generated VIES number must also pass the site's own validator. Where a country issues several kinds of VAT number, only the kind named in the UI is generated (e.g. 8-digit legal-entity DIČ for Czechia).
+
 ## ⚠️ Disclaimer
 
-**This tool generates valid NIF numbers for testing purposes only.** These are randomly generated numbers that follow the Portuguese NIF validation algorithm. They should **NEVER** be used for:
+**This tool generates valid tax numbers for testing purposes only.** These are randomly generated numbers that follow each country's validation algorithm. They should **NEVER** be used for:
 - Real tax declarations
 - Official documents
 - Identity fraud
