@@ -25,8 +25,9 @@ export function NifGenerator() {
         <h1 className="text-3xl font-bold tracking-tight">Tax Number Generator</h1>
         <p className="max-w-2xl text-muted-foreground">
           Generate valid tax identification numbers with a correct check digit, for testing forms
-          and systems. Covers Portuguese NIFs of every type and the VAT numbers of all 27 EU member
-          states, Northern Ireland and the United Kingdom. Free, instant and fully in your browser.
+          and systems. Covers Portuguese NIFs of every type, the VAT numbers of all 27 EU member
+          states, Northern Ireland and the United Kingdom, and tax numbers from countries such as
+          Brazil, Switzerland, Norway, Australia and Japan. Free, instant and fully in your browser.
         </p>
       </div>
 

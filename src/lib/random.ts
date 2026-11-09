@@ -15,3 +15,8 @@ export function randomDigits(length: number): string {
 export function randomChar(chars: string): string {
   return chars[randomInt(chars.length)]
 }
+
+/** One random element of `items`. */
+export function randomChoice<T>(items: readonly T[]): T {
+  return items[randomInt(items.length)]
+}

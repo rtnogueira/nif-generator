@@ -22,9 +22,14 @@ export function getTaxIdCountry(code: TaxIdCountryCode): TaxIdCountry {
   return country
 }
 
-/** English country name, from the VIES table (every generator country is a VIES country). */
+/** True for countries in the EU's VIES system, whose numbers take a VAT prefix. */
+export function isViesCountry(code: string): boolean {
+  return getVatCountry(code) !== undefined
+}
+
+/** English country name: from the VIES table for VIES countries, otherwise from the generator. */
 export function getTaxIdCountryName(code: TaxIdCountryCode): string {
-  return getVatCountry(code)?.name ?? code
+  return getVatCountry(code)?.name ?? getTaxIdCountry(code).name ?? code
 }
 
 export function getTaxIdType(code: TaxIdCountryCode, typeId: string): TaxIdType | undefined {

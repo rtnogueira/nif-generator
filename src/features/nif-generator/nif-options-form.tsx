@@ -17,6 +17,7 @@ import {
   getTaxIdCountry,
   getTaxIdCountryName,
   isTaxIdCountryCode,
+  isViesCountry,
   TAX_ID_COUNTRIES,
   type TaxIdCountryCode,
 } from '@/lib/tax-id'
@@ -47,6 +48,7 @@ export function NifOptionsForm({ onGenerate }: NifOptionsFormProps) {
   const types = getTaxIdCountry(country).types
   const type = types.find(t => t.id === typeId) ?? types[0]
   const isPortugal = country === 'PT'
+  const vies = isViesCountry(country)
 
   function handleCountryChange(value: string) {
     if (!isTaxIdCountryCode(value)) return
@@ -58,7 +60,7 @@ export function NifOptionsForm({ onGenerate }: NifOptionsFormProps) {
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
-    onGenerate({ country, typeId: type.id, quantity, withPrefix })
+    onGenerate({ country, typeId: type.id, quantity, withPrefix: vies && withPrefix })
   }
 
   return (
@@ -97,7 +99,7 @@ export function NifOptionsForm({ onGenerate }: NifOptionsFormProps) {
               <SelectContent position="popper" className="max-h-80">
                 {types.map(t => (
                   <SelectItem key={t.id} value={t.id}>
-                    <span className="min-w-7 rounded bg-muted px-1.5 text-center font-mono text-xs">
+                    <span className="min-w-7 shrink-0 rounded bg-muted px-1.5 text-center font-mono text-xs">
                       {t.badge}
                     </span>
                     <span className="truncate">{t.label}</span>
@@ -131,22 +133,24 @@ export function NifOptionsForm({ onGenerate }: NifOptionsFormProps) {
             </p>
           </div>
 
-          <div className="flex items-start gap-2.5">
-            <input
-              id={`${id}-prefix`}
-              type="checkbox"
-              checked={withPrefix}
-              onChange={event => setWithPrefix(event.target.checked)}
-              className="mt-0.5 size-4 shrink-0 accent-primary"
-            />
-            <div className="flex flex-col gap-1">
-              <Label htmlFor={`${id}-prefix`}>Include the {country} prefix</Label>
-              <p className="text-xs text-muted-foreground">
-                VAT number format: <span className="font-mono text-foreground">{country}</span>{' '}
-                followed by the national number.
-              </p>
+          {vies && (
+            <div className="flex items-start gap-2.5">
+              <input
+                id={`${id}-prefix`}
+                type="checkbox"
+                checked={withPrefix}
+                onChange={event => setWithPrefix(event.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-primary"
+              />
+              <div className="flex flex-col gap-1">
+                <Label htmlFor={`${id}-prefix`}>Include the {country} prefix</Label>
+                <p className="text-xs text-muted-foreground">
+                  VAT number format: <span className="font-mono text-foreground">{country}</span>{' '}
+                  followed by the national number.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
           <Button type="submit" size="lg" className="h-11">
             <RefreshCwIcon />

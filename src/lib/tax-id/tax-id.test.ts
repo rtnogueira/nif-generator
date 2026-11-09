@@ -7,6 +7,7 @@ import {
   getTaxIdCountryName,
   getTaxIdType,
   isTaxIdCountryCode,
+  isViesCountry,
   TAX_ID_COUNTRIES,
   type TaxIdCountry,
 } from '.'
@@ -55,10 +56,30 @@ const REAL_NUMBERS: Record<string, string[]> = {
   XI: ['432525179'],
   // 100190874 uses the newer "restarting" checksum (remainder 42 or 55).
   GB: ['002425728', '003232345', '100190874', '980780684'],
+  // Outside VIES, from tests/test_<country>_<number>.doctest (CPF: the stdnum.br.cpf docstring;
+  // CA: the 9-digit BN part of real program accounts).
+  AR: ['20101234569', '20040356437', '20047433747'],
+  AU: ['11574456001', '12123552732', '112474082', '459599230', '000024733', '001002731'],
+  BR: ['07195358000166', '08807432000110', '11015248000142', '39053344705'],
+  CA: ['000089987', '100007780', '100026723'],
+  CH: ['CHE113042942', 'CHE101415551', 'CHE105067880'],
+  CL: ['10626628-K', '10075381-2', '10219183-8'],
+  CO: ['1118534248-0', '15252525-0', '17343020-1'],
+  JP: ['1020281079130', '1092280840134', '1878613755182'],
+  NO: ['965920358', '980430596', '998772680'],
+  NZ: ['047179025', '136410132', '35901981'],
+  PE: ['10000655959', '10010734121', '10040578108'],
+  TR: ['0010213576', '0010441520', '10010405214', '10036951702'],
+  UY: ['020164180014', '020334150013', '040003080012'],
+  ZA: ['0001339050', '0843089848'],
 }
 
 /** Position of the (first) check character, where it is not the last one. */
-const CHECK_INDEX: Record<string, number> = { FR: 1, NL: 8, SE: 9 }
+const CHECK_INDEX: Record<string, number> = { FR: 1, NL: 8, SE: 9, JP: 0 }
+
+/** ABNs (11 digits) carry their check digits first. */
+const checkIndex = (code: string, number: string) =>
+  code === 'AU' && number.length === 11 ? 1 : (CHECK_INDEX[code] ?? number.length - 1)
 
 /** Changes one character to a different one of the same kind (digit → digit, letter → letter). */
 function mutate(number: string, index: number): string {
@@ -74,8 +95,15 @@ const isValidFor = (country: TaxIdCountry, number: string) =>
   country.types.some(type => type.isValid(number))
 
 describe('tax number countries', () => {
-  it('covers every VIES country, and only those', () => {
-    expect(countries.map(c => c.code).sort()).toEqual(VAT_COUNTRIES.map(c => c.code).sort())
+  it('covers every VIES country', () => {
+    const codes = countries.map(c => c.code)
+    for (const { code } of VAT_COUNTRIES) expect(codes, code).toContain(code)
+  })
+
+  it('names every country outside VIES', () => {
+    for (const country of countries) {
+      if (!isViesCountry(country.code)) expect(country.name, country.code).toBeTruthy()
+    }
   })
 
   it('has real numbers to test every country against', () => {
@@ -93,6 +121,9 @@ describe('tax number countries', () => {
     expect(isTaxIdCountryCode('DE')).toBe(true)
     expect(isTaxIdCountryCode('US')).toBe(false)
     expect(getTaxIdCountryName('EL')).toBe('Greece')
+    expect(getTaxIdCountryName('BR')).toBe('Brazil')
+    expect(isViesCountry('BR')).toBe(false)
+    expect(isViesCountry('XI')).toBe(true)
     expect(getTaxIdType('ES', 'nie')?.name).toBe('NIE')
     expect(getTaxIdType('ES', 'nope')).toBeUndefined()
   })
@@ -107,7 +138,7 @@ describe.each(countries)('$code', country => {
 
   it('rejects real numbers with a wrong check character', () => {
     for (const number of REAL_NUMBERS[country.code]) {
-      const index = CHECK_INDEX[country.code] ?? number.length - 1
+      const index = checkIndex(country.code, number)
       const mutated = mutate(number, index)
       expect(isValidFor(country, mutated), mutated).toBe(false)
     }
@@ -117,9 +148,11 @@ describe.each(countries)('$code', country => {
     for (let i = 0; i < 300; i++) {
       const number = type.generate()
       expect(type.isValid(number), number).toBe(true)
-      // The site's own validator must agree, with and without the country prefix.
-      expect(validateVatNumber(country.code + number).status, number).toBe('valid')
-      expect(validateVatNumber(number, country.code).status, number).toBe('valid')
+      if (isViesCountry(country.code)) {
+        // The site's own validator must agree, with and without the country prefix.
+        expect(validateVatNumber(country.code + number).status, number).toBe('valid')
+        expect(validateVatNumber(number, country.code).status, number).toBe('valid')
+      }
     }
   })
 })

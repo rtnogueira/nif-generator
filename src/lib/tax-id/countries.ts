@@ -1,17 +1,18 @@
 /**
- * Tax number generators, one or more per country of the VIES table (see `@/lib/vat`).
+ * Tax number generators: VAT numbers for every country of the VIES table (see `@/lib/vat`), plus
+ * national tax numbers of other countries.
  *
  * Every check-digit algorithm below is a line-by-line port of python-stdnum
  * (https://github.com/arthurdejong/python-stdnum), the module named in each comment, and is tested
- * against the real, registered VAT numbers collected in that project's test suite. A country is
- * only listed when its algorithm is verified that way. Where a country issues several kinds of VAT
- * number (e.g. legal entities and individuals), only the kind named in `label` is generated.
+ * against the real, registered numbers collected in that project's test suite. A country is only
+ * listed when its algorithm is verified that way; numbers without a check digit (e.g. the US SSN or
+ * EIN) are not. Where a country issues several kinds of number, only the kinds named in `label`
+ * are generated.
  *
- * Each `isValid` checks the national part of the number, without the country prefix.
+ * Each `isValid` checks the national part of the number, without a VIES country prefix.
  */
 import { generateNif, isValidNif, NIF_TYPES } from '@/lib/nif'
-import { randomChar, randomDigits, randomInt } from '@/lib/random'
-import type { VatCountryCode } from '@/lib/vat'
+import { randomChar, randomChoice, randomDigits, randomInt } from '@/lib/random'
 import {
   isLuhnValid,
   isMod11_10Valid,
@@ -39,7 +40,10 @@ export interface TaxIdType {
 }
 
 export interface TaxIdCountry {
-  code: VatCountryCode
+  /** VIES prefix for VIES countries (e.g. `EL` for Greece), ISO 3166-1 alpha-2 otherwise. */
+  code: string
+  /** English name, only for countries outside VIES (VIES countries take theirs from `@/lib/vat`). */
+  name?: string
   types: readonly TaxIdType[]
 }
 
@@ -60,15 +64,17 @@ function rejectionSampler(candidate: () => string, isValid: (n: string) => boole
 }
 
 interface VatTypeDefinition extends Omit<TaxIdType, 'id' | 'badge' | 'generate'> {
+  /** Defaults to `name`; set a short abbreviation when the name is long. */
+  badge?: string
   candidate: () => string
 }
 
 function vatType({ candidate, ...definition }: VatTypeDefinition, id = 'vat'): TaxIdType {
   return {
     id,
-    badge: definition.name,
-    generate: rejectionSampler(candidate, definition.isValid),
     ...definition,
+    badge: definition.badge ?? definition.name,
+    generate: rejectionSampler(candidate, definition.isValid),
   }
 }
 
@@ -150,6 +156,74 @@ const cifChecks = (digits: string) => {
   return [check, 'JABCDEFGHI'[Number(check)]]
 }
 
+// --- Argentina (stdnum.ar.cuit) ------------------------------------------------------------------
+const arRemainder = (body: string) => weightedSum(body, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]) % 11
+const arCheck = (body: string) => '012345678990'[11 - arRemainder(body)]
+
+// --- Brazil (stdnum.br.cpf, stdnum.br.cnpj) ------------------------------------------------------
+function cpfChecks(n: string) {
+  const d1 = mod(11 - weightedSum(n, [10, 9, 8, 7, 6, 5, 4, 3, 2]), 11) % 10
+  const d2 = mod(11 - (weightedSum(n, [11, 10, 9, 8, 7, 6, 5, 4, 3]) + 2 * d1), 11) % 10
+  return `${d1}${d2}`
+}
+function cnpjChecks(n: string) {
+  const d1 = mod(11 - weightedSum(n, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]), 11) % 10
+  const d2 =
+    mod(11 - weightedSum(n.slice(0, 12) + d1, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]), 11) % 10
+  return `${d1}${d2}`
+}
+
+// --- Chile (stdnum.cl.rut) -----------------------------------------------------------------------
+function clCheck(body: string) {
+  const reversed = [...body].reverse()
+  const sum = reversed.reduce((total, d, i) => total + Number(d) * (4 + mod(5 - i, 6)), 0)
+  return '0123456789K'[sum % 11]
+}
+
+// --- Colombia (stdnum.co.nit) --------------------------------------------------------------------
+const CO_WEIGHTS = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71]
+const coCheck = (body: string) =>
+  '01987654321'[weightedSum([...body].reverse().join(''), CO_WEIGHTS.slice(0, body.length)) % 11]
+
+// --- Japan (stdnum.jp.cn) ------------------------------------------------------------------------
+const jpCheck = (body: string) =>
+  String(9 - (weightedSum([...body].reverse().join(''), [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]) % 9))
+
+// --- New Zealand (stdnum.nz.ird) -----------------------------------------------------------------
+function nzCheck(body: string) {
+  const digits = body.padStart(8, '0')
+  const primary = mod(-weightedSum(digits, [3, 2, 7, 6, 5, 4, 3, 2]), 11)
+  if (primary !== 10) return String(primary)
+  return String(mod(-weightedSum(digits, [7, 4, 3, 2, 5, 2, 7, 6]), 11))
+}
+
+// --- Peru (stdnum.pe.ruc) ------------------------------------------------------------------------
+const peCheck = (body: string) =>
+  String((11 - (weightedSum(body, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]) % 11)) % 10)
+
+// --- Switzerland (stdnum.ch.uid) -----------------------------------------------------------------
+const chCheck = (body: string) => String(mod(11 - weightedSum(body, [5, 4, 3, 2, 7, 6, 5, 4]), 11))
+
+// --- Turkey (stdnum.tr.vkn, stdnum.tr.tckimlik) --------------------------------------------------
+function vknCheck(body: string) {
+  let sum = 0
+  ;[...body.slice(0, 9)].reverse().forEach((d, index) => {
+    const i = index + 1
+    const c1 = (Number(d) + i) % 10
+    if (c1) sum += (c1 * 2 ** i) % 9 || 9
+  })
+  return String(mod(10 - sum, 10))
+}
+function tcknChecks(body: string) {
+  const check1 = mod(10 - weightedSum(body, [3, 1, 3, 1, 3, 1, 3, 1, 3]), 10)
+  const check2 = (check1 + weightedSum(body, [1, 1, 1, 1, 1, 1, 1, 1, 1])) % 10
+  return `${check1}${check2}`
+}
+
+// --- Uruguay (stdnum.uy.rut) ---------------------------------------------------------------------
+const uyCheck = (body: string) =>
+  String(mod(-weightedSum(body, [4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]), 11))
+
 // --- United Kingdom and Northern Ireland (stdnum.gb.vat, 9-digit standard numbers) ---------------
 const gbChecksum = (n: string) => weightedSum(n, [8, 7, 6, 5, 4, 3, 2, 10, 1]) % 97
 const GB_VAT = vatType({
@@ -196,6 +270,7 @@ export const TAX_ID_COUNTRIES = [
     types: [
       vatType({
         name: 'Ondernemingsnummer',
+        badge: 'BTW',
         label: 'Enterprise number (VAT number)',
         algorithm: 'Modulo 97, two check digits',
         isValid: n =>
@@ -402,6 +477,7 @@ export const TAX_ID_COUNTRIES = [
     types: [
       vatType({
         name: 'Partita IVA',
+        badge: 'P.IVA',
         label: 'Partita IVA (VAT number)',
         algorithm: 'Luhn, with a valid tax office code in digits 8–10',
         isValid: n =>
@@ -484,6 +560,7 @@ export const TAX_ID_COUNTRIES = [
     types: [
       vatType({
         name: 'Btw-nummer',
+        badge: 'BTW',
         label: 'Btw-nummer (RSIN/BSN + B01)',
         algorithm: 'Elfproef (weighted modulo 11) on the first 9 digits',
         isValid: n =>
@@ -629,4 +706,346 @@ export const TAX_ID_COUNTRIES = [
   },
   { code: 'XI', types: [GB_VAT] },
   { code: 'GB', types: [GB_VAT] },
+  // --- Outside VIES ---------------------------------------------------------------------------
+  {
+    code: 'AR',
+    name: 'Argentina',
+    types: [
+      vatType(
+        {
+          name: 'CUIT',
+          label: 'CUIT/CUIL (individuals: 20, 27; companies: 30)',
+          algorithm: 'Weighted modulo 11 (weights 5, 4, 3, 2, 7, 6, 5, 4, 3, 2)',
+          isValid: n =>
+            /^(20|23|24|27|30|33|34|50|51|55)\d{9}$/.test(n) && arCheck(n.slice(0, 10)) === n[10],
+          candidate: () => {
+            const body = randomChoice(['20', '27', '30']) + randomDigits(8)
+            // A remainder of 1 has no check digit: AFIP then changes the prefix to 23/33 instead.
+            return arRemainder(body) === 1 ? '' : body + arCheck(body)
+          },
+        },
+        'cuit'
+      ),
+    ],
+  },
+  {
+    code: 'AU',
+    name: 'Australia',
+    types: [
+      vatType(
+        {
+          name: 'ABN',
+          label: 'Australian Business Number',
+          algorithm: 'Weighted modulo 89, two leading check digits',
+          isValid: n => {
+            if (!/^\d{11}$/.test(n)) return false
+            const sum = -weightedSum(n.slice(2), [3, 5, 7, 9, 11, 13, 15, 17, 19])
+            return String(11 + mod(sum - 1, 89)) === n.slice(0, 2)
+          },
+          candidate: () => {
+            const body = randomDigits(9)
+            const sum = -weightedSum(body, [3, 5, 7, 9, 11, 13, 15, 17, 19])
+            return String(11 + mod(sum - 1, 89)) + body
+          },
+        },
+        'abn'
+      ),
+      vatType(
+        {
+          name: 'TFN',
+          label: 'Tax File Number (9 digits)',
+          algorithm: 'Weighted modulo 11 (weights 1, 4, 3, 7, 5, 8, 6, 9, 10)',
+          isValid: n =>
+            /^\d{8,9}$/.test(n) && weightedSum(n, [1, 4, 3, 7, 5, 8, 6, 9, 10]) % 11 === 0,
+          candidate: () => {
+            const body = randomChar(NONZERO) + randomDigits(7)
+            return body + mod(weightedSum(body, [1, 4, 3, 7, 5, 8, 6, 9]), 11)
+          },
+        },
+        'tfn'
+      ),
+      vatType(
+        {
+          name: 'ACN',
+          label: 'Australian Company Number',
+          algorithm: 'Weighted modulo 10 (weights 8 to 1)',
+          isValid: n =>
+            /^\d{9}$/.test(n) &&
+            String(mod(-weightedSum(n, [8, 7, 6, 5, 4, 3, 2, 1]), 10)) === n[8],
+          candidate: () => {
+            const body = randomDigits(8)
+            return body + mod(-weightedSum(body, [8, 7, 6, 5, 4, 3, 2, 1]), 10)
+          },
+        },
+        'acn'
+      ),
+    ],
+  },
+  {
+    code: 'BR',
+    name: 'Brazil',
+    types: [
+      vatType(
+        {
+          name: 'CPF',
+          label: 'Cadastro de Pessoas Físicas (individuals)',
+          algorithm: 'Two modulo 11 check digits (weights 10 to 2, then 11 to 2)',
+          isValid: n => /^\d{11}$/.test(n) && Number(n) > 0 && cpfChecks(n) === n.slice(9),
+          candidate: () => {
+            const body = randomDigits(9)
+            // The Receita Federal does not issue CPFs made of a single repeated digit.
+            return /^(\d)\1+$/.test(body) ? '' : body + cpfChecks(body)
+          },
+        },
+        'cpf'
+      ),
+      vatType(
+        {
+          name: 'CNPJ',
+          label: 'Cadastro Nacional da Pessoa Jurídica (companies, head office 0001)',
+          algorithm: 'Two modulo 11 check digits (weights 2 to 9, repeating)',
+          isValid: n =>
+            /^\d{14}$/.test(n) && !n.startsWith('000000000000') && cnpjChecks(n) === n.slice(12),
+          candidate: () => {
+            const body = randomChar(NONZERO) + randomDigits(7) + '0001'
+            return body + cnpjChecks(body)
+          },
+        },
+        'cnpj'
+      ),
+    ],
+  },
+  {
+    code: 'CA',
+    name: 'Canada',
+    types: [
+      vatType(
+        {
+          name: 'BN',
+          label: 'Business Number (9 digits)',
+          algorithm: 'Luhn',
+          isValid: n => /^\d{9}$/.test(n) && isLuhnValid(n),
+          candidate: () => {
+            const body = randomChar(NONZERO) + randomDigits(7)
+            return body + luhnCheckDigit(body)
+          },
+        },
+        'bn'
+      ),
+    ],
+  },
+  {
+    code: 'CL',
+    name: 'Chile',
+    types: [
+      vatType(
+        {
+          name: 'RUT',
+          label: 'Rol Único Tributario (8 digits, dash, check digit)',
+          algorithm: 'Weighted modulo 11 (weights 2 to 7, repeating), check 0–9 or K',
+          isValid: n => /^\d{7,8}-[\dK]$/.test(n) && clCheck(n.slice(0, -2)) === n.slice(-1),
+          candidate: () => {
+            const body = randomChar(NONZERO) + randomDigits(7)
+            return `${body}-${clCheck(body)}`
+          },
+        },
+        'rut'
+      ),
+    ],
+  },
+  {
+    code: 'CO',
+    name: 'Colombia',
+    types: [
+      vatType(
+        {
+          name: 'NIT',
+          label: 'Número de Identificación Tributaria (company, 9 digits, dash, check digit)',
+          algorithm: 'Weighted modulo 11 (prime weights 3, 7, 13, 17, …)',
+          isValid: n => /^\d{7,15}-\d$/.test(n) && coCheck(n.slice(0, -2)) === n.slice(-1),
+          candidate: () => {
+            const body = randomChar('89') + randomDigits(8)
+            return `${body}-${coCheck(body)}`
+          },
+        },
+        'nit'
+      ),
+    ],
+  },
+  {
+    code: 'JP',
+    name: 'Japan',
+    types: [
+      vatType(
+        {
+          name: 'Hōjin bangō',
+          badge: 'CN',
+          label: 'Corporate Number (13 digits, leading check digit)',
+          algorithm: 'Weighted modulo 9 (weights 1, 2), check digit first',
+          isValid: n => /^\d{13}$/.test(n) && jpCheck(n.slice(1)) === n[0],
+          candidate: () => {
+            const body = randomDigits(12)
+            return jpCheck(body) + body
+          },
+        },
+        'cn'
+      ),
+    ],
+  },
+  {
+    code: 'NZ',
+    name: 'New Zealand',
+    types: [
+      vatType(
+        {
+          name: 'IRD',
+          label: 'IRD number (9 digits)',
+          algorithm: 'Weighted modulo 11 (weights 3, 2, 7, 6, 5, 4, 3, 2, fallback weights)',
+          isValid: n =>
+            /^\d{8,9}$/.test(n) &&
+            Number(n) > 10_000_000 &&
+            Number(n) < 150_000_000 &&
+            nzCheck(n.slice(0, -1)) === n.slice(-1),
+          candidate: () => {
+            const body = String(10_000_000 + randomInt(5_000_000))
+            return body + nzCheck(body)
+          },
+        },
+        'ird'
+      ),
+    ],
+  },
+  {
+    code: 'NO',
+    name: 'Norway',
+    types: [
+      vatType(
+        {
+          name: 'Orgnr',
+          label: 'Organisasjonsnummer (the MVA number is this + "MVA")',
+          algorithm: 'Weighted modulo 11 (weights 3, 2, 7, 6, 5, 4, 3, 2)',
+          isValid: n => /^\d{9}$/.test(n) && weightedSum(n, [3, 2, 7, 6, 5, 4, 3, 2, 1]) % 11 === 0,
+          candidate: () => {
+            const body = randomChar('89') + randomDigits(7)
+            return body + mod(-weightedSum(body, [3, 2, 7, 6, 5, 4, 3, 2]), 11)
+          },
+        },
+        'orgnr'
+      ),
+    ],
+  },
+  {
+    code: 'PE',
+    name: 'Peru',
+    types: [
+      vatType(
+        {
+          name: 'RUC',
+          label: 'Registro Único de Contribuyentes (companies: 20, individuals: 10)',
+          algorithm: 'Weighted modulo 11 (weights 5, 4, 3, 2, 7, 6, 5, 4, 3, 2)',
+          isValid: n => /^(10|15|17|20)\d{9}$/.test(n) && peCheck(n.slice(0, 10)) === n[10],
+          candidate: () => {
+            const body = randomChoice(['10', '20']) + randomDigits(8)
+            return body + peCheck(body)
+          },
+        },
+        'ruc'
+      ),
+    ],
+  },
+  {
+    code: 'ZA',
+    name: 'South Africa',
+    types: [
+      vatType(
+        {
+          name: 'TIN',
+          label: 'Tax reference number (10 digits)',
+          algorithm: 'Luhn',
+          isValid: n => /^[01239]\d{9}$/.test(n) && isLuhnValid(n),
+          candidate: () => {
+            const body = randomChar('01239') + randomDigits(8)
+            return body + luhnCheckDigit(body)
+          },
+        },
+        'tin'
+      ),
+    ],
+  },
+  {
+    code: 'CH',
+    name: 'Switzerland',
+    types: [
+      vatType(
+        {
+          name: 'UID',
+          label: 'Unternehmens-Identifikationsnummer (CHE + 9 digits; the VAT number adds MWST)',
+          algorithm: 'Weighted modulo 11 (weights 5, 4, 3, 2, 7, 6, 5, 4)',
+          isValid: n => /^CHE\d{9}$/.test(n) && chCheck(n.slice(3, 11)) === n[11],
+          candidate: () => {
+            const body = randomChar(NONZERO) + randomDigits(7)
+            return `CHE${body}${chCheck(body)}`
+          },
+        },
+        'uid'
+      ),
+    ],
+  },
+  {
+    code: 'TR',
+    name: 'Turkey',
+    types: [
+      vatType(
+        {
+          name: 'VKN',
+          label: 'Vergi Kimlik Numarası (businesses, 10 digits)',
+          algorithm: 'Positional powers of 2 modulo 9',
+          isValid: n => /^\d{10}$/.test(n) && vknCheck(n) === n[9],
+          candidate: () => {
+            const body = randomDigits(9)
+            return body + vknCheck(body)
+          },
+        },
+        'vkn'
+      ),
+      vatType(
+        {
+          name: 'TCKN',
+          label: 'T.C. Kimlik No. (individuals, 11 digits)',
+          algorithm: 'Two modulo 10 check digits (weights 3, 1)',
+          isValid: n => /^[1-9]\d{10}$/.test(n) && tcknChecks(n) === n.slice(9),
+          candidate: () => {
+            const body = randomChar(NONZERO) + randomDigits(8)
+            return body + tcknChecks(body)
+          },
+        },
+        'tckn'
+      ),
+    ],
+  },
+  {
+    code: 'UY',
+    name: 'Uruguay',
+    types: [
+      vatType(
+        {
+          name: 'RUT',
+          label: 'Registro Único Tributario (12 digits)',
+          algorithm: 'Weighted modulo 11 (weights 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2)',
+          isValid: n =>
+            /^\d{12}$/.test(n) &&
+            n.slice(0, 2) >= '01' &&
+            n.slice(0, 2) <= '22' &&
+            n.slice(2, 8) !== '000000' &&
+            n.slice(8, 11) === '001' &&
+            uyCheck(n.slice(0, 11)) === n[11],
+          candidate: () => {
+            const body = pad2(1 + randomInt(22)) + randomDigits(6) + '001'
+            return body + uyCheck(body)
+          },
+        },
+        'rut'
+      ),
+    ],
+  },
 ] as const satisfies readonly TaxIdCountry[]

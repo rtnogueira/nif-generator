@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { downloadXlsxColumn } from '@/lib/export-xlsx'
 import { isValidNif } from '@/lib/nif'
+import { getTaxIdType } from '@/lib/tax-id'
 import { validateVatNumber } from '@/lib/vat'
 import { createAppRouter } from '@/router'
 
@@ -138,6 +139,18 @@ describe('NIF generator page', () => {
     await user.click(screen.getByRole('button', { name: 'Generate' }))
     const [nie] = generatedNifs(/^Copy [XYZ]\d{7}[A-Z]$/)
     expect(validateVatNumber(nie, 'ES').status).toBe('valid')
+  })
+
+  it('generates tax numbers outside VIES, without the prefix option', async () => {
+    const user = await renderApp()
+
+    await user.click(screen.getByRole('combobox', { name: 'Country' }))
+    await user.click(await screen.findByRole('option', { name: /Brazil/ }))
+    expect(screen.queryByLabelText(/Include the .* prefix/)).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+    const [cpf] = generatedNifs(/^Copy \d{11}$/)
+    expect(getTaxIdType('BR', 'cpf')?.isValid(cpf)).toBe(true)
   })
 
   it('renders the site chrome', async () => {

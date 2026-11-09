@@ -7,9 +7,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { MAX_QUANTITY, NIF_TYPES } from '@/lib/nif'
-import { getTaxIdCountryName, TAX_ID_COUNTRIES } from '@/lib/tax-id'
+import { getTaxIdCountryName, isViesCountry, TAX_ID_COUNTRIES } from '@/lib/tax-id'
 
 const STDNUM_URL = 'https://github.com/arthurdejong/python-stdnum'
+
+const SUPPORTED_OUTSIDE_VIES = TAX_ID_COUNTRIES.filter(c => !isViesCountry(c.code)).length
 
 /** One row per country and number type, sorted by country name. Portugal is summarised in one row. */
 const SUPPORTED = TAX_ID_COUNTRIES.flatMap(country =>
@@ -52,8 +54,7 @@ const FAQ = [
           python-stdnum
         </a>
         , a widely used open-source library of identifier validators, and is tested against real,
-        registered VAT numbers. Countries are only included when their algorithm is verified that
-        way.
+        registered numbers. Countries are only included when their algorithm is verified that way.
       </>
     ),
   },
@@ -142,8 +143,10 @@ export function NifAbout() {
         </h2>
         <p>
           Besides Portugal, the generator creates VAT identification numbers for every country in
-          the EU&apos;s VIES system. Numbers are shown without the country prefix by default; tick
-          &ldquo;Include the prefix&rdquo; to get the full VAT format (e.g.{' '}
+          the EU&apos;s VIES system, plus the main tax numbers of {SUPPORTED_OUTSIDE_VIES} other
+          countries. Only numbers with a published check digit are included, so numbers such as the
+          US SSN or EIN, which have none, are not. VIES numbers are shown without the country prefix
+          by default; tick &ldquo;Include the prefix&rdquo; to get the full VAT format (e.g.{' '}
           <span className="font-mono text-foreground">DE</span> followed by 9 digits).
         </p>
         <div className="rounded-lg border">
