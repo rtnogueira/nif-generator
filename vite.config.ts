@@ -6,9 +6,9 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => ({
-  // GitHub Pages serves the app from /nif-generator/; everything else derives from BASE_URL.
-  base: mode === 'production' ? '/nif-generator/' : '/',
+export default defineConfig(() => ({
+  // Served from the root of the custom domain (rtnogueira.com) on GitHub Pages.
+  base: '/',
   plugins: [
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),
