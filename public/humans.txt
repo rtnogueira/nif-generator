@@ -1,14 +1,14 @@
 /* TEAM */
-Developer: NIF Generator Team
+Developer: Tiago Nogueira (rtnogueira)
 Site: https://rtnogueira.github.io/nif-generator/
 Location: Portugal
 
 /* THANKS */
-React, Material-UI, Redux
+React, TanStack Router, Tailwind CSS, shadcn/ui
 
 /* SITE */
-Last update: 2025/12/14
+Last update: 2026/11/09
 Standards: HTML5, CSS3, JavaScript ES6+
-Components: React, Redux, Material-UI
+Components: React, TanStack Router, Tailwind CSS, shadcn/ui, Radix UI
 Software: Visual Studio Code, Node.js, pnpm
 

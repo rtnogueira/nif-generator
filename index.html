@@ -2,9 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="shortcut icon" href="/logo.png" />
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
@@ -19,82 +19,92 @@
     </script>
     
     <!-- Primary Meta Tags -->
-    <title>NIF Generator - Portuguese Tax Number Generator for QA Testing</title>
-    <meta name="title" content="NIF Generator - Portuguese Tax Number Generator for QA Testing" />
-    <meta name="description" content="Free online tool to generate valid Portuguese NIF (Tax Identification Numbers) for QA testing. Supports individual, corporate, and non-resident tax numbers. Perfect for developers and QA testers." />
-    <meta name="keywords" content="NIF generator, Portuguese tax number, Portuguese NIF, tax identification number, QA testing, test data generator, Portugal NIF, numero fiscal, gerador NIF" />
-    <meta name="author" content="NIF Generator" />
-    <meta name="robots" content="index, follow" />
-    <meta name="language" content="English" />
-    <meta name="revisit-after" content="7 days" />
-    
+    <title>Portuguese Tax Number Generator (NIF) | rtnogueira</title>
+    <meta name="description" content="Free online Portuguese NIF generator (gerador de NIF). Instantly create valid número de contribuinte for individuals, companies and non-residents to test forms and systems. Copy or export to Excel." />
+    <meta name="author" content="Tiago Nogueira" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://rtnogueira.github.io/nif-generator/" />
-    
-    <!-- Open Graph / Facebook -->
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://rtnogueira.github.io/nif-generator/" />
-    <meta property="og:title" content="NIF Generator - Portuguese Tax Number Generator for QA Testing" />
-    <meta property="og:description" content="Free online tool to generate valid Portuguese NIF (Tax Identification Numbers) for QA testing. Supports individual, corporate, and non-resident tax numbers." />
-    <meta property="og:image" content="https://rtnogueira.github.io/nif-generator/logo.png" />
-    <meta property="og:site_name" content="NIF Generator" />
+    <meta property="og:title" content="Portuguese Tax Number Generator (NIF) | rtnogueira" />
+    <meta property="og:description" content="Free online tool to generate valid Portuguese NIFs (número de contribuinte) for QA testing. Individuals, companies, non-residents and more." />
+    <meta property="og:image" content="https://rtnogueira.github.io/nif-generator/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="rtnogueira – Tax Number Generator: valid Portuguese NIFs for QA testing" />
+    <meta property="og:site_name" content="rtnogueira" />
     <meta property="og:locale" content="en_US" />
-    
+
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://rtnogueira.github.io/nif-generator/" />
-    <meta property="twitter:title" content="NIF Generator - Portuguese Tax Number Generator for QA Testing" />
-    <meta property="twitter:description" content="Free online tool to generate valid Portuguese NIF (Tax Identification Numbers) for QA testing. Supports individual, corporate, and non-resident tax numbers." />
-    <meta property="twitter:image" content="https://rtnogueira.github.io/nif-generator/logo.png" />
-    
-    <!-- Additional SEO -->
-    <meta name="application-name" content="NIF Generator" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Portuguese Tax Number Generator (NIF) | rtnogueira" />
+    <meta name="twitter:description" content="Free online tool to generate valid Portuguese NIFs (número de contribuinte) for QA testing." />
+    <meta name="twitter:image" content="https://rtnogueira.github.io/nif-generator/og-image.jpg" />
+    <meta name="twitter:image:alt" content="rtnogueira – Tax Number Generator: valid Portuguese NIFs for QA testing" />
+
+    <!-- App -->
+    <meta name="application-name" content="rtnogueira" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="NIF Generator" />
+    <meta name="apple-mobile-web-app-title" content="rtnogueira" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="mobile-web-app-capable" content="yes" />
-    
+
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json" />
     <link rel="author" href="/humans.txt" />
-    
+
     <!-- Structured Data / JSON-LD -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "NIF Generator",
-      "url": "https://rtnogueira.github.io/nif-generator/",
-      "description": "Free online tool to generate valid Portuguese NIF (Tax Identification Numbers) for QA testing and development purposes.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "author": {
-        "@type": "Organization",
-        "name": "NIF Generator"
-      },
-      "browserRequirements": "Requires JavaScript. Requires HTML5.",
-      "softwareVersion": "1.0.0",
-      "featureList": [
-        "Generate Portuguese NIF numbers",
-        "Support for individual tax numbers",
-        "Support for corporate tax numbers",
-        "Support for non-resident tax numbers",
-        "Export to Excel (.xlsx)",
-        "Copy to clipboard",
-        "Generate multiple NIFs at once"
-      ],
-      "screenshot": "https://rtnogueira.github.io/nif-generator/logo.png"
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://rtnogueira.github.io/nif-generator/#website",
+          "name": "rtnogueira",
+          "url": "https://rtnogueira.github.io/nif-generator/",
+          "inLanguage": "en",
+          "image": "https://rtnogueira.github.io/nif-generator/logo.png"
+        },
+        {
+          "@type": "WebApplication",
+          "name": "Tax Number Generator",
+          "alternateName": ["Portuguese NIF Generator", "Gerador de NIF"],
+          "url": "https://rtnogueira.github.io/nif-generator/",
+          "isPartOf": { "@id": "https://rtnogueira.github.io/nif-generator/#website" },
+          "description": "Free online tool to generate valid Portuguese NIFs (Número de Identificação Fiscal / número de contribuinte) for QA testing and development.",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Any",
+          "browserRequirements": "Requires JavaScript.",
+          "isAccessibleForFree": true,
+          "inLanguage": "en",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+          "author": {
+            "@type": "Person",
+            "name": "Tiago Nogueira",
+            "url": "https://github.com/rtnogueira"
+          },
+          "featureList": [
+            "Generate valid Portuguese NIF numbers",
+            "Individual, corporate, public administration and non-resident NIF prefixes",
+            "Generate up to 50 unique NIFs at once",
+            "Copy to clipboard",
+            "Export to Excel (.xlsx)"
+          ],
+          "image": "https://rtnogueira.github.io/nif-generator/og-image.jpg"
+        }
+      ]
     }
     </script>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>The rtnogueira Tax Number Generator generates valid Portuguese tax identification numbers (NIF) for QA testing. You need to enable JavaScript to use it.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1797239821173252"
