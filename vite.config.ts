@@ -1,17 +1,23 @@
-/// <reference types="vitest" />
+import tailwindcss from '@tailwindcss/vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import react from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'node:url'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { defineConfig } from 'vite'
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig } from 'vitest/config'
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [TanStackRouterVite(), react(),
-  visualizer({
-    filename: `stats.html`,
-    open: true
-  })],
-  base: process.env.NODE_ENV === 'production' ? '/nif-generator/' : '/',
+// https://vite.dev/config/
+export default defineConfig(({ mode }) => ({
+  // GitHub Pages serves the app from /nif-generator/; everything else derives from BASE_URL.
+  base: mode === 'production' ? '/nif-generator/' : '/',
+  plugins: [
+    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
+    react(),
+    tailwindcss(),
+    !!process.env.ANALYZE && visualizer({ filename: 'stats.html', open: true, gzipSize: true }),
+  ],
+  resolve: {
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+  },
   server: {
     port: 3000,
     open: true,
@@ -20,28 +26,15 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
   },
-  optimizeDeps: {
-    esbuildOptions: {
-      loader: {
-        '.js': 'jsx' as const,
-      },
-    },
-  },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: './vitest.setup.ts',
+    include: ['src/**/*.test.{ts,tsx}'],
     coverage: {
-      reportsDirectory: `./coverage`,
-      all: true,
-      clean: true,
-      enabled: true,
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/routeTree.gen.ts', 'src/components/ui/**', 'src/**/*.test.{ts,tsx}'],
     },
-    exclude: [
-      '**/node_modules/**',
-      '**/coverage/**',
-      '**/.{idea,git,cache,output,temp,husky,github}/**',
-      '**/{vite,vitest}.config.*',
-    ],
   },
-})
+}))

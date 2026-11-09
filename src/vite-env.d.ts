@@ -1,10 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly PROD: boolean
-  readonly DEV: boolean
-  readonly MODE: string
-  readonly PUBLIC_URL?: string
+  /** Google Analytics 4 measurement ID (e.g. G-XXXXXXX). Analytics is disabled when unset. */
+  readonly VITE_GA_MEASUREMENT_ID?: string
 }
 
 interface ImportMeta {
