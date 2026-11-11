@@ -1,18 +1,18 @@
 [![CI/CD](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml)
 
-# Tax Number Generator & Validator (NIF, EU VAT and more)
+# Tax ID Generator & Validator (NIF, EU VAT, CPF and more)
 
-**Free online tools to generate and validate tax identification numbers for QA testing and development: Portuguese NIFs of every type, EU VAT numbers and national tax numbers of 14 more countries.**
+**Free online tools to generate and validate tax identification numbers (tax IDs, or TINs) for QA testing and development: Portuguese NIFs of every type, EU VAT numbers and national tax numbers of 14 more countries.**
 
 🔗 **Live App:** https://rtnogueira.com/
 
-## 🧾 What is a tax identification number?
+## 🧾 What is a tax ID?
 
 Most countries give every taxpayer a tax identification number: the Portuguese NIF (Número de Identificação Fiscal, or *número de contribuinte*), the VAT numbers of EU companies, the Brazilian CPF and CNPJ, the Australian ABN and many more. Most end with a check digit computed from the other digits, so forms can reject mistyped numbers. Testing those forms needs valid numbers that belong to no one, and invalid ones that should be rejected.
 
 ## ✨ Features
 
-### Tax number generator (`/`)
+### Tax ID generator (`/`)
 
 - 🇵🇹 Portuguese NIFs of every taxpayer type (individuals, companies, non-residents, public administration, investment funds and more; see [NIF types](#-nif-types-supported))
 - 🌍 VAT numbers for all 27 EU member states, Northern Ireland and the UK (optionally with the country prefix), plus tax numbers from 14 more countries, all with a correct check digit. See [Supported countries](#-supported-countries)
@@ -22,8 +22,11 @@ Most countries give every taxpayer a tax identification number: the Portuguese N
 - 📋 Copy a single number or the whole list (one per line, comma-separated or as a JSON array)
 - 📄 Export to Excel (.xlsx), CSV, JSON or plain text
 - 🔗 The options are kept in the URL (e.g. `/?country=BR&type=cpf&qty=20&format=1`), so a setup can be bookmarked or shared
+- 🎯 Landing pages for the most searched numbers, with the form preset and their own explanations: [`/nif-generator`](https://rtnogueira.com/nif-generator), [`/vat-number-generator`](https://rtnogueira.com/vat-number-generator) and [`/cpf-generator`](https://rtnogueira.com/cpf-generator)
 
-### Tax number validator (`/tax-number-validator`)
+### Tax ID validator (`/tax-id-validator`)
+
+The former address, `/tax-number-validator`, redirects here.
 
 - 🛡️ Checks EU VAT numbers (all 27 member states, Northern Ireland and the UK) against the official structure published by the European Commission ([VIES](https://ec.europa.eu/taxation_customs/vies/#/faq)), detecting the country from the prefix
 - ✅ Verifies the check digit of every kind of number the generator supports, including the 14 countries outside VIES, and names the kind of number that matched
@@ -34,6 +37,7 @@ Most countries give every taxpayer a tax identification number: the Portuguese N
 - 🔒 Everything runs in the browser; no number is sent to a server
 - 🐞 Bug reports and feature requests through GitHub issue forms, linked from the footer
 - 🌗 Light and dark mode, responsive layout
+- 🔎 Every page is prerendered at build time with its own title, description, canonical URL and structured data (`src/lib/pages.ts`), so crawlers that do not run JavaScript see the full content; the build also writes `sitemap.xml`
 
 ## 🎯 Use Cases
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useDocumentTitle } from '@/hooks/use-document-title'
+import { usePageMeta } from '@/hooks/use-page-meta'
 import { GITHUB_REPO_URL, SITE_NAME } from '@/lib/site'
 
 const LAST_UPDATED = '11 November 2026'
@@ -27,7 +27,7 @@ function ExternalLink({ href, children }: { href: string; children: ReactNode })
 }
 
 export function PrivacyPolicy() {
-  useDocumentTitle(`Privacy Policy | ${SITE_NAME}`)
+  usePageMeta('/privacy')
 
   return (
     <article className="flex max-w-3xl flex-col gap-8 text-muted-foreground">

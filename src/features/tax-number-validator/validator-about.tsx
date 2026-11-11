@@ -53,7 +53,7 @@ const FAQ = [
         <ExternalLink href={STDNUM_URL}>python-stdnum</ExternalLink> library and tested against
         real, registered numbers from its test suite. They are the same algorithms the{' '}
         <Link to="/" className="font-medium text-foreground underline underline-offset-4">
-          tax number generator
+          tax ID generator
         </Link>{' '}
         uses.
       </>

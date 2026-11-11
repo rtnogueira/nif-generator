@@ -5,14 +5,14 @@ import { newIssueUrl } from '@/lib/site'
 export const TOOLS = [
   {
     to: '/',
-    label: 'Tax number generator',
-    description: 'Valid or invalid NIFs, EU VAT and other tax numbers for testing.',
+    label: 'Tax ID generator',
+    description: 'Valid or invalid NIFs, EU VAT and other tax IDs for testing.',
     icon: ReceiptTextIcon,
   },
   {
-    to: '/tax-number-validator',
-    label: 'Tax number validator',
-    description: 'Check the check digit of NIFs, EU VAT and other tax numbers.',
+    to: '/tax-id-validator',
+    label: 'Tax ID validator',
+    description: 'Check the check digit of NIFs, EU VAT and other tax IDs.',
     icon: ShieldCheckIcon,
   },
 ] as const

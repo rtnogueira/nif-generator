@@ -14,7 +14,7 @@ async function renderApp(url = '/') {
   const user = userEvent.setup()
   const router = createAppRouter(createMemoryHistory({ initialEntries: [url] }))
   render(<RouterProvider router={router} />)
-  await screen.findByRole('heading', { name: 'Tax Number Generator' })
+  await screen.findByRole('heading', { name: 'Tax ID Generator' })
   return user
 }
 
@@ -22,7 +22,7 @@ async function renderAppWithRouter(url = '/') {
   const user = userEvent.setup()
   const router = createAppRouter(createMemoryHistory({ initialEntries: [url] }))
   render(<RouterProvider router={router} />)
-  await screen.findByRole('heading', { name: 'Tax Number Generator' })
+  await screen.findByRole('heading', { name: 'Tax ID Generator' })
   return { user, router }
 }
 
@@ -53,7 +53,7 @@ describe('NIF generator page', () => {
     const user = await renderApp()
 
     await user.click(screen.getByRole('button', { name: 'Tools' }))
-    expect(await screen.findByRole('link', { name: /Tax number generator/ })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: /Tax ID generator/ })).toHaveAttribute(
       'href',
       '/'
     )
@@ -322,16 +322,14 @@ describe('NIF generator page', () => {
     await user.click(screen.getByRole('button', { name: 'Open menu' }))
     const items = await screen.findAllByRole('menuitem')
     expect(items.map(item => item.textContent)).toEqual([
-      'Tax number generator',
-      'Tax number validator',
+      'Tax ID generator',
+      'Tax ID validator',
       'Report a bug',
       'Suggest a feature',
     ])
 
-    await user.click(screen.getByRole('menuitem', { name: 'Tax number validator' }))
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'Tax Number Validator' })
-    ).toBeVisible()
+    await user.click(screen.getByRole('menuitem', { name: 'Tax ID validator' }))
+    expect(await screen.findByRole('heading', { level: 1, name: 'Tax ID Validator' })).toBeVisible()
   })
 
   it('explains tax numbers in general, not only Portuguese NIFs', async () => {
@@ -339,15 +337,16 @@ describe('NIF generator page', () => {
     const headings = screen.getAllByRole('heading', { level: 2 }).map(h => h.textContent)
 
     expect(headings).toEqual([
-      'What is a tax identification number?',
+      'What is a tax ID?',
       'How do check digits work?',
       'Supported countries',
       'Portuguese NIF types',
       'Frequently asked questions',
+      'Related tools',
     ])
-    expect(screen.getByRole('link', { name: 'tax number validator' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'tax ID validator' })).toHaveAttribute(
       'href',
-      '/tax-number-validator'
+      '/tax-id-validator'
     )
   })
 
@@ -359,5 +358,93 @@ describe('NIF generator page', () => {
     expect(within(footer).getByRole('link', { name: /buy me a coffee/i })).toBeInTheDocument()
     expect(within(footer).getByText(/For QA testing purposes only/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /switch to (dark|light) mode/i })).toBeInTheDocument()
+  })
+})
+
+describe('Generator landing pages', () => {
+  async function renderPage(url: string, heading: string) {
+    const user = userEvent.setup()
+    const router = createAppRouter(createMemoryHistory({ initialEntries: [url] }))
+    render(<RouterProvider router={router} />)
+    await screen.findByRole('heading', { level: 1, name: heading })
+    return { user, router }
+  }
+
+  it('presets the CPF page to formatted Brazilian CPFs and keeps its own address', async () => {
+    const { user, router } = await renderPage('/cpf-generator', 'CPF Generator')
+
+    expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('Brazil')
+    expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('CPF')
+    expect(screen.getByLabelText('Formatted')).toBeChecked()
+    expect(document.title).toBe('CPF Generator: valid Brazilian CPF & CNPJ numbers | rtnogueira')
+
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+    const [button] = resultRows(/^Copy \d{3}\.\d{3}\.\d{3}-\d{2}$/)
+    const cpf = (button.getAttribute('aria-label') ?? '').slice(5)
+    expect(validateTaxNumber(cpf, 'BR')).toMatchObject({ status: 'valid' })
+    expect(router.state.location.pathname).toBe('/cpf-generator')
+    expect(router.state.location.searchStr).toBe('?country=BR&type=cpf&qty=1&format=1')
+  })
+
+  it('presets the VAT page to German VAT numbers with the prefix', async () => {
+    await renderPage('/vat-number-generator', 'VAT Number Generator')
+
+    expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('Germany')
+    expect(screen.getByLabelText('Include the DE prefix')).toBeChecked()
+  })
+
+  it('lets options in the URL override the preset', async () => {
+    await renderPage('/nif-generator?country=BR&type=cnpj&qty=2', 'NIF Generator')
+
+    expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('Brazil')
+    expect(resultRows(/^Copy \d{14}$/)).toHaveLength(2)
+  })
+
+  it('links to the other tools but not to itself', async () => {
+    await renderPage('/nif-generator', 'NIF Generator')
+    const related = screen.getByRole('navigation', { name: 'Related tools' })
+
+    expect(
+      within(related)
+        .getAllByRole('link')
+        .map(link => link.getAttribute('href'))
+    ).toEqual(['/', '/vat-number-generator', '/cpf-generator', '/tax-id-validator'])
+  })
+
+  it('updates the description and canonical URL on navigation', async () => {
+    document.head.innerHTML =
+      '<meta name="description" content=""><link rel="canonical" href="">' +
+      '<meta property="og:url" content=""><meta property="og:title" content="">'
+    const { user } = await renderPage('/', 'Tax ID Generator')
+
+    const related = screen.getByRole('navigation', { name: 'Related tools' })
+    await user.click(within(related).getByRole('link', { name: /VAT number generator/ }))
+    await screen.findByRole('heading', { level: 1, name: 'VAT Number Generator' })
+
+    expect(document.querySelector('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://rtnogueira.com/vat-number-generator'
+    )
+    expect(document.querySelector('meta[property="og:url"]')).toHaveAttribute(
+      'content',
+      'https://rtnogueira.com/vat-number-generator'
+    )
+    expect(document.querySelector('meta[property="og:title"]')).toHaveAttribute(
+      'content',
+      document.title
+    )
+    expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toMatch(
+      /^Generate random, valid EU VAT numbers/
+    )
+  })
+
+  it('redirects the former validator address', async () => {
+    const router = createAppRouter(
+      createMemoryHistory({ initialEntries: ['/tax-number-validator'] })
+    )
+    render(<RouterProvider router={router} />)
+
+    await screen.findByRole('heading', { level: 1, name: 'Tax ID Validator' })
+    expect(router.state.location.pathname).toBe('/tax-id-validator')
   })
 })
