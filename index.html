@@ -19,8 +19,8 @@
     </script>
     
     <!-- Primary Meta Tags -->
-    <title>Portuguese Tax Number Generator (NIF) | rtnogueira</title>
-    <meta name="description" content="Free online Portuguese NIF generator (gerador de NIF). Instantly create valid número de contribuinte for individuals, companies and non-residents to test forms and systems. Copy or export to Excel." />
+    <title>Tax Number Generator: NIF, EU VAT &amp; more | rtnogueira</title>
+    <meta name="description" content="Free tax number generator for QA testing: valid or invalid Portuguese NIFs, EU VAT numbers, CPF, CNPJ, ABN and more. Copy or export to Excel, CSV or JSON." />
     <meta name="author" content="Tiago Nogueira" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
 
@@ -30,22 +30,22 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://rtnogueira.com/" />
-    <meta property="og:title" content="Portuguese Tax Number Generator (NIF) | rtnogueira" />
-    <meta property="og:description" content="Free online tool to generate valid Portuguese NIFs (número de contribuinte) for QA testing. Individuals, companies, non-residents and more." />
+    <meta property="og:title" content="Tax Number Generator: NIF, EU VAT &amp; more | rtnogueira" />
+    <meta property="og:description" content="Generate valid or deliberately invalid tax numbers for QA testing: Portuguese NIFs, EU VAT numbers, Brazilian CPF and CNPJ and more, with a matching validator." />
     <meta property="og:image" content="https://rtnogueira.com/og-image.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="rtnogueira – Tax Number Generator: valid Portuguese NIFs for QA testing" />
+    <meta property="og:image:alt" content="rtnogueira – Tax Number Generator and Validator: NIFs, EU VAT numbers and more for QA testing" />
     <meta property="og:site_name" content="rtnogueira" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Portuguese Tax Number Generator (NIF) | rtnogueira" />
-    <meta name="twitter:description" content="Free online tool to generate valid Portuguese NIFs (número de contribuinte) for QA testing." />
+    <meta name="twitter:title" content="Tax Number Generator: NIF, EU VAT &amp; more | rtnogueira" />
+    <meta name="twitter:description" content="Generate valid or deliberately invalid tax numbers for QA testing: Portuguese NIFs, EU VAT numbers, Brazilian CPF and CNPJ and more, with a matching validator." />
     <meta name="twitter:image" content="https://rtnogueira.com/og-image.jpg" />
-    <meta name="twitter:image:alt" content="rtnogueira – Tax Number Generator: valid Portuguese NIFs for QA testing" />
+    <meta name="twitter:image:alt" content="rtnogueira – Tax Number Generator and Validator: NIFs, EU VAT numbers and more for QA testing" />
 
     <!-- App -->
     <meta name="application-name" content="rtnogueira" />
@@ -78,10 +78,10 @@
         {
           "@type": "WebApplication",
           "name": "Tax Number Generator",
-          "alternateName": ["Portuguese NIF Generator", "Gerador de NIF"],
+          "alternateName": ["NIF Generator", "Gerador de NIF", "EU VAT Number Generator"],
           "url": "https://rtnogueira.com/",
           "isPartOf": { "@id": "https://rtnogueira.com/#website" },
-          "description": "Free online tool to generate valid Portuguese NIFs (Número de Identificação Fiscal / número de contribuinte) for QA testing and development.",
+          "description": "Free online tool to generate valid or deliberately invalid tax identification numbers for QA testing and development: Portuguese NIFs (número de contribuinte), EU VAT numbers and national tax numbers of 14 more countries.",
           "applicationCategory": "DeveloperApplication",
           "operatingSystem": "Any",
           "browserRequirements": "Requires JavaScript.",
@@ -94,11 +94,16 @@
             "url": "https://github.com/rtnogueira"
           },
           "featureList": [
-            "Generate valid Portuguese NIF numbers",
-            "Individual, corporate, public administration and non-resident NIF prefixes",
-            "Generate up to 50 unique NIFs at once",
-            "Copy to clipboard",
-            "Export to Excel (.xlsx)"
+            "Portuguese NIFs of every taxpayer type",
+            "VAT numbers for all 27 EU member states, Northern Ireland and the United Kingdom",
+            "Tax numbers of 14 more countries, such as the Brazilian CPF and CNPJ and the Australian ABN",
+            "Deliberately invalid numbers (wrong check digit or wrong length)",
+            "Numbers in their usual written form",
+            "Up to 50 unique numbers at once",
+            "Copy to clipboard as lines, a comma-separated list or a JSON array",
+            "Export to Excel (.xlsx), CSV, JSON or text",
+            "Shareable options in the page address",
+            "Tax number validator with check-digit verification"
           ],
           "image": "https://rtnogueira.com/og-image.jpg"
         }
@@ -107,7 +112,7 @@
     </script>
   </head>
   <body>
-    <noscript>The rtnogueira Tax Number Generator generates valid Portuguese tax identification numbers (NIF) for QA testing. You need to enable JavaScript to use it.</noscript>
+    <noscript>The rtnogueira Tax Number Generator creates valid tax identification numbers for QA testing: Portuguese NIFs, EU VAT numbers and more. You need to enable JavaScript to use it.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
     <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="rubentiagor" data-description="Support me on Buy me a coffee!" data-message="If this tool has been been helpful to you, consider supporting the project. Your support helps keep the site online and allows me to improve and maintain it. ☕️" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>

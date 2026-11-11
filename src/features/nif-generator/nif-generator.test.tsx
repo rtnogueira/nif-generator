@@ -265,6 +265,23 @@ describe('NIF generator page', () => {
     expect(feature.searchParams.get('template')).toBe('feature_request.yml')
   })
 
+  it('explains tax numbers in general, not only Portuguese NIFs', async () => {
+    await renderApp()
+    const headings = screen.getAllByRole('heading', { level: 2 }).map(h => h.textContent)
+
+    expect(headings).toEqual([
+      'What is a tax identification number?',
+      'How do check digits work?',
+      'Supported countries',
+      'Portuguese NIF types',
+      'Frequently asked questions',
+    ])
+    expect(screen.getByRole('link', { name: 'tax number validator' })).toHaveAttribute(
+      'href',
+      '/tax-number-validator'
+    )
+  })
+
   it('renders the site chrome', async () => {
     await renderApp()
     const footer = screen.getByRole('contentinfo')

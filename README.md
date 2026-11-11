@@ -1,48 +1,47 @@
 [![CI/CD](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml)
 
-# NIF Generator - Portuguese Tax Number Generator
+# Tax Number Generator & Validator (NIF, EU VAT and more)
 
-**Free online tool to generate valid Portuguese NIF (Número de Identificação Fiscal) for QA testing and development purposes.**
+**Free online tools to generate and validate tax identification numbers for QA testing and development: Portuguese NIFs of every type, EU VAT numbers and national tax numbers of 14 more countries.**
 
 🔗 **Live App:** https://rtnogueira.com/
 
-## 🇵🇹 What is a NIF?
+## 🧾 What is a tax identification number?
 
-NIF (Número de Identificação Fiscal) is the Portuguese Tax Identification Number, similar to:
-- SSN (Social Security Number) in the United States
-- NIE (Número de Identidad de Extranjero) in Spain
-- Tax Identification Number (TIN) in other countries
+Most countries give every taxpayer a tax identification number: the Portuguese NIF (Número de Identificação Fiscal, or *número de contribuinte*), the VAT numbers of EU companies, the Brazilian CPF and CNPJ, the Australian ABN and many more. Most end with a check digit computed from the other digits, so forms can reject mistyped numbers. Testing those forms needs valid numbers that belong to no one, and invalid ones that should be rejected.
 
 ## ✨ Features
 
-- ✅ Generate valid Portuguese NIF numbers for QA testing
-- 📋 Support for multiple NIF types:
-  - Individual tax numbers (pessoa singular)
-  - Corporate tax numbers (pessoa colectiva)
-  - Non-resident tax numbers
-  - Government entities
-  - Investment funds
-  - And many more...
+### Tax number generator (`/`)
+
+- 🇵🇹 Portuguese NIFs of every taxpayer type (individuals, companies, non-residents, public administration, investment funds and more; see [NIF types](#-nif-types-supported))
 - 🌍 VAT numbers for all 27 EU member states, Northern Ireland and the UK (optionally with the country prefix), plus tax numbers from 14 more countries, all with a correct check digit. See [Supported countries](#-supported-countries)
-- 🔢 Generate up to 50 numbers at once
+- ❌ Deliberately invalid numbers (wrong check digit or wrong length) to test that forms reject them; invalid batches are clearly marked
 - ✍️ Optionally in their usual written form (e.g. `390.533.447-05`, `CHE-113.042.942`), where python-stdnum defines one
-- ❌ Deliberately invalid numbers (wrong check digit or wrong length) to test that forms reject them
-- 🔗 The options are kept in the URL (e.g. `/?country=BR&type=cpf&qty=20&format=1`), so a setup can be bookmarked or shared
-- 📄 Export to Excel (.xlsx), CSV, JSON or plain text
+- 🔢 Up to 50 unique numbers at once
 - 📋 Copy a single number or the whole list (one per line, comma-separated or as a JSON array)
-- 🛡️ Tax number validator (`/tax-number-validator`): checks VAT numbers from all 27 EU member states, Northern Ireland and the UK against the official structure published by the European Commission ([VIES](https://ec.europa.eu/taxation_customs/vies/#/faq)), and verifies the check digit of every kind of number the generator supports, including the 14 countries outside VIES
+- 📄 Export to Excel (.xlsx), CSV, JSON or plain text
+- 🔗 The options are kept in the URL (e.g. `/?country=BR&type=cpf&qty=20&format=1`), so a setup can be bookmarked or shared
+
+### Tax number validator (`/tax-number-validator`)
+
+- 🛡️ Checks EU VAT numbers (all 27 member states, Northern Ireland and the UK) against the official structure published by the European Commission ([VIES](https://ec.europa.eu/taxation_customs/vies/#/faq)), detecting the country from the prefix
+- ✅ Verifies the check digit of every kind of number the generator supports, including the 14 countries outside VIES, and names the kind of number that matched
+- ✍️ Accepts numbers as people write them: spaces, dots, dashes and slashes are ignored, and suffixes such as the Norwegian `MVA` or Swiss `MWST` are understood
+
+### Everywhere
+
+- 🔒 Everything runs in the browser; no number is sent to a server
 - 🐞 Bug reports and feature requests through GitHub issue forms, linked from the footer
-- 🌗 Light and dark mode
-- 🎨 Modern and responsive UI
-- 🚀 Fast and lightweight
+- 🌗 Light and dark mode, responsive layout
 
 ## 🎯 Use Cases
 
 Perfect for:
-- QA Engineers testing Portuguese applications
-- Developers building Portugal-specific features
-- Software testers needing test data
-- Development and staging environments
+- QA engineers testing forms, checkouts and invoicing that ask for a tax number
+- Developers implementing or debugging tax number validation
+- Negative testing with numbers that must be rejected
+- Seeding development and staging databases with realistic test data
 
 ## 🛠️ Technology Stack
 
@@ -118,7 +117,7 @@ The check-digit algorithms (`src/lib/tax-id/countries.ts`) are ported from [pyth
 
 ## ⚠️ Disclaimer
 
-**This tool generates valid tax numbers for testing purposes only.** These are randomly generated numbers that follow each country's validation algorithm. They should **NEVER** be used for:
+**This tool generates tax numbers for testing purposes only.** These are randomly generated numbers that follow each country's validation algorithm (or deliberately break it, for invalid batches). They should **NEVER** be used for:
 - Real tax declarations
 - Official documents
 - Identity fraud
@@ -131,13 +130,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest new features
+- [Report a bug](https://github.com/rtnogueira/nif-generator/issues/new?template=bug_report.yml)
+- [Suggest a feature](https://github.com/rtnogueira/nif-generator/issues/new?template=feature_request.yml), such as a new country or number type (a link to its official check-digit specification helps a lot)
 - Submit pull requests
+
+The site links to the same forms from its footer, with the page you were on filled in.
 
 ## 📬 Contact
 
-For questions or suggestions, please open an issue on GitHub.
+For questions, please [open an issue](https://github.com/rtnogueira/nif-generator/issues/new/choose) on GitHub.
 
 ## 🌟 Show Your Support
 
@@ -145,4 +146,4 @@ If you find this tool useful, please consider giving it a ⭐ on GitHub!
 
 ---
 
-**Keywords:** NIF generator, Portuguese tax number, Portuguese NIF, tax identification number, QA testing, test data generator, Portugal NIF, numero fiscal, gerador NIF, Portuguese tax ID
+**Keywords:** tax number generator, tax number validator, NIF generator, Portuguese NIF, gerador de NIF, número de contribuinte, EU VAT number generator, VAT number validator, VIES, CPF generator, CNPJ generator, ABN generator, tax identification number, check digit, QA testing, test data generator

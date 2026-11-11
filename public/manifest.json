@@ -1,7 +1,7 @@
 {
   "short_name": "rtnogueira",
   "name": "rtnogueira – Developer tools",
-  "description": "Free developer and QA tools, including a tax number generator for valid Portuguese NIFs.",
+  "description": "Free developer and QA tools: a tax number generator and validator for Portuguese NIFs, EU VAT numbers and more.",
   "icons": [
     {
       "src": "favicon.ico",

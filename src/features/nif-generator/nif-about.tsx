@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import {
   Table,
   TableBody,
@@ -10,6 +11,7 @@ import { MAX_QUANTITY, NIF_TYPES } from '@/lib/nif'
 import { getTaxIdCountryName, isViesCountry, TAX_ID_COUNTRIES } from '@/lib/tax-id'
 
 const STDNUM_URL = 'https://github.com/arthurdejong/python-stdnum'
+const LINK_CLASS = 'font-medium text-foreground underline underline-offset-4'
 
 const SUPPORTED_OUTSIDE_VIES = TAX_ID_COUNTRIES.filter(c => !isViesCountry(c.code)).length
 
@@ -20,7 +22,7 @@ const SUPPORTED = TAX_ID_COUNTRIES.flatMap(country =>
     code: country.code,
     country: getTaxIdCountryName(country.code),
     name: type.name,
-    label: country.code === 'PT' ? 'All taxpayer types (see the prefixes above)' : type.label,
+    label: country.code === 'PT' ? 'All taxpayer types (see the NIF types below)' : type.label,
     algorithm: type.algorithm,
   }))
 ).sort((a, b) => a.country.localeCompare(b.country))
@@ -49,6 +51,11 @@ const FAQ = [
     question: 'Why do some numbers lose their leading zeros in Excel?',
     answer:
       'Excel reads CSV values as numbers, dropping leading zeros and showing long numbers in scientific notation. Use the .xlsx export to open the numbers in Excel: it stores them as text.',
+  },
+  {
+    question: 'Can I get numbers with dots, dashes or spaces?',
+    answer:
+      'Yes, for numbers that have a usual written form, such as 390.533.447-05 for a Brazilian CPF or CHE-113.042.942 for a Swiss UID: tick "Formatted". The option only appears where python-stdnum defines that form; other numbers are always shown as plain digits.',
   },
   {
     question: 'Can I share or bookmark a set of options?',
@@ -88,68 +95,42 @@ export function NifAbout() {
     >
       <div className="flex flex-col gap-3">
         <h2 id="about-nif" className="text-2xl font-semibold tracking-tight text-foreground">
-          What is a NIF?
+          What is a tax identification number?
         </h2>
         <p>
-          The NIF (<i lang="pt">Número de Identificação Fiscal</i>), also known as the{' '}
-          <i lang="pt">número de contribuinte</i>, is the 9-digit tax identification number issued
-          by the Portuguese Tax and Customs Authority (<i lang="pt">Autoridade Tributária</i>) to
-          individuals, companies and other entities. Almost every Portuguese form, invoice and
-          e-commerce checkout asks for one, which is why QA engineers and developers need valid test
-          NIFs.
+          Most countries give every taxpayer a tax identification number: the Portuguese NIF (
+          <i lang="pt">número de contribuinte</i>), the VAT numbers of EU companies, the Brazilian
+          CPF and CNPJ, the Australian ABN and many more. Forms, invoices and checkouts ask for
+          them, and usually check that they are well formed, which is why QA engineers and
+          developers need valid test numbers that belong to no one.
         </p>
         <p>
-          This free <i lang="pt">gerador de NIF</i> creates valid Portuguese NIFs for any taxpayer
-          type, so you can test validations without using real people&apos;s data.
+          This generator creates such numbers for {TAX_ID_COUNTRIES.length} countries and regions,
+          including every type of Portuguese NIF (it is also a <i lang="pt">gerador de NIF</i>), so
+          you can test validations without using real people&apos;s or companies&apos; data.
         </p>
       </div>
 
       <div className="flex flex-col gap-3">
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          How is a NIF validated?
+          How do check digits work?
         </h2>
         <p>
-          A NIF has 9 digits: a prefix that identifies the taxpayer type, followed by a sequence
-          number and a final check digit computed with a modulo-11 algorithm:
+          Most tax numbers end with a check digit (sometimes two, or a letter) computed from the
+          other digits. A typical algorithm multiplies each digit by a weight, adds the results and
+          takes the remainder of a division, often by 11 or 97; others use the Luhn algorithm or a
+          lookup table. When someone mistypes a digit, the check digit no longer matches, so a form
+          can reject the number without contacting the tax authority.
         </p>
-        <ol className="list-decimal space-y-1 pl-6">
-          <li>Multiply the first 8 digits by the weights 9, 8, 7, 6, 5, 4, 3 and 2.</li>
-          <li>Add the results and compute the remainder of dividing the sum by 11.</li>
-          <li>
-            If the remainder is 0 or 1, the check digit is 0; otherwise it is 11 minus the
-            remainder.
-          </li>
-        </ol>
         <p>
-          For example, for <span className="font-mono text-foreground">12345678</span> the weighted
-          sum is 156, the remainder is 2, so the check digit is 9 and the full NIF is{' '}
-          <span className="font-mono text-foreground">123456789</span>.
+          Each country uses its own algorithm, named for every number in the table below. A valid
+          check digit only means the number is well formed, not that it has been assigned. To check
+          a number you already have, use the{' '}
+          <Link to="/tax-number-validator" className={LINK_CLASS}>
+            tax number validator
+          </Link>
+          .
         </p>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">NIF prefixes</h2>
-        <p>The first digit (or first two digits) of a NIF identify the type of taxpayer:</p>
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-24">Prefix</TableHead>
-                <TableHead>Taxpayer type</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {NIF_TYPES.map(type => (
-                <TableRow key={type.prefix}>
-                  <TableCell className="font-mono text-foreground">{type.prefix}</TableCell>
-                  <TableCell lang="pt" className="whitespace-normal">
-                    {type.label}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -184,6 +165,36 @@ export function NifAbout() {
                     <span className="font-medium text-foreground">{row.name}</span> — {row.label}
                   </TableCell>
                   <TableCell className="whitespace-normal">{row.algorithm}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          Portuguese NIF types
+        </h2>
+        <p>
+          For Portugal, the Type option sets the first digit (or first two digits) of the NIF, which
+          identify the type of taxpayer:
+        </p>
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-24">Prefix</TableHead>
+                <TableHead>Taxpayer type</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {NIF_TYPES.map(type => (
+                <TableRow key={type.prefix}>
+                  <TableCell className="font-mono text-foreground">{type.prefix}</TableCell>
+                  <TableCell lang="pt" className="whitespace-normal">
+                    {type.label}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
