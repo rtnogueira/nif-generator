@@ -81,6 +81,21 @@ describe('Tax number validator page', () => {
     expect(screen.getByText('Invalid check digit')).toBeInTheDocument()
   })
 
+  it('searches the grouped country list', async () => {
+    const user = await renderValidator()
+
+    await user.click(screen.getByRole('combobox', { name: 'Country' }))
+    await user.type(await screen.findByRole('combobox', { name: 'Search countries' }), 'bra')
+    expect(screen.getByRole('option', { name: /Brazil/ })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Portugal/ })).not.toBeInTheDocument()
+    const list = screen.getByRole('listbox')
+    expect(within(list).getByText('EU VAT (VIES)')).not.toBeVisible()
+    expect(within(list).getByText('Other countries')).toBeVisible()
+
+    await user.click(screen.getByRole('option', { name: /Brazil/ }))
+    expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('Brazil')
+  })
+
   it('explains the expected format when it does not match', async () => {
     const user = await renderValidator()
 

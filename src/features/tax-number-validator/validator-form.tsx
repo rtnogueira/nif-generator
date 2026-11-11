@@ -1,19 +1,10 @@
 import { ShieldCheckIcon } from 'lucide-react'
 import { useId, useState, type SubmitEvent } from 'react'
+import { CountryCombobox } from '@/components/country-combobox'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   getExpectedFormats,
   getValidatorCountry,
@@ -38,6 +29,11 @@ interface ValidatorFormProps {
 const byName = (a: ValidatorCountry, b: ValidatorCountry) => a.name.localeCompare(b.name)
 const VIES_COUNTRIES = VALIDATOR_COUNTRIES.filter(c => c.vat).sort(byName)
 const OTHER_COUNTRIES = VALIDATOR_COUNTRIES.filter(c => !c.vat).sort(byName)
+const COUNTRY_GROUPS = [
+  { heading: 'EU VAT (VIES)', countries: VIES_COUNTRIES },
+  { heading: 'Other countries', countries: OTHER_COUNTRIES },
+]
+const EXTRA_OPTIONS = [{ value: AUTO_DETECT, label: 'Detect from prefix' }]
 
 export function ValidatorForm({ onValidate }: ValidatorFormProps) {
   const id = useId()
@@ -62,23 +58,15 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <Label htmlFor={`${id}-country`}>Country</Label>
-            <Select
+            <CountryCombobox
+              id={`${id}-country`}
               value={country}
               onValueChange={value =>
                 (value === AUTO_DETECT || getValidatorCountry(value)) && setCountry(value)
               }
-            >
-              <SelectTrigger id={`${id}-country`} className="w-full data-[size=default]:h-10">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper" className="max-h-80">
-                <SelectItem value={AUTO_DETECT}>Detect from prefix</SelectItem>
-                <SelectSeparator />
-                <CountryGroup label="EU VAT (VIES)" countries={VIES_COUNTRIES} />
-                <SelectSeparator />
-                <CountryGroup label="Other countries" countries={OTHER_COUNTRIES} />
-              </SelectContent>
-            </Select>
+              groups={COUNTRY_GROUPS}
+              extraOptions={EXTRA_OPTIONS}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -111,27 +99,5 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
         </form>
       </CardContent>
     </Card>
-  )
-}
-
-function CountryGroup({
-  label,
-  countries,
-}: {
-  label: string
-  countries: readonly ValidatorCountry[]
-}) {
-  return (
-    <SelectGroup>
-      <SelectLabel>{label}</SelectLabel>
-      {countries.map(c => (
-        <SelectItem key={c.code} value={c.code}>
-          <span className="w-7 rounded bg-muted px-1.5 text-center font-mono text-xs">
-            {c.code}
-          </span>
-          <span className="truncate">{c.name}</span>
-        </SelectItem>
-      ))}
-    </SelectGroup>
   )
 }
