@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { GITHUB_REPO_URL, SITE_NAME } from '@/lib/site'
 import { GithubIcon } from './icons'
 import { MainMenu } from './main-menu'
+import { MobileMenu } from './mobile-menu'
 import { ThemeToggle } from './theme-toggle'
 
 export function SiteHeader() {
@@ -34,6 +35,7 @@ export function SiteHeader() {
             </a>
           </Button>
           <ThemeToggle />
+          <MobileMenu />
         </div>
       </div>
     </header>
