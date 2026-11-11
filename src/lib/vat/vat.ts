@@ -36,9 +36,9 @@ export function isVatCountryCode(value: string): value is VatCountryCode {
   return COUNTRIES_BY_CODE.has(value)
 }
 
-/** Uppercases and removes the separators people commonly type (spaces, dots, dashes). */
+/** Uppercases and removes the separators people commonly type (spaces, dots, dashes, slashes). */
 export function normalizeVatNumber(input: string): string {
-  return input.toUpperCase().replace(/[\s.-]/g, '')
+  return input.toUpperCase().replace(/[\s./-]/g, '')
 }
 
 export type VatValidation =

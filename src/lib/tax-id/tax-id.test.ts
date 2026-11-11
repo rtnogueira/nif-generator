@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { generateNif, MAX_QUANTITY } from '@/lib/nif'
 import { validateVatNumber, VAT_COUNTRIES } from '@/lib/vat'
 import {
+  checkPosition,
+  displayTaxId,
   generateTaxIds,
   getTaxIdCountry,
   getTaxIdCountryName,
@@ -9,7 +11,9 @@ import {
   isTaxIdCountryCode,
   isViesCountry,
   TAX_ID_COUNTRIES,
+  taxIdGenerator,
   validateTaxNumber,
+  VALIDITIES,
   type TaxIdCountry,
 } from '.'
 import {
@@ -75,12 +79,12 @@ const REAL_NUMBERS: Record<string, string[]> = {
   ZA: ['0001339050', '0843089848'],
 }
 
-/** Position of the (first) check character, where it is not the last one. */
-const CHECK_INDEX: Record<string, number> = { FR: 1, NL: 8, SE: 9, JP: 0 }
-
-/** ABNs (11 digits) carry their check digits first. */
-const checkIndex = (code: string, number: string) =>
-  code === 'AU' && number.length === 11 ? 1 : (CHECK_INDEX[code] ?? number.length - 1)
+/** Position of the check character of a real number, from the type it belongs to. */
+function checkIndex(code: string, number: string) {
+  const type = getTaxIdCountry(code as never).types.find(t => t.isValid(number))
+  if (!type) throw new Error(`${number} is not a valid ${code} number`)
+  return checkPosition(type, number)
+}
 
 /** Changes one character to a different one of the same kind (digit → digit, letter → letter). */
 function mutate(number: string, index: number): string {
@@ -246,6 +250,93 @@ describe('validateTaxNumber', () => {
     for (const input of ['123456789', 'US123456789', 'BR39053344705']) {
       expect(validateTaxNumber(input).status, input).toBe('unknown-country')
     }
+  })
+})
+
+describe('formatted numbers', () => {
+  it('match the examples of python-stdnum', () => {
+    const format = (code: string, id: string, number: string) =>
+      getTaxIdType(code as never, id)?.format?.(number)
+    expect(format('BR', 'cpf', '39053344705')).toBe('390.533.447-05')
+    expect(format('BR', 'cnpj', '16727230000197')).toBe('16.727.230/0001-97')
+    expect(format('AU', 'abn', '51824753556')).toBe('51 824 753 556')
+    expect(format('CH', 'uid', 'CHE113042942')).toBe('CHE-113.042.942')
+    expect(format('CL', 'rut', '76086428-5')).toBe('76.086.428-5')
+    expect(format('CO', 'nit', '213123432-1')).toBe('213.123.432-1')
+    expect(format('NZ', 'ird', '49091850')).toBe('49-091-850')
+    expect(format('UY', 'rut', '211003420017')).toBe('21-100342-001-7')
+    expect(format('GB', 'vat', '980780684')).toBe('980 7806 84')
+    expect(format('PL', 'vat', '1234563218')).toBe('123-456-32-18')
+  })
+
+  it.each(countries)('are accepted by the validator ($code)', country => {
+    for (const type of country.types.filter(t => t.format)) {
+      for (let i = 0; i < 50; i++) {
+        const number = type.generate()
+        for (const withPrefix of [false, true]) {
+          const shown = displayTaxId(country.code, type, number, {
+            validity: 'valid',
+            formatted: true,
+            withPrefix,
+          })
+          expect(validateTaxNumber(shown, country.code), shown).toMatchObject({
+            status: 'valid',
+            verified: true,
+          })
+        }
+      }
+    }
+  })
+})
+
+describe('invalid numbers', () => {
+  const EXPECTED = {
+    'invalid-check-digit': 'invalid-check-digit',
+    'invalid-length': 'invalid-format',
+  }
+
+  it.each(countries)('are generated for every $code type and invalid kind', country => {
+    for (const type of country.types) {
+      for (const validity of VALIDITIES.filter(v => v !== 'valid')) {
+        const numbers = generateTaxIds(
+          type,
+          MAX_QUANTITY,
+          taxIdGenerator(country.code, type, validity)
+        )
+        expect(new Set(numbers).size, `${type.id} ${validity}`).toBe(MAX_QUANTITY)
+        for (const number of numbers) {
+          expect(validateTaxNumber(number, country.code).status, number).toBe(EXPECTED[validity])
+        }
+      }
+    }
+  })
+
+  it.each(countries)('are still rejected as shown, formatted and prefixed ($code)', country => {
+    for (const type of country.types) {
+      const generate = taxIdGenerator(country.code, type, 'invalid-check-digit')
+      for (let i = 0; i < 20; i++) {
+        const shown = displayTaxId(country.code, type, generate(), {
+          validity: 'invalid-check-digit',
+          formatted: true,
+          withPrefix: true,
+        })
+        expect(validateTaxNumber(shown, country.code).status, shown).toBe('invalid-check-digit')
+      }
+    }
+  })
+
+  it('keep the format when only the check digit is wrong', () => {
+    const type = getTaxIdType('BR', 'cpf')
+    if (!type) throw new Error('missing type')
+    const [number] = generateTaxIds(type, 1, taxIdGenerator('BR', type, 'invalid-check-digit'))
+    expect(number).toMatch(/^\d{11}$/)
+    expect(
+      displayTaxId('BR', type, number, {
+        validity: 'invalid-check-digit',
+        formatted: true,
+        withPrefix: false,
+      })
+    ).toMatch(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)
   })
 })
 

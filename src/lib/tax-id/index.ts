@@ -1,6 +1,7 @@
 import { clampQuantity } from '@/lib/nif'
 import { getVatCountry } from '@/lib/vat'
 import { TAX_ID_COUNTRIES, type TaxIdCountry, type TaxIdType } from './countries'
+import type { Validity } from './variants'
 
 export { TAX_ID_COUNTRIES, type TaxIdCountry, type TaxIdType }
 
@@ -36,18 +37,26 @@ export function getTaxIdType(code: TaxIdCountryCode, typeId: string): TaxIdType 
   return getTaxIdCountry(code).types.find(type => type.id === typeId)
 }
 
-/** A batch of generated numbers, as shown in the results. */
+/** A batch of generated numbers, as shown in the results (formatted and prefixed as requested). */
 export interface GeneratedBatch {
   country: TaxIdCountryCode
   type: TaxIdType
+  validity: Validity
   numbers: string[]
 }
 
-/** Generates `count` distinct numbers of a type (count is clamped to the supported range). */
-export function generateTaxIds(type: TaxIdType, count: number): string[] {
+/**
+ * Generates `count` distinct numbers (count is clamped to the supported range), with `generate`,
+ * which defaults to the type's valid numbers (see `taxIdGenerator` for invalid ones).
+ */
+export function generateTaxIds(
+  type: TaxIdType,
+  count: number,
+  generate: () => string = type.generate
+): string[] {
   const unique = new Set<string>()
   const target = clampQuantity(count)
-  while (unique.size < target) unique.add(type.generate())
+  while (unique.size < target) unique.add(generate())
   return [...unique]
 }
 
@@ -60,3 +69,12 @@ export {
   type TaxNumberValidation,
   type ValidatorCountry,
 } from './validate'
+export {
+  checkPosition,
+  displayTaxId,
+  isValidity,
+  taxIdGenerator,
+  VALIDITIES,
+  type DisplayOptions,
+  type Validity,
+} from './variants'

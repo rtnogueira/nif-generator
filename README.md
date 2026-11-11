@@ -25,8 +25,11 @@ NIF (Número de Identificação Fiscal) is the Portuguese Tax Identification Num
   - And many more...
 - 🌍 VAT numbers for all 27 EU member states, Northern Ireland and the UK (optionally with the country prefix), plus tax numbers from 14 more countries, all with a correct check digit. See [Supported countries](#-supported-countries)
 - 🔢 Generate up to 50 numbers at once
-- 📄 Export generated NIFs to Excel (.xlsx)
-- 📋 Copy a single NIF or the whole list to the clipboard
+- ✍️ Optionally in their usual written form (e.g. `390.533.447-05`, `CHE-113.042.942`), where python-stdnum defines one
+- ❌ Deliberately invalid numbers (wrong check digit or wrong length) to test that forms reject them
+- 🔗 The options are kept in the URL (e.g. `/?country=BR&type=cpf&qty=20&format=1`), so a setup can be bookmarked or shared
+- 📄 Export to Excel (.xlsx), CSV, JSON or plain text
+- 📋 Copy a single number or the whole list (one per line, comma-separated or as a JSON array)
 - 🛡️ Tax number validator (`/tax-number-validator`): checks VAT numbers from all 27 EU member states, Northern Ireland and the UK against the official structure published by the European Commission ([VIES](https://ec.europa.eu/taxation_customs/vies/#/faq)), and verifies the check digit of every kind of number the generator supports, including the 14 countries outside VIES
 - 🌗 Light and dark mode
 - 🎨 Modern and responsive UI

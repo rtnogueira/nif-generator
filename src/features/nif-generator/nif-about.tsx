@@ -32,13 +32,28 @@ const FAQ = [
       'They are mathematically valid — the structure and check digit follow the official rules — but they are randomly generated and not tied to any person or company. A generated number may coincide with one that has been assigned, so never use them outside of test environments.',
   },
   {
+    question: 'What are invalid numbers for?',
+    answer:
+      'To check that a form rejects bad input. "Invalid check digit" numbers have the right format but a wrong check digit, and "Invalid length" numbers have digits added or removed; the validator on this site reports them as such. Invalid batches are marked in the results and their files are named accordingly (e.g. tax-numbers-pt-invalid-check-digit.csv), so they are not mistaken for valid test data.',
+  },
+  {
     question: 'Can I use a generated number on an invoice or official document?',
     answer:
       'No. These numbers exist only to test forms, validations and databases. Using them for invoices, contracts, tax returns or to impersonate someone is illegal.',
   },
   {
     question: 'How many numbers can I generate at once?',
-    answer: `Up to ${MAX_QUANTITY} unique numbers per batch. You can copy them one by one, copy the whole list, or export it to Excel (.xlsx).`,
+    answer: `Up to ${MAX_QUANTITY} unique numbers per batch. You can copy them one by one, copy the whole list (one per line, comma-separated or as a JSON array), or export it to Excel (.xlsx), CSV, JSON or a text file.`,
+  },
+  {
+    question: 'Why do some numbers lose their leading zeros in Excel?',
+    answer:
+      'Excel reads CSV values as numbers, dropping leading zeros and showing long numbers in scientific notation. Use the .xlsx export to open the numbers in Excel: it stores them as text.',
+  },
+  {
+    question: 'Can I share or bookmark a set of options?',
+    answer:
+      'Yes. The page address keeps the country, type, quantity and other options of the last batch (for example ?country=BR&type=cpf&qty=20&format=1). Opening it fills in the form and generates a new batch with those options.',
   },
   {
     question: 'Where do the check-digit algorithms come from?',

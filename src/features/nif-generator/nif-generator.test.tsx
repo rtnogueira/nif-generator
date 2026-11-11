@@ -4,18 +4,44 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { downloadXlsxColumn } from '@/lib/export-xlsx'
 import { isValidNif } from '@/lib/nif'
-import { getTaxIdType } from '@/lib/tax-id'
+import { getTaxIdType, validateTaxNumber } from '@/lib/tax-id'
 import { validateVatNumber } from '@/lib/vat'
 import { createAppRouter } from '@/router'
 
 vi.mock('@/lib/export-xlsx', () => ({ downloadXlsxColumn: vi.fn(() => Promise.resolve()) }))
 
-async function renderApp() {
+async function renderApp(url = '/') {
   const user = userEvent.setup()
-  const router = createAppRouter(createMemoryHistory({ initialEntries: ['/'] }))
+  const router = createAppRouter(createMemoryHistory({ initialEntries: [url] }))
   render(<RouterProvider router={router} />)
   await screen.findByRole('heading', { name: 'Tax Number Generator' })
   return user
+}
+
+async function renderAppWithRouter(url = '/') {
+  const user = userEvent.setup()
+  const router = createAppRouter(createMemoryHistory({ initialEntries: [url] }))
+  render(<RouterProvider router={router} />)
+  await screen.findByRole('heading', { name: 'Tax Number Generator' })
+  return { user, router }
+}
+
+/** Captures text downloads: the file name and content of each `downloadTextFile`. */
+function captureDownloads() {
+  const downloads: { name: string; blob: Blob }[] = []
+  const blobs = new Map<string, Blob>()
+  URL.createObjectURL = vi.fn((blob: Blob) => {
+    const url = `blob:${blobs.size}`
+    blobs.set(url, blob)
+    return url
+  })
+  URL.revokeObjectURL = vi.fn()
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+    this: HTMLAnchorElement
+  ) {
+    downloads.push({ name: this.download, blob: blobs.get(this.href) as Blob })
+  })
+  return downloads
 }
 
 const resultRows = (pattern = /^Copy \d{9}$/) => screen.getAllByRole('button', { name: pattern })
@@ -100,8 +126,76 @@ describe('NIF generator page', () => {
     await user.click(screen.getByRole('button', { name: 'Generate' }))
     const nifs = generatedNifs()
 
-    await user.click(screen.getByRole('button', { name: 'Export .xlsx' }))
+    await user.click(screen.getByRole('button', { name: 'Export' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'Excel (.xlsx)' }))
     expect(downloadXlsxColumn).toHaveBeenCalledWith('NIF', nifs, 'tax-numbers-pt')
+  })
+
+  it('exports CSV and JSON files and copies in other formats', async () => {
+    const downloads = captureDownloads()
+    const user = await renderApp()
+    await user.click(screen.getByRole('button', { name: 'Increase quantity' }))
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+    const [first, second] = generatedNifs()
+
+    await user.click(screen.getByRole('button', { name: 'Export' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'CSV (.csv)' }))
+    await user.click(screen.getByRole('button', { name: 'Export' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'JSON (.json)' }))
+    expect(downloads.map(d => d.name)).toEqual(['tax-numbers-pt.csv', 'tax-numbers-pt.json'])
+    expect(await downloads[0].blob.text()).toBe(`"NIF"\r\n"${first}"\r\n"${second}"\r\n`)
+    expect(JSON.parse(await downloads[1].blob.text())).toEqual([first, second])
+
+    await user.click(screen.getByRole('button', { name: 'More copy formats' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'JSON array' }))
+    expect(JSON.parse(await navigator.clipboard.readText())).toEqual([first, second])
+    await user.click(screen.getByRole('button', { name: 'More copy formats' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'Comma-separated list' }))
+    expect(await navigator.clipboard.readText()).toBe(`${first}, ${second}`)
+  })
+
+  it('keeps the options in the URL', async () => {
+    const { user, router } = await renderAppWithRouter()
+    await user.click(screen.getByRole('button', { name: 'Increase quantity' }))
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+
+    expect(router.state.location.searchStr).toBe('?country=PT&type=2&qty=2')
+  })
+
+  it('fills the form and generates from a shared URL', async () => {
+    await renderApp('/?country=BR&type=cnpj&qty=3&format=1')
+
+    expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('Brazil')
+    expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('CNPJ')
+    expect(screen.getByLabelText('Formatted')).toBeChecked()
+    const cnpjs = generatedNifs(/^Copy \d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)
+    expect(cnpjs).toHaveLength(3)
+    expect(cnpjs.every(n => validateTaxNumber(n, 'BR').status === 'valid')).toBe(true)
+  })
+
+  it('ignores invalid options in the URL', async () => {
+    await renderApp('/?country=XX&type=nope&qty=-4')
+
+    expect(screen.getByText('No numbers yet')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('Portugal')
+  })
+
+  it('generates numbers with a wrong check digit, clearly marked', async () => {
+    const downloads = captureDownloads()
+    const user = await renderApp()
+
+    await user.click(screen.getByRole('combobox', { name: 'Validity' }))
+    await user.click(await screen.findByRole('option', { name: 'Invalid check digit' }))
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+
+    const [nif] = generatedNifs()
+    expect(isValidNif(nif)).toBe(false)
+    expect(validateTaxNumber(nif, 'PT').status).toBe('invalid-check-digit')
+    expect(screen.getByText('Invalid check digit', { selector: '[data-slot=badge]' })).toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: 'Export' }))
+    await user.click(await screen.findByRole('menuitem', { name: /Text/ }))
+    expect(downloads[0].name).toBe('tax-numbers-pt-invalid-check-digit.txt')
   })
 
   it('generates VAT numbers for another country, with or without its prefix', async () => {
