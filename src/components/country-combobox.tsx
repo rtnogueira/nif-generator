@@ -1,5 +1,6 @@
 import { CheckIcon, ChevronDownIcon } from 'lucide-react'
 import { Fragment, useState } from 'react'
+import { CountryFlag } from '@/components/country-flag'
 import {
   Command,
   CommandEmpty,
@@ -100,6 +101,7 @@ export function CountryCombobox({
                     keywords={[option.label]}
                     onSelect={() => select(option.value)}
                   >
+                    <CountryFlag />
                     <span className="truncate">{option.label}</span>
                     <SelectedIcon visible={option.value === value} />
                   </CommandItem>
@@ -134,6 +136,7 @@ export function CountryCombobox({
 function CountryLabel({ country }: { country: CountryOption }) {
   return (
     <>
+      <CountryFlag code={country.code} />
       <span className="w-7 shrink-0 rounded bg-muted px-1.5 text-center font-mono text-xs">
         {country.code}
       </span>
