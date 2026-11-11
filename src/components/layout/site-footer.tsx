@@ -1,14 +1,14 @@
-import { Link, useRouterState } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { BugIcon, CoffeeIcon, HeartIcon, LightbulbIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useCurrentPageUrl } from '@/hooks/use-current-page-url'
 import { AUTHOR_NAME, AUTHOR_URL, BUY_ME_A_COFFEE_URL, newIssueUrl } from '@/lib/site'
 
 const FOOTER_LINK = 'inline-flex items-center gap-1.5 hover:text-foreground hover:underline'
 
 export function SiteFooter() {
   // The page and its options (e.g. ?country=BR&type=cpf), so a bug report says how to reproduce it.
-  const href = useRouterState({ select: state => state.location.href })
-  const page = window.location.origin + href
+  const page = useCurrentPageUrl()
 
   return (
     <footer className="border-t">

@@ -5,9 +5,10 @@ Location: Portugal
 
 /* THANKS */
 React, TanStack Router, Tailwind CSS, shadcn/ui
+python-stdnum (check-digit algorithms): https://github.com/arthurdejong/python-stdnum
 
 /* SITE */
-Last update: 2026/11/09
+Last update: 2026/11/11
 Standards: HTML5, CSS3, JavaScript ES6+
 Components: React, TanStack Router, Tailwind CSS, shadcn/ui, Radix UI
 Software: Visual Studio Code, Node.js, pnpm

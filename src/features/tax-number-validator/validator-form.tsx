@@ -99,7 +99,7 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
                   Expected: <ExpectedFormats country={selected} />
                 </>
               ) : (
-                'Spaces, dots and dashes are ignored.'
+                'Spaces, dots, dashes and slashes are ignored.'
               )}
             </p>
           </div>

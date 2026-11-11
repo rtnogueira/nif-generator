@@ -265,6 +265,58 @@ describe('NIF generator page', () => {
     expect(feature.searchParams.get('template')).toBe('feature_request.yml')
   })
 
+  it('offers bug reports and feature requests in the top bar', async () => {
+    const user = await renderApp('/?country=BR&type=cpf&qty=2')
+
+    const nav = screen.getByRole('navigation', { name: 'Main' })
+    await user.click(within(nav).getByRole('button', { name: 'Feedback' }))
+    const bug = await within(nav).findByRole('link', { name: /Report a bug/ })
+    const url = new URL(bug.getAttribute('href') ?? '')
+    expect(url.searchParams.get('template')).toBe('bug_report.yml')
+    expect(url.searchParams.get('page')).toBe(
+      `${window.location.origin}/?country=BR&type=cpf&qty=2`
+    )
+    expect(within(nav).getByRole('link', { name: /Suggest a feature/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining('template=feature_request.yml')
+    )
+  })
+
+  it('has a burger menu with the tools and feedback links', async () => {
+    const user = await renderApp()
+
+    await user.click(screen.getByRole('button', { name: 'Open menu' }))
+    const items = await screen.findAllByRole('menuitem')
+    expect(items.map(item => item.textContent)).toEqual([
+      'Tax number generator',
+      'Tax number validator',
+      'Report a bug',
+      'Suggest a feature',
+    ])
+
+    await user.click(screen.getByRole('menuitem', { name: 'Tax number validator' }))
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Tax Number Validator' })
+    ).toBeVisible()
+  })
+
+  it('explains tax numbers in general, not only Portuguese NIFs', async () => {
+    await renderApp()
+    const headings = screen.getAllByRole('heading', { level: 2 }).map(h => h.textContent)
+
+    expect(headings).toEqual([
+      'What is a tax identification number?',
+      'How do check digits work?',
+      'Supported countries',
+      'Portuguese NIF types',
+      'Frequently asked questions',
+    ])
+    expect(screen.getByRole('link', { name: 'tax number validator' })).toHaveAttribute(
+      'href',
+      '/tax-number-validator'
+    )
+  })
+
   it('renders the site chrome', async () => {
     await renderApp()
     const footer = screen.getByRole('contentinfo')
