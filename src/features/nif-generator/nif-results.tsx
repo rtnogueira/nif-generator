@@ -1,9 +1,16 @@
-import { CheckIcon, CopyIcon, DownloadIcon, HashIcon } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon, CopyIcon, DownloadIcon, HashIcon } from 'lucide-react'
 import { memo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -13,8 +20,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useClipboard } from '@/hooks/use-clipboard'
+import { downloadTextFile, formatNumbers, type TextFileExtension } from '@/lib/export'
 import { downloadXlsxColumn } from '@/lib/export-xlsx'
-import type { GeneratedBatch } from '@/lib/tax-id'
+import type { GeneratedBatch, Validity } from '@/lib/tax-id'
 
 interface NifResultsProps {
   batch: GeneratedBatch | null
@@ -23,11 +31,21 @@ interface NifResultsProps {
 const COPY_ALL_KEY = 'all'
 const NO_NUMBERS: readonly string[] = []
 
+const INVALID_LABELS: Partial<Record<Validity, string>> = {
+  'invalid-check-digit': 'Invalid check digit',
+  'invalid-length': 'Invalid length',
+}
+
+/** e.g. `tax-numbers-pt`, or `tax-numbers-pt-invalid-check-digit` for an invalid batch. */
+const fileName = (batch: GeneratedBatch) =>
+  `tax-numbers-${batch.country.toLowerCase()}${batch.validity === 'valid' ? '' : `-${batch.validity}`}`
+
 export function NifResults({ batch }: NifResultsProps) {
   const { copied, copy } = useClipboard()
   const nifs = batch?.numbers ?? NO_NUMBERS
   const hasResults = batch !== null && nifs.length > 0
   const allNifs = nifs.join('\n')
+  const invalidLabel = batch && INVALID_LABELS[batch.validity]
 
   return (
     <Card className="min-w-0 flex-1 gap-0 py-0">
@@ -37,18 +55,59 @@ export function NifResults({ batch }: NifResultsProps) {
           <Badge variant="secondary" className="rounded-full tabular-nums">
             {nifs.length}
           </Badge>
+          {hasResults && invalidLabel && <Badge variant="destructive">{invalidLabel}</Badge>}
         </CardTitle>
         {hasResults && (
           <CardAction className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => copy(allNifs, `Copied ${nifs.length} numbers`, COPY_ALL_KEY)}
-            >
-              {copied === COPY_ALL_KEY ? <CheckIcon className="text-success" /> : <CopyIcon />}
-              Copy all
-            </Button>
-            <ExportButton batch={batch} />
+            <div className="flex">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-r-none"
+                onClick={() => copy(allNifs, `Copied ${nifs.length} numbers`, COPY_ALL_KEY)}
+              >
+                {copied === COPY_ALL_KEY ? <CheckIcon className="text-success" /> : <CopyIcon />}
+                Copy all
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-l-none border-l-0 px-2"
+                    aria-label="More copy formats"
+                  >
+                    <ChevronDownIcon />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Copy all as</DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onSelect={() =>
+                      copy(
+                        formatNumbers('comma', '', nifs),
+                        `Copied ${nifs.length} numbers`,
+                        COPY_ALL_KEY
+                      )
+                    }
+                  >
+                    Comma-separated list
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() =>
+                      copy(
+                        formatNumbers('json', '', nifs),
+                        `Copied ${nifs.length} numbers`,
+                        COPY_ALL_KEY
+                      )
+                    }
+                  >
+                    JSON array
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <ExportMenu batch={batch} />
           </CardAction>
         )}
       </CardHeader>
@@ -120,17 +179,21 @@ const NifRow = memo(function NifRow({ index, nif, badge, copied, onCopy }: NifRo
   )
 })
 
-function ExportButton({ batch }: { batch: GeneratedBatch }) {
+const TEXT_EXPORTS: { extension: TextFileExtension; label: string }[] = [
+  { extension: 'csv', label: 'CSV (.csv)' },
+  { extension: 'json', label: 'JSON (.json)' },
+  { extension: 'txt', label: 'Text, one per line (.txt)' },
+]
+
+const TEXT_FORMATS = { csv: 'csv', json: 'json', txt: 'lines' } as const
+
+function ExportMenu({ batch }: { batch: GeneratedBatch }) {
   const [exporting, setExporting] = useState(false)
 
-  async function handleExport() {
+  async function exportXlsx() {
     setExporting(true)
     try {
-      await downloadXlsxColumn(
-        batch.type.name,
-        batch.numbers,
-        `tax-numbers-${batch.country.toLowerCase()}`
-      )
+      await downloadXlsxColumn(batch.type.name, batch.numbers, fileName(batch))
     } catch {
       toast.error('Export failed, please try again')
     } finally {
@@ -138,11 +201,29 @@ function ExportButton({ batch }: { batch: GeneratedBatch }) {
     }
   }
 
+  function exportText(extension: TextFileExtension) {
+    const content = formatNumbers(TEXT_FORMATS[extension], batch.type.name, batch.numbers)
+    downloadTextFile(content, fileName(batch), extension)
+  }
+
   return (
-    <Button variant="outline" size="sm" disabled={exporting} onClick={handleExport}>
-      <DownloadIcon />
-      Export .xlsx
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" disabled={exporting}>
+          <DownloadIcon />
+          Export
+          <ChevronDownIcon />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onSelect={() => void exportXlsx()}>Excel (.xlsx)</DropdownMenuItem>
+        {TEXT_EXPORTS.map(({ extension, label }) => (
+          <DropdownMenuItem key={extension} onSelect={() => exportText(extension)}>
+            {label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

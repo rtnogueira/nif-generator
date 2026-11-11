@@ -1,5 +1,5 @@
 import { RefreshCwIcon } from 'lucide-react'
-import { useId, useState, type SubmitEvent } from 'react'
+import { useId, useState, type ReactNode, type SubmitEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -17,38 +17,68 @@ import {
   getTaxIdCountry,
   getTaxIdCountryName,
   isTaxIdCountryCode,
+  isValidity,
   isViesCountry,
   TAX_ID_COUNTRIES,
   type TaxIdCountryCode,
+  type TaxIdType,
+  type Validity,
 } from '@/lib/tax-id'
+import type { NifOptions } from './generator-options'
 import { QuantityInput } from './quantity-input'
 
-export interface NifOptions {
-  country: TaxIdCountryCode
-  typeId: string
-  quantity: number
-  withPrefix: boolean
+const FORMAT_EXAMPLES = new Map<TaxIdType, string>()
+
+/** A formatted example number, generated once per type so it does not change on every render. */
+function formatExample(type: TaxIdType): string | undefined {
+  if (!type.format) return undefined
+  let example = FORMAT_EXAMPLES.get(type)
+  if (!example) {
+    example = type.format(type.generate())
+    FORMAT_EXAMPLES.set(type, example)
+  }
+  return example
 }
 
 interface NifOptionsFormProps {
+  initialOptions: NifOptions
   onGenerate: (options: NifOptions) => void
 }
+
+const VALIDITY_OPTIONS: { value: Validity; label: string; description: string }[] = [
+  { value: 'valid', label: 'Valid', description: 'Correct format and check digit.' },
+  {
+    value: 'invalid-check-digit',
+    label: 'Invalid check digit',
+    description: 'Right format, wrong check digit: forms should reject these.',
+  },
+  {
+    value: 'invalid-length',
+    label: 'Invalid length',
+    description: 'Digits added or removed: forms should reject these.',
+  },
+]
 
 const COUNTRIES_BY_NAME = [...TAX_ID_COUNTRIES]
   .map(country => ({ code: country.code, name: getTaxIdCountryName(country.code) }))
   .sort((a, b) => a.name.localeCompare(b.name))
 
-export function NifOptionsForm({ onGenerate }: NifOptionsFormProps) {
+export function NifOptionsForm({ initialOptions, onGenerate }: NifOptionsFormProps) {
   const id = useId()
-  const [country, setCountry] = useState<TaxIdCountryCode>(DEFAULT_TAX_ID_COUNTRY)
-  const [typeId, setTypeId] = useState(DEFAULT_TAX_ID_TYPE)
-  const [quantity, setQuantity] = useState(MIN_QUANTITY)
-  const [withPrefix, setWithPrefix] = useState(false)
+  const [country, setCountry] = useState<TaxIdCountryCode>(initialOptions.country)
+  const [typeId, setTypeId] = useState(initialOptions.typeId)
+  const [quantity, setQuantity] = useState(initialOptions.quantity)
+  const [withPrefix, setWithPrefix] = useState(initialOptions.withPrefix)
+  const [formatted, setFormatted] = useState(initialOptions.formatted)
+  const [validity, setValidity] = useState<Validity>(initialOptions.validity)
 
   const types = getTaxIdCountry(country).types
   const type = types.find(t => t.id === typeId) ?? types[0]
   const isPortugal = country === 'PT'
   const vies = isViesCountry(country)
+  const canFormat = Boolean(type.format) && validity !== 'invalid-length'
+  const validityOption = VALIDITY_OPTIONS.find(option => option.value === validity)
+  const example = formatExample(type)
 
   function handleCountryChange(value: string) {
     if (!isTaxIdCountryCode(value)) return
@@ -60,7 +90,15 @@ export function NifOptionsForm({ onGenerate }: NifOptionsFormProps) {
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
-    onGenerate({ country, typeId: type.id, quantity, withPrefix: vies && withPrefix })
+    onGenerate({
+      country,
+      typeId: type.id,
+      quantity,
+      withPrefix: vies && withPrefix,
+      // Numbers of the wrong length have no written form.
+      formatted: canFormat && formatted,
+      validity,
+    })
   }
 
   return (
@@ -133,23 +171,48 @@ export function NifOptionsForm({ onGenerate }: NifOptionsFormProps) {
             </p>
           </div>
 
+          <div className="flex flex-col gap-2">
+            <Label htmlFor={`${id}-validity`}>Validity</Label>
+            <Select
+              value={validity}
+              onValueChange={value => isValidity(value) && setValidity(value)}
+            >
+              <SelectTrigger id={`${id}-validity`} className="w-full data-[size=default]:h-10">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {VALIDITY_OPTIONS.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">{validityOption?.description}</p>
+          </div>
+
           {vies && (
-            <div className="flex items-start gap-2.5">
-              <input
-                id={`${id}-prefix`}
-                type="checkbox"
-                checked={withPrefix}
-                onChange={event => setWithPrefix(event.target.checked)}
-                className="mt-0.5 size-4 shrink-0 accent-primary"
-              />
-              <div className="flex flex-col gap-1">
-                <Label htmlFor={`${id}-prefix`}>Include the {country} prefix</Label>
-                <p className="text-xs text-muted-foreground">
-                  VAT number format: <span className="font-mono text-foreground">{country}</span>{' '}
-                  followed by the national number.
-                </p>
-              </div>
-            </div>
+            <CheckboxField
+              id={`${id}-prefix`}
+              label={`Include the ${country} prefix`}
+              checked={withPrefix}
+              onChange={setWithPrefix}
+            >
+              VAT number format: <span className="font-mono text-foreground">{country}</span>{' '}
+              followed by the national number.
+            </CheckboxField>
+          )}
+
+          {canFormat && example && (
+            <CheckboxField
+              id={`${id}-formatted`}
+              label="Formatted"
+              checked={formatted}
+              onChange={setFormatted}
+            >
+              Written the usual way, e.g.{' '}
+              <span className="font-mono whitespace-nowrap text-foreground">{example}</span>
+            </CheckboxField>
           )}
 
           <Button type="submit" size="lg" className="h-11">
@@ -159,5 +222,31 @@ export function NifOptionsForm({ onGenerate }: NifOptionsFormProps) {
         </form>
       </CardContent>
     </Card>
+  )
+}
+
+interface CheckboxFieldProps {
+  id: string
+  label: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+  children: ReactNode
+}
+
+function CheckboxField({ id, label, checked, onChange, children }: CheckboxFieldProps) {
+  return (
+    <div className="flex items-start gap-2.5">
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={event => onChange(event.target.checked)}
+        className="mt-0.5 size-4 shrink-0 accent-primary"
+      />
+      <div className="flex flex-col gap-1">
+        <Label htmlFor={id}>{label}</Label>
+        <p className="text-xs text-muted-foreground">{children}</p>
+      </div>
+    </div>
   )
 }

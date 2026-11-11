@@ -113,8 +113,9 @@ describe('validateVatNumber', () => {
 })
 
 describe('normalizeVatNumber', () => {
-  it('uppercases and strips spaces, dots and dashes but keeps "+" and "*"', () => {
+  it('uppercases and strips spaces, dots, dashes and slashes but keeps "+" and "*"', () => {
     expect(normalizeVatNumber(' be 0123.456-789 ')).toBe('BE0123456789')
+    expect(normalizeVatNumber('16.727.230/0001-97')).toBe('16727230000197')
     expect(normalizeVatNumber('nl0+*abc123b9z')).toBe('NL0+*ABC123B9Z')
   })
 })

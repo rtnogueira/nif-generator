@@ -10,6 +10,6 @@ export async function downloadXlsxColumn(
   const { default: writeXlsxFile } = await import('write-excel-file/browser')
 
   await writeXlsxFile([[{ value: header, fontWeight: 'bold' }], ...values.map(value => [value])], {
-    columns: [{ width: 16 }],
+    columns: [{ width: 22 }],
   }).toFile(`${fileName}.xlsx`)
 }
