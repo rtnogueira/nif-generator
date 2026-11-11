@@ -13,8 +13,12 @@ router.subscribe('onResolved', ({ toLocation }) => trackPageView(toLocation.href
 const rootElement = document.getElementById('root')
 if (!rootElement) throw new Error('Root element not found')
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>
-)
+// #root holds the page prerendered by the build. Load the route's code first, so React replaces
+// that markup with the same content instead of an empty main area for a moment.
+void router.load().finally(() => {
+  createRoot(rootElement).render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>
+  )
+})

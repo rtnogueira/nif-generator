@@ -1,5 +1,6 @@
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useState, type ReactNode } from 'react'
+import { RelatedTools } from '@/components/related-tools'
 import { usePageMeta } from '@/hooks/use-page-meta'
 import type { PagePath } from '@/lib/pages'
 import type { GeneratedBatch } from '@/lib/tax-id'
@@ -13,7 +14,6 @@ import {
 } from './generator-options'
 import { NifOptionsForm } from './nif-options-form'
 import { NifResults } from './nif-results'
-import { RelatedTools } from './related-tools'
 
 export interface NifGeneratorProps {
   path: PagePath

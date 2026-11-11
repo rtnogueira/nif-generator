@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { RelatedTools } from '@/components/related-tools'
 import { usePageMeta } from '@/hooks/use-page-meta'
 import { validateTaxNumber, type TaxNumberValidation } from '@/lib/tax-id'
 import { ValidationResult } from './validation-result'
@@ -32,6 +33,8 @@ export function TaxNumberValidator() {
       </div>
 
       <ValidatorAbout />
+
+      <RelatedTools current="/tax-id-validator" />
     </div>
   )
 }
