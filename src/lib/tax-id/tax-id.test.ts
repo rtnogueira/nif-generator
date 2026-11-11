@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_QUANTITY } from '@/lib/nif'
+import { generateNif, MAX_QUANTITY } from '@/lib/nif'
 import { validateVatNumber, VAT_COUNTRIES } from '@/lib/vat'
 import {
   generateTaxIds,
@@ -9,6 +9,7 @@ import {
   isTaxIdCountryCode,
   isViesCountry,
   TAX_ID_COUNTRIES,
+  validateTaxNumber,
   type TaxIdCountry,
 } from '.'
 import {
@@ -148,11 +149,102 @@ describe.each(countries)('$code', country => {
     for (let i = 0; i < 300; i++) {
       const number = type.generate()
       expect(type.isValid(number), number).toBe(true)
+      expect(number, number).toMatch(type.pattern)
+      expect(validateTaxNumber(number, country.code), number).toMatchObject({
+        status: 'valid',
+        verified: true,
+      })
       if (isViesCountry(country.code)) {
         // The site's own validator must agree, with and without the country prefix.
         expect(validateVatNumber(country.code + number).status, number).toBe('valid')
         expect(validateVatNumber(number, country.code).status, number).toBe('valid')
       }
+    }
+  })
+})
+
+describe('validateTaxNumber', () => {
+  it.each(countries)('verifies real $code numbers and rejects a wrong check character', country => {
+    const vies = isViesCountry(country.code)
+    for (const number of REAL_NUMBERS[country.code]) {
+      const valid = { status: 'valid', verified: true }
+      expect(validateTaxNumber(number, country.code), number).toMatchObject(valid)
+      if (vies) expect(validateTaxNumber(country.code + number), number).toMatchObject(valid)
+
+      const mutated = mutate(number, checkIndex(country.code, number))
+      expect(validateTaxNumber(mutated, country.code).status, mutated).not.toBe('valid')
+    }
+  })
+
+  it('reports a wrong check digit, naming the kind of number', () => {
+    expect(validateTaxNumber('DE113866164')).toMatchObject({
+      status: 'invalid-check-digit',
+      number: '113866164',
+      types: [{ name: 'USt-IdNr.' }],
+    })
+    expect(validateTaxNumber('PT123456788').status).toBe('invalid-check-digit')
+  })
+
+  it('checks only the format of kinds of number without a known algorithm', () => {
+    for (const input of [
+      'CZ1234567890',
+      'IE1234567AB',
+      'LV01234567890',
+      'GBGD001',
+      'BG1234567890',
+    ]) {
+      expect(validateTaxNumber(input), input).toMatchObject({ status: 'valid', verified: false })
+    }
+  })
+
+  it('names the matching type, the most specific one for Portugal', () => {
+    expect(validateTaxNumber('ESX5253868R')).toMatchObject({ type: { name: 'NIE' } })
+    expect(validateTaxNumber('PT501964843')).toMatchObject({ type: { badge: '5' } })
+    const nif = generateNif('38')
+    expect(validateTaxNumber(nif, 'PT')).toMatchObject({ type: { badge: '38' } })
+  })
+
+  it('lists every accepted format outside VIES', () => {
+    for (const country of countries) {
+      if (isViesCountry(country.code)) continue
+      for (const type of country.types) {
+        expect(type.notations?.length, `${country.code} ${type.id}`).toBeGreaterThan(0)
+        // Each notation (not a description in words) must have the type's shape.
+        for (const notation of type.notations ?? []) {
+          if (notation.includes(' ')) continue
+          const sample = notation.replace(/9/g, '1').replace(/X/g, 'K')
+          expect(sample, `${country.code} ${notation}`).toMatch(type.pattern)
+        }
+      }
+    }
+  })
+
+  it('accepts the usual ways of writing numbers outside VIES', () => {
+    const valid = { status: 'valid', verified: true }
+    expect(validateTaxNumber('390.533.447-05', 'BR')).toMatchObject(valid)
+    expect(validateTaxNumber('10626628k', 'CL')).toMatchObject(valid)
+    expect(validateTaxNumber('15.252.525-0', 'CO')).toMatchObject(valid)
+    expect(validateTaxNumber('NO 965 920 358 MVA', 'NO')).toMatchObject(valid)
+    expect(validateTaxNumber('113.042.942', 'CH')).toMatchObject(valid)
+    // Swiss UIDs are recognised by their CHE prefix, with or without a VAT suffix.
+    expect(validateTaxNumber('CHE-113.042.942 MWST')).toMatchObject({
+      ...valid,
+      country: { code: 'CH' },
+    })
+  })
+
+  it('reports a wrong format with the national part only', () => {
+    expect(validateTaxNumber('DE12345678')).toMatchObject({
+      status: 'invalid-format',
+      number: '12345678',
+    })
+    expect(validateTaxNumber('1234', 'BR').status).toBe('invalid-format')
+  })
+
+  it('reports empty input and unsupported prefixes', () => {
+    expect(validateTaxNumber(' ').status).toBe('empty')
+    for (const input of ['123456789', 'US123456789', 'BR39053344705']) {
+      expect(validateTaxNumber(input).status, input).toBe('unknown-country')
     }
   })
 })

@@ -20,7 +20,7 @@ const TOOLS = [
   {
     to: '/tax-number-validator',
     label: 'Tax number validator',
-    description: 'Check EU VAT numbers and Portuguese NIFs.',
+    description: 'Check the check digit of NIFs, EU VAT and other tax numbers.',
     icon: ShieldCheckIcon,
   },
 ] as const

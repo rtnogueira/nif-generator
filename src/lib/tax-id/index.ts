@@ -50,3 +50,13 @@ export function generateTaxIds(type: TaxIdType, count: number): string[] {
   while (unique.size < target) unique.add(type.generate())
   return [...unique]
 }
+
+export {
+  getExpectedFormats,
+  getValidatorCountry,
+  validateTaxNumber,
+  VALIDATOR_COUNTRIES,
+  type ExpectedFormat,
+  type TaxNumberValidation,
+  type ValidatorCountry,
+} from './validate'

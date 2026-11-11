@@ -1,4 +1,3 @@
-import { isValidNif } from '@/lib/nif'
 import {
   VAT_COUNTRIES,
   type VatCountry,
@@ -47,12 +46,11 @@ export type VatValidation =
   /** No country was chosen and the input does not start with a supported prefix. */
   | { status: 'unknown-country' }
   | { status: 'invalid-format'; country: VatCountry; number: string }
-  | { status: 'invalid-check-digit'; country: VatCountry; number: string }
   | { status: 'valid'; country: VatCountry; number: string }
 
 /**
- * Checks a VAT number against the official structure of its country (and the check digit, where
- * supported). `countryCode` is optional: without it the country is taken from the number's prefix.
+ * Checks a VAT number against the official structure of its country (format only: check digits are
+ * verified by `validateTaxNumber` in `@/lib/tax-id`). `countryCode` is optional: without it the country is taken from the number's prefix.
  * The prefix is optional when a country is given.
  */
 export function validateVatNumber(input: string, countryCode?: string): VatValidation {
@@ -65,9 +63,6 @@ export function validateVatNumber(input: string, countryCode?: string): VatValid
   const number = value.startsWith(country.code) ? value.slice(country.code.length) : value
   if (!country.formats.some(format => formatPattern(format).test(number))) {
     return { status: 'invalid-format', country, number }
-  }
-  if (country.code === 'PT' && !isValidNif(number)) {
-    return { status: 'invalid-check-digit', country, number }
   }
   return { status: 'valid', country, number }
 }
