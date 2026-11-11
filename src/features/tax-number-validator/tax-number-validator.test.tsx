@@ -6,25 +6,24 @@ import { createAppRouter } from '@/router'
 
 async function renderValidator() {
   const user = userEvent.setup()
-  const router = createAppRouter(createMemoryHistory({ initialEntries: ['/tax-number-validator'] }))
+  const router = createAppRouter(createMemoryHistory({ initialEntries: ['/tax-id-validator'] }))
   render(<RouterProvider router={router} />)
-  await screen.findByRole('heading', { level: 1, name: 'Tax Number Validator' })
+  await screen.findByRole('heading', { level: 1, name: 'Tax ID Validator' })
   return user
 }
 
-describe('Tax number validator page', () => {
+describe('Tax ID validator page', () => {
   it('is reachable from the Tools menu and sets the page title', async () => {
     const user = userEvent.setup()
     const router = createAppRouter(createMemoryHistory({ initialEntries: ['/'] }))
     render(<RouterProvider router={router} />)
 
-    await user.click(await screen.findByRole('button', { name: 'Tools' }))
-    await user.click(await screen.findByRole('link', { name: /Tax number validator/ }))
+    const nav = await screen.findByRole('navigation', { name: 'Main' })
+    await user.click(within(nav).getByRole('button', { name: 'Tools' }))
+    await user.click(await within(nav).findByRole('link', { name: /Tax ID validator/ }))
 
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'Tax Number Validator' })
-    ).toBeVisible()
-    expect(document.title).toBe('Tax Number Validator (EU VAT, NIF & more) | rtnogueira')
+    expect(await screen.findByRole('heading', { level: 1, name: 'Tax ID Validator' })).toBeVisible()
+    expect(document.title).toBe('Tax ID Validator: Check EU VAT, NIF, CPF & more | rtnogueira')
   })
 
   it('detects the country from the prefix and verifies the check digit', async () => {

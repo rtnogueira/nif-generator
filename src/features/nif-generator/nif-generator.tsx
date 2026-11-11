@@ -1,58 +1,72 @@
-import { getRouteApi } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useNavigate, useSearch } from '@tanstack/react-router'
+import { useState, type ReactNode } from 'react'
+import { usePageMeta } from '@/hooks/use-page-meta'
+import type { PagePath } from '@/lib/pages'
 import type { GeneratedBatch } from '@/lib/tax-id'
 import {
   DEFAULT_OPTIONS,
   generateBatch,
   optionsFromSearch,
   searchFromOptions,
+  validateGeneratorSearch,
   type NifOptions,
 } from './generator-options'
-import { NifAbout } from './nif-about'
 import { NifOptionsForm } from './nif-options-form'
 import { NifResults } from './nif-results'
+import { RelatedTools } from './related-tools'
 
-const route = getRouteApi('/')
+export interface NifGeneratorProps {
+  path: PagePath
+  heading: string
+  intro: ReactNode
+  /** Options the form starts with when the URL has none (e.g. Brazil for the CPF page). */
+  preset?: Partial<NifOptions>
+  /** Explanations shown below the generator. */
+  about: ReactNode
+}
 
-export function NifGenerator() {
-  const search = route.useSearch()
-  const navigate = route.useNavigate()
+/** The generator page (`/`) and its landing pages for one kind of number, e.g. `/cpf-generator`. */
+export function NifGenerator({ path, heading, intro, preset, about }: NifGeneratorProps) {
+  usePageMeta(path)
+  const search = validateGeneratorSearch(useSearch({ strict: false }))
+  const navigate = useNavigate()
   // Read once: a link with options (e.g. ?country=BR&type=cpf&qty=20) fills the form and shows a
   // batch straight away. Computed in the initializers, not an effect, so it runs once.
-  const [initialOptions] = useState(() => optionsFromSearch(search))
+  const [fromUrl] = useState(() => optionsFromSearch(search))
   const [batch, setBatch] = useState<GeneratedBatch | null>(() =>
-    initialOptions ? generateBatch(initialOptions) : null
+    fromUrl ? generateBatch(fromUrl) : null
   )
 
   function handleGenerate(options: NifOptions) {
     setBatch(generateBatch(options))
     // Keep the URL in step, so the current options can be bookmarked or shared.
-    void navigate({ search: searchFromOptions(options), replace: true, resetScroll: false })
+    void navigate({
+      to: '.',
+      search: searchFromOptions(options),
+      replace: true,
+      resetScroll: false,
+    })
   }
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">Tools</p>
-        <h1 className="text-3xl font-bold tracking-tight">Tax Number Generator</h1>
-        <p className="max-w-2xl text-muted-foreground">
-          Generate valid tax identification numbers with a correct check digit, for testing forms
-          and systems, or deliberately invalid ones to check that they are rejected. Covers
-          Portuguese NIFs of every type, the VAT numbers of all 27 EU member states, Northern
-          Ireland and the United Kingdom, and tax numbers from countries such as Brazil,
-          Switzerland, Norway, Australia and Japan. Free, instant and fully in your browser.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
+        <div className="flex max-w-2xl flex-col gap-2 text-muted-foreground">{intro}</div>
       </div>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <NifOptionsForm
-          initialOptions={initialOptions ?? DEFAULT_OPTIONS}
+          initialOptions={fromUrl ?? { ...DEFAULT_OPTIONS, ...preset }}
           onGenerate={handleGenerate}
         />
         <NifResults batch={batch} />
       </div>
 
-      <NifAbout />
+      {about}
+
+      <RelatedTools current={path} />
     </div>
   )
 }

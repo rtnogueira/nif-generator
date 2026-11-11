@@ -10,12 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CpfGeneratorRouteImport } from './routes/cpf-generator'
+import { Route as NifGeneratorRouteImport } from './routes/nif-generator'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TaxIdValidatorRouteImport } from './routes/tax-id-validator'
 import { Route as TaxNumberValidatorRouteImport } from './routes/tax-number-validator'
+import { Route as VatNumberGeneratorRouteImport } from './routes/vat-number-generator'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CpfGeneratorRoute = CpfGeneratorRouteImport.update({
+  id: '/cpf-generator',
+  path: '/cpf-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NifGeneratorRoute = NifGeneratorRouteImport.update({
+  id: '/nif-generator',
+  path: '/nif-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -23,40 +37,88 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TaxIdValidatorRoute = TaxIdValidatorRouteImport.update({
+  id: '/tax-id-validator',
+  path: '/tax-id-validator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TaxNumberValidatorRoute = TaxNumberValidatorRouteImport.update({
   id: '/tax-number-validator',
   path: '/tax-number-validator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VatNumberGeneratorRoute = VatNumberGeneratorRouteImport.update({
+  id: '/vat-number-generator',
+  path: '/vat-number-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cpf-generator': typeof CpfGeneratorRoute
+  '/nif-generator': typeof NifGeneratorRoute
   '/privacy': typeof PrivacyRoute
+  '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
+  '/vat-number-generator': typeof VatNumberGeneratorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cpf-generator': typeof CpfGeneratorRoute
+  '/nif-generator': typeof NifGeneratorRoute
   '/privacy': typeof PrivacyRoute
+  '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
+  '/vat-number-generator': typeof VatNumberGeneratorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cpf-generator': typeof CpfGeneratorRoute
+  '/nif-generator': typeof NifGeneratorRoute
   '/privacy': typeof PrivacyRoute
+  '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
+  '/vat-number-generator': typeof VatNumberGeneratorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacy' | '/tax-number-validator'
+  fullPaths:
+    | '/'
+    | '/cpf-generator'
+    | '/nif-generator'
+    | '/privacy'
+    | '/tax-id-validator'
+    | '/tax-number-validator'
+    | '/vat-number-generator'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/tax-number-validator'
-  id: '__root__' | '/' | '/privacy' | '/tax-number-validator'
+  to:
+    | '/'
+    | '/cpf-generator'
+    | '/nif-generator'
+    | '/privacy'
+    | '/tax-id-validator'
+    | '/tax-number-validator'
+    | '/vat-number-generator'
+  id:
+    | '__root__'
+    | '/'
+    | '/cpf-generator'
+    | '/nif-generator'
+    | '/privacy'
+    | '/tax-id-validator'
+    | '/tax-number-validator'
+    | '/vat-number-generator'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CpfGeneratorRoute: typeof CpfGeneratorRoute
+  NifGeneratorRoute: typeof NifGeneratorRoute
   PrivacyRoute: typeof PrivacyRoute
+  TaxIdValidatorRoute: typeof TaxIdValidatorRoute
   TaxNumberValidatorRoute: typeof TaxNumberValidatorRoute
+  VatNumberGeneratorRoute: typeof VatNumberGeneratorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,11 +130,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cpf-generator': {
+      id: '/cpf-generator'
+      path: '/cpf-generator'
+      fullPath: '/cpf-generator'
+      preLoaderRoute: typeof CpfGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nif-generator': {
+      id: '/nif-generator'
+      path: '/nif-generator'
+      fullPath: '/nif-generator'
+      preLoaderRoute: typeof NifGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tax-id-validator': {
+      id: '/tax-id-validator'
+      path: '/tax-id-validator'
+      fullPath: '/tax-id-validator'
+      preLoaderRoute: typeof TaxIdValidatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tax-number-validator': {
@@ -82,13 +165,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TaxNumberValidatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vat-number-generator': {
+      id: '/vat-number-generator'
+      path: '/vat-number-generator'
+      fullPath: '/vat-number-generator'
+      preLoaderRoute: typeof VatNumberGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CpfGeneratorRoute: CpfGeneratorRoute,
+  NifGeneratorRoute: NifGeneratorRoute,
   PrivacyRoute: PrivacyRoute,
+  TaxIdValidatorRoute: TaxIdValidatorRoute,
   TaxNumberValidatorRoute: TaxNumberValidatorRoute,
+  VatNumberGeneratorRoute: VatNumberGeneratorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

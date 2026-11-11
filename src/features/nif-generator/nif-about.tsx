@@ -87,6 +87,32 @@ const FAQ = [
   },
 ]
 
+/** The Portuguese NIF prefixes and the type of taxpayer each identifies. */
+export function NifTypesTable() {
+  return (
+    <div className="rounded-lg border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-24">Prefix</TableHead>
+            <TableHead>Taxpayer type</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {NIF_TYPES.map(type => (
+            <TableRow key={type.prefix}>
+              <TableCell className="font-mono text-foreground">{type.prefix}</TableCell>
+              <TableCell lang="pt" className="whitespace-normal">
+                {type.label}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
+
 export function NifAbout() {
   return (
     <section
@@ -95,14 +121,14 @@ export function NifAbout() {
     >
       <div className="flex flex-col gap-3">
         <h2 id="about-nif" className="text-2xl font-semibold tracking-tight text-foreground">
-          What is a tax identification number?
+          What is a tax ID?
         </h2>
         <p>
-          Most countries give every taxpayer a tax identification number: the Portuguese NIF (
-          <i lang="pt">número de contribuinte</i>), the VAT numbers of EU companies, the Brazilian
-          CPF and CNPJ, the Australian ABN and many more. Forms, invoices and checkouts ask for
-          them, and usually check that they are well formed, which is why QA engineers and
-          developers need valid test numbers that belong to no one.
+          Most countries give every taxpayer a tax identification number (tax ID, or TIN): the
+          Portuguese NIF (<i lang="pt">número de contribuinte</i>), the VAT numbers of EU companies,
+          the Brazilian CPF and CNPJ, the Australian ABN and many more. Forms, invoices and
+          checkouts ask for them, and usually check that they are well formed, which is why QA
+          engineers and developers need valid test numbers that belong to no one.
         </p>
         <p>
           This generator creates such numbers for {TAX_ID_COUNTRIES.length} countries and regions,
@@ -126,8 +152,8 @@ export function NifAbout() {
           Each country uses its own algorithm, named for every number in the table below. A valid
           check digit only means the number is well formed, not that it has been assigned. To check
           a number you already have, use the{' '}
-          <Link to="/tax-number-validator" className={LINK_CLASS}>
-            tax number validator
+          <Link to="/tax-id-validator" className={LINK_CLASS}>
+            tax ID validator
           </Link>
           .
         </p>
@@ -180,26 +206,7 @@ export function NifAbout() {
           For Portugal, the Type option sets the first digit (or first two digits) of the NIF, which
           identify the type of taxpayer:
         </p>
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-24">Prefix</TableHead>
-                <TableHead>Taxpayer type</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {NIF_TYPES.map(type => (
-                <TableRow key={type.prefix}>
-                  <TableCell className="font-mono text-foreground">{type.prefix}</TableCell>
-                  <TableCell lang="pt" className="whitespace-normal">
-                    {type.label}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <NifTypesTable />
       </div>
 
       <div className="flex flex-col gap-5">

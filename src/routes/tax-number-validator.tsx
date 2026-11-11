@@ -1,6 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { TaxNumberValidator } from '@/features/tax-number-validator/tax-number-validator'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
+/** The validator's former address, kept so bookmarks and old links still work. */
 export const Route = createFileRoute('/tax-number-validator')({
-  component: TaxNumberValidator,
+  beforeLoad: () => {
+    throw redirect({ to: '/tax-id-validator', replace: true })
+  },
 })
