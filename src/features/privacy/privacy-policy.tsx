@@ -109,7 +109,9 @@ export function PrivacyPolicy() {
             <ExternalLink href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">
               GitHub Privacy Statement
             </ExternalLink>
-            .
+            . The &ldquo;Report a bug&rdquo; and &ldquo;Suggest a feature&rdquo; links open an issue
+            form on GitHub, with the address of the page you were on filled in. Nothing is sent
+            until you submit the form, and what you submit is public.
           </li>
           <li>
             <strong className="text-foreground">Buy Me a Coffee</strong> provides the support

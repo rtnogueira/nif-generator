@@ -1,0 +1,40 @@
+name: Bug report
+description: Something on the site is wrong or does not work.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. Please do not paste real tax numbers of real people or companies.
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The page where it happened (filled in when you use the link on the site).
+      placeholder: https://rtnogueira.com/?country=PT&type=2&qty=5
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: For a wrong result, include the number, the country and the type you chose.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Pick Brazil, CNPJ, 5 numbers
+        2. Press Generate
+        3. ...
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 140 on macOS, Safari on iPhone…

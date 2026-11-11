@@ -247,6 +247,24 @@ describe('NIF generator page', () => {
     expect(getTaxIdType('BR', 'cpf')?.isValid(cpf)).toBe(true)
   })
 
+  it('links to GitHub issue forms with the current page and options', async () => {
+    const user = await renderApp()
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+    const footer = screen.getByRole('contentinfo')
+
+    const bug = new URL(
+      within(footer).getByRole('link', { name: 'Report a bug' }).getAttribute('href') ?? ''
+    )
+    expect(bug.origin + bug.pathname).toBe('https://github.com/rtnogueira/nif-generator/issues/new')
+    expect(bug.searchParams.get('template')).toBe('bug_report.yml')
+    expect(bug.searchParams.get('page')).toBe(`${window.location.origin}/?country=PT&type=2&qty=1`)
+
+    const feature = new URL(
+      within(footer).getByRole('link', { name: 'Suggest a feature' }).getAttribute('href') ?? ''
+    )
+    expect(feature.searchParams.get('template')).toBe('feature_request.yml')
+  })
+
   it('renders the site chrome', async () => {
     await renderApp()
     const footer = screen.getByRole('contentinfo')

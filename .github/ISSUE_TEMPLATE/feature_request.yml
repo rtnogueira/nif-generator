@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a new country, number type, tool or improvement.
+labels: [enhancement]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The page you were on (filled in when you use the link on the site).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Tax number generator
+        - Tax number validator
+        - A new country or number type
+        - A new tool
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe the feature and the problem it solves for you.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: For a new number type, a link to its official specification or check-digit algorithm helps a lot.
