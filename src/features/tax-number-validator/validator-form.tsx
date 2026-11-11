@@ -7,19 +7,27 @@ import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { getVatCountry, isVatCountryCode, VAT_COUNTRIES, type VatCountryCode } from '@/lib/vat'
+import {
+  getExpectedFormats,
+  getValidatorCountry,
+  VALIDATOR_COUNTRIES,
+  type ValidatorCountry,
+} from '@/lib/tax-id'
 import { ExpectedFormats } from './expected-formats'
 
 /** Select value meaning "take the country from the number's prefix". */
 export const AUTO_DETECT = 'auto'
-export type CountryChoice = VatCountryCode | typeof AUTO_DETECT
 
 export interface ValidatorInput {
-  country: CountryChoice
+  /** A country code, or `AUTO_DETECT`. */
+  country: string
   number: string
 }
 
@@ -27,13 +35,15 @@ interface ValidatorFormProps {
   onValidate: (input: ValidatorInput) => void
 }
 
-const COUNTRIES_BY_NAME = [...VAT_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name))
+const byName = (a: ValidatorCountry, b: ValidatorCountry) => a.name.localeCompare(b.name)
+const VIES_COUNTRIES = VALIDATOR_COUNTRIES.filter(c => c.vat).sort(byName)
+const OTHER_COUNTRIES = VALIDATOR_COUNTRIES.filter(c => !c.vat).sort(byName)
 
 export function ValidatorForm({ onValidate }: ValidatorFormProps) {
   const id = useId()
-  const [country, setCountry] = useState<CountryChoice>(AUTO_DETECT)
+  const [country, setCountry] = useState(AUTO_DETECT)
   const [number, setNumber] = useState('')
-  const selected = country === AUTO_DETECT ? undefined : getVatCountry(country)
+  const selected = getValidatorCountry(country)
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -45,7 +55,7 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
       <CardHeader>
         <CardTitle>Tax number</CardTitle>
         <CardDescription>
-          Pick a country, or type the number with its country prefix.
+          Pick a country, or type an EU VAT number with its country prefix.
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
@@ -55,7 +65,7 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
             <Select
               value={country}
               onValueChange={value =>
-                (value === AUTO_DETECT || isVatCountryCode(value)) && setCountry(value)
+                (value === AUTO_DETECT || getValidatorCountry(value)) && setCountry(value)
               }
             >
               <SelectTrigger id={`${id}-country`} className="w-full data-[size=default]:h-10">
@@ -63,14 +73,10 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
               </SelectTrigger>
               <SelectContent position="popper" className="max-h-80">
                 <SelectItem value={AUTO_DETECT}>Detect from prefix</SelectItem>
-                {COUNTRIES_BY_NAME.map(c => (
-                  <SelectItem key={c.code} value={c.code}>
-                    <span className="w-7 rounded bg-muted px-1.5 text-center font-mono text-xs">
-                      {c.code}
-                    </span>
-                    <span className="truncate">{c.name}</span>
-                  </SelectItem>
-                ))}
+                <SelectSeparator />
+                <CountryGroup label="EU VAT (VIES)" countries={VIES_COUNTRIES} />
+                <SelectSeparator />
+                <CountryGroup label="Other countries" countries={OTHER_COUNTRIES} />
               </SelectContent>
             </Select>
           </div>
@@ -81,9 +87,7 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
               id={`${id}-number`}
               value={number}
               onChange={event => setNumber(event.target.value)}
-              placeholder={
-                selected ? `${selected.code}${selected.formats[0].notation}` : 'PT123456789'
-              }
+              placeholder={selected ? getExpectedFormats(selected)[0].formats[0] : 'PT123456789'}
               autoComplete="off"
               autoCapitalize="characters"
               spellCheck={false}
@@ -107,5 +111,27 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
         </form>
       </CardContent>
     </Card>
+  )
+}
+
+function CountryGroup({
+  label,
+  countries,
+}: {
+  label: string
+  countries: readonly ValidatorCountry[]
+}) {
+  return (
+    <SelectGroup>
+      <SelectLabel>{label}</SelectLabel>
+      {countries.map(c => (
+        <SelectItem key={c.code} value={c.code}>
+          <span className="w-7 rounded bg-muted px-1.5 text-center font-mono text-xs">
+            {c.code}
+          </span>
+          <span className="truncate">{c.name}</span>
+        </SelectItem>
+      ))}
+    </SelectGroup>
   )
 }

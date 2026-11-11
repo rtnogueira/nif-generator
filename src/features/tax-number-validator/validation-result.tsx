@@ -1,12 +1,13 @@
 import { CircleCheckIcon, CircleXIcon, ScanSearchIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Card } from '@/components/ui/card'
+import type { TaxIdType, TaxNumberValidation, ValidatorCountry } from '@/lib/tax-id'
 import { cn } from '@/lib/utils'
-import { VIES_VALIDATION_URL, type VatCountry, type VatValidation } from '@/lib/vat'
+import { VIES_VALIDATION_URL } from '@/lib/vat'
 import { ExpectedFormats } from './expected-formats'
 
 interface ValidationResultProps {
-  result: VatValidation | null
+  result: TaxNumberValidation | null
 }
 
 export function ValidationResult({ result }: ValidationResultProps) {
@@ -15,6 +16,22 @@ export function ValidationResult({ result }: ValidationResultProps) {
       <ResultContent result={result} />
     </Card>
   )
+}
+
+const ViesLink = () => (
+  <a
+    href={VIES_VALIDATION_URL}
+    target="_blank"
+    rel="noreferrer"
+    className="font-medium text-foreground underline underline-offset-4"
+  >
+    VIES
+  </a>
+)
+
+/** The kind of number that matched, e.g. "NIF · Pessoa singular" or "Partita IVA (VAT number)". */
+function describeType(type: TaxIdType) {
+  return type.label.includes(type.name) ? type.label : `${type.name} · ${type.label}`
 }
 
 function ResultContent({ result }: ValidationResultProps) {
@@ -36,42 +53,49 @@ function ResultContent({ result }: ValidationResultProps) {
     case 'unknown-country':
       return (
         <Invalid title="Country not recognised">
-          Start the number with a supported country prefix (such as PT, ES or DE), or pick the
-          country from the list.
+          Start the number with an EU VAT prefix (such as PT, ES or DE), or pick the country from
+          the list. Numbers from outside the EU need the country picked.
         </Invalid>
       )
     case 'invalid-format':
       return (
         <Invalid title="Invalid format" country={result.country} number={result.number}>
-          This number does not match the official structure for {result.country.name}. Expected{' '}
-          <ExpectedFormats country={result.country} />.
+          This number does not match the {result.country.vat ? 'official structure' : 'format'} for{' '}
+          {result.country.name}. Expected <ExpectedFormats country={result.country} />.
         </Invalid>
       )
     case 'invalid-check-digit':
       return (
         <Invalid title="Invalid check digit" country={result.country} number={result.number}>
-          The format is right, but the last digit does not match the modulo-11 check digit, so this
-          is not a valid Portuguese NIF.
+          The format is right, but the check digit is wrong, so this is not a valid{' '}
+          {result.types.map(type => type.name).join(' or ')} (
+          {result.types.map(type => type.algorithm).join('; ')}).
         </Invalid>
       )
     case 'valid':
-      return result.country.checkDigit ? (
+      if (!result.verified) {
+        return (
+          <Valid title="Valid format" country={result.country} number={result.number}>
+            This number matches the official structure for {result.country.name}. Its check digit is
+            not verified, as this kind of number is not covered. To confirm it is registered, check
+            it on <ViesLink />.
+          </Valid>
+        )
+      }
+      return (
         <Valid title="Valid tax number" country={result.country} number={result.number}>
+          {result.type && (
+            <span className="mb-1 block font-medium text-foreground">
+              {describeType(result.type)}
+            </span>
+          )}
           Both the format and the check digit are correct.
-        </Valid>
-      ) : (
-        <Valid title="Valid format" country={result.country} number={result.number}>
-          This number matches the official structure for {result.country.name}. To confirm it is
-          registered, check it on{' '}
-          <a
-            href={VIES_VALIDATION_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="font-medium text-foreground underline underline-offset-4"
-          >
-            VIES
-          </a>
-          .
+          {result.country.vat && (
+            <>
+              {' '}
+              To confirm it is registered, check it on <ViesLink />.
+            </>
+          )}
         </Valid>
       )
   }
@@ -79,7 +103,7 @@ function ResultContent({ result }: ValidationResultProps) {
 
 interface OutcomeProps {
   title: string
-  country?: VatCountry
+  country?: ValidatorCountry
   number?: string
   children: ReactNode
 }
@@ -120,11 +144,11 @@ function Message({
       <p className="font-semibold">{title}</p>
       {country && (
         <p className="font-mono text-lg tracking-wider break-all">
-          {country.code}
+          {country.vat && country.code}
           {number}
         </p>
       )}
-      <p className="max-w-sm text-sm text-muted-foreground">{children}</p>
+      <div className="max-w-sm text-sm text-muted-foreground">{children}</div>
     </div>
   )
 }

@@ -80,9 +80,8 @@ describe('validateVatNumber', () => {
     })
   }
 
-  it('verifies the Portuguese check digit', () => {
-    expect(validateVatNumber('PT123456789').status).toBe('valid')
-    expect(validateVatNumber('PT123456788').status).toBe('invalid-check-digit')
+  it('checks the format only (check digits are verified in @/lib/tax-id)', () => {
+    expect(validateVatNumber('PT123456788').status).toBe('valid')
   })
 
   it('accepts the number without prefix when the country is given', () => {

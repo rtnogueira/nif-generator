@@ -9,9 +9,10 @@
  * EIN) are not. Where a country issues several kinds of number, only the kinds named in `label`
  * are generated.
  *
- * Each `isValid` checks the national part of the number, without a VIES country prefix.
+ * Each `isValid` checks the national part of the number, without a VIES country prefix. Chilean and
+ * Colombian numbers are accepted with or without the dash before the check digit.
  */
-import { generateNif, isValidNif, NIF_TYPES } from '@/lib/nif'
+import { generateNif, isValidNif, NIF_LENGTH, NIF_TYPES } from '@/lib/nif'
 import { randomChar, randomChoice, randomDigits, randomInt } from '@/lib/random'
 import {
   isLuhnValid,
@@ -35,6 +36,18 @@ export interface TaxIdType {
   label: string
   /** Plain-language summary of the check-digit algorithm. */
   algorithm: string
+  /**
+   * Shape of the numbers the algorithm applies to (national part, uppercase, without spaces or
+   * dots). The validator only reports a wrong check digit for numbers of this shape: a number with
+   * another valid shape is a kind this site does not check (e.g. a 10-digit Czech personal DIČ).
+   */
+  pattern: RegExp
+  /**
+   * Every accepted format, for countries outside VIES (whose formats come from `@/lib/vat`):
+   * 9 = a digit, X = a digit or the letter K, anything else is literal. An entry with spaces is a
+   * description in words, for formats a notation cannot express. The first entry is the usual one.
+   */
+  notations?: readonly string[]
   generate: () => string
   isValid: (number: string) => boolean
 }
@@ -230,6 +243,7 @@ const GB_VAT = vatType({
   name: 'VAT',
   label: 'VAT registration number (9-digit standard number)',
   algorithm: 'Modulo 97 (weights 8 to 2), two check digits',
+  pattern: /^\d{9}$/,
   isValid: n =>
     /^\d{9}$/.test(n) &&
     (Number(n.slice(0, 3)) >= 100 ? [0, 42, 55].includes(gbChecksum(n)) : gbChecksum(n) === 0),
@@ -245,6 +259,7 @@ const PORTUGAL_TYPES: TaxIdType[] = NIF_TYPES.map(type => ({
   badge: type.prefix,
   label: type.label,
   algorithm: 'Modulo 11 (weights 9 to 2)',
+  pattern: new RegExp(`^${type.prefix}\\d{${NIF_LENGTH - type.prefix.length}}$`),
   generate: () => generateNif(type.prefix),
   isValid: (number: string) => number.startsWith(type.prefix) && isValidNif(number),
 }))
@@ -257,6 +272,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'UID',
         label: 'Umsatzsteuer-Identifikationsnummer (VAT number)',
         algorithm: 'Luhn variant ("U" + 7 digits + check digit)',
+        pattern: /^U\d{8}$/,
         isValid: n => /^U\d{8}$/.test(n) && atCheck(n.slice(0, 8)) === n[8],
         candidate: () => {
           const body = 'U' + randomDigits(7)
@@ -273,6 +289,7 @@ export const TAX_ID_COUNTRIES = [
         badge: 'BTW',
         label: 'Enterprise number (VAT number)',
         algorithm: 'Modulo 97, two check digits',
+        pattern: /^[01]\d{9}$/,
         isValid: n =>
           /^[01]\d{9}$/.test(n) &&
           Number(n) > 0 &&
@@ -291,6 +308,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'ЕИК',
         label: 'Legal entity VAT number (9 digits, ЕИК/BULSTAT)',
         algorithm: 'Weighted modulo 11 (weights 1 to 8, fallback 3 to 10)',
+        pattern: /^\d{9}$/,
         isValid: n => /^\d{9}$/.test(n) && bgLegalCheck(n.slice(0, 8)) === n[8],
         candidate: () => {
           const body = randomDigits(8)
@@ -306,6 +324,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'OIB',
         label: 'Osobni identifikacijski broj (individuals and companies)',
         algorithm: 'ISO 7064 Mod 11, 10',
+        pattern: /^\d{11}$/,
         isValid: n => /^\d{11}$/.test(n) && isMod11_10Valid(n),
         candidate: () => {
           const body = randomDigits(10)
@@ -321,6 +340,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'ΦΠΑ',
         label: 'VAT number (8 digits + check letter)',
         algorithm: 'Translated digit sum modulo 26, check letter',
+        pattern: /^\d{8}[A-Z]$/,
         isValid: n =>
           /^\d{8}[A-Z]$/.test(n) && !n.startsWith('12') && cyCheck(n.slice(0, 8)) === n[8],
         candidate: () => {
@@ -337,6 +357,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'DIČ',
         label: 'Legal entity VAT number (8 digits)',
         algorithm: 'Weighted modulo 11 (weights 8 to 2)',
+        pattern: /^\d{8}$/,
         isValid: n => /^[0-8]\d{7}$/.test(n) && czLegalCheck(n.slice(0, 7)) === n[7],
         candidate: () => {
           const body = randomChar('012345678') + randomDigits(6)
@@ -352,6 +373,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'CVR',
         label: 'Momsregistreringsnummer (CVR number)',
         algorithm: 'Weighted modulo 11 (weights 2, 7, 6, 5, 4, 3, 2, 1)',
+        pattern: /^\d{8}$/,
         isValid: n => /^[1-9]\d{7}$/.test(n) && weightedSum(n, [2, 7, 6, 5, 4, 3, 2, 1]) % 11 === 0,
         candidate: () => {
           const body = randomChar(NONZERO) + randomDigits(6)
@@ -367,6 +389,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'KMKR',
         label: 'Käibemaksukohustuslase number (VAT number)',
         algorithm: 'Weighted modulo 10 (weights 3, 7, 1)',
+        pattern: /^\d{9}$/,
         isValid: n => /^\d{9}$/.test(n) && weightedSum(n, [3, 7, 1, 3, 7, 1, 3, 7, 1]) % 10 === 0,
         candidate: () => {
           const body = '10' + randomDigits(6)
@@ -382,6 +405,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'ALV',
         label: 'Arvonlisäveronumero (VAT number, from the Y-tunnus)',
         algorithm: 'Weighted modulo 11 (weights 7, 9, 10, 5, 8, 4, 2)',
+        pattern: /^\d{8}$/,
         isValid: n => /^\d{8}$/.test(n) && weightedSum(n, [7, 9, 10, 5, 8, 4, 2, 1]) % 11 === 0,
         candidate: () => {
           const body = randomDigits(7)
@@ -397,6 +421,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'TVA',
         label: 'Numéro de TVA intracommunautaire (numeric key + SIREN)',
         algorithm: 'SIREN with Luhn check digit, key = (SIREN × 100 + 12) mod 97',
+        pattern: /^\d{11}$/,
         isValid: n => {
           if (!/^\d{11}$/.test(n)) return false
           const siren = n.slice(2)
@@ -419,6 +444,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'USt-IdNr.',
         label: 'Umsatzsteuer-Identifikationsnummer (VAT number)',
         algorithm: 'ISO 7064 Mod 11, 10',
+        pattern: /^\d{9}$/,
         isValid: n => /^[1-9]\d{8}$/.test(n) && isMod11_10Valid(n),
         candidate: () => {
           const body = randomChar(NONZERO) + randomDigits(7)
@@ -434,6 +460,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'ΑΦΜ',
         label: 'Αριθμός Φορολογικού Μητρώου (tax number)',
         algorithm: 'Powers of 2 modulo 11',
+        pattern: /^\d{9}$/,
         isValid: n => /^\d{9}$/.test(n) && grCheck(n.slice(0, 8)) === n[8],
         candidate: () => {
           const body = randomDigits(8)
@@ -449,6 +476,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'ANUM',
         label: 'Közösségi adószám (VAT number)',
         algorithm: 'Weighted modulo 10 (weights 9, 7, 3, 1)',
+        pattern: /^\d{8}$/,
         isValid: n => /^\d{8}$/.test(n) && weightedSum(n, [9, 7, 3, 1, 9, 7, 3, 1]) % 10 === 0,
         candidate: () => {
           const body = randomChar(NONZERO) + randomDigits(6)
@@ -464,6 +492,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'VAT',
         label: 'VAT number (7 digits + check letter)',
         algorithm: 'Weighted modulo 23 (weights 8 to 2), check letter',
+        pattern: /^\d{7}[A-Z]$/,
         isValid: n => /^\d{7}[A-Z]$/.test(n) && ieCheck(n) === n[7],
         candidate: () => {
           const body = randomDigits(7)
@@ -480,6 +509,7 @@ export const TAX_ID_COUNTRIES = [
         badge: 'P.IVA',
         label: 'Partita IVA (VAT number)',
         algorithm: 'Luhn, with a valid tax office code in digits 8–10',
+        pattern: /^\d{11}$/,
         isValid: n =>
           /^\d{11}$/.test(n) &&
           Number(n.slice(0, 7)) > 0 &&
@@ -500,6 +530,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'PVN',
         label: 'Legal entity VAT number (11 digits, first digit above 3)',
         algorithm: 'Weighted modulo 11 (weights 9, 1, 4, 8, 3, 10, 2, 5, 7, 6, 1)',
+        pattern: /^[4-9]\d{10}$/,
         isValid: n =>
           /^[4-9]\d{10}$/.test(n) && weightedSum(n, [9, 1, 4, 8, 3, 10, 2, 5, 7, 6, 1]) % 11 === 3,
         candidate: () => {
@@ -516,6 +547,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'PVM',
         label: 'Legal entity VAT number (9 digits)',
         algorithm: 'Weighted modulo 11 (weights 1 to 9, fallback 3 to 9, 1, 2)',
+        pattern: /^\d{9}$/,
         isValid: n => /^\d{7}1\d$/.test(n) && ltCheck(n.slice(0, 8)) === n[8],
         candidate: () => {
           const body = randomDigits(7) + '1'
@@ -531,6 +563,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'TVA',
         label: 'Numéro d’identification à la TVA (VAT number)',
         algorithm: 'First 6 digits modulo 89, two check digits',
+        pattern: /^\d{8}$/,
         isValid: n => /^\d{8}$/.test(n) && pad2(Number(n.slice(0, 6)) % 89) === n.slice(6),
         candidate: () => {
           const body = randomChar(NONZERO) + randomDigits(5)
@@ -546,6 +579,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'VAT',
         label: 'VAT registration number',
         algorithm: 'Weighted modulo 37 (weights 3, 4, 6, 7, 8, 9, 10, 1)',
+        pattern: /^\d{8}$/,
         isValid: n =>
           /^[1-9]\d{7}$/.test(n) && weightedSum(n, [3, 4, 6, 7, 8, 9, 10, 1]) % 37 === 0,
         candidate: () => {
@@ -563,6 +597,7 @@ export const TAX_ID_COUNTRIES = [
         badge: 'BTW',
         label: 'Btw-nummer (RSIN/BSN + B01)',
         algorithm: 'Elfproef (weighted modulo 11) on the first 9 digits',
+        pattern: /^\d{9}B\d{2}$/,
         isValid: n =>
           /^\d{9}B\d{2}$/.test(n) &&
           Number(n.slice(0, 9)) > 0 &&
@@ -582,6 +617,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'NIP',
         label: 'Numer Identyfikacji Podatkowej (tax number)',
         algorithm: 'Weighted modulo 11 (weights 6, 5, 7, 2, 3, 4, 5, 6, 7)',
+        pattern: /^\d{10}$/,
         isValid: n =>
           /^\d{10}$/.test(n) && mod(weightedSum(n, [6, 5, 7, 2, 3, 4, 5, 6, 7, -1]), 11) === 0,
         candidate: () => {
@@ -602,6 +638,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'CIF',
         label: 'Cod de identificare fiscală (8-digit company number)',
         algorithm: 'Weighted modulo 11 (weights 7, 5, 3, 2, 1, 7, 5, 3, 2)',
+        pattern: /^\d{2,10}$/,
         isValid: n => /^[1-9]\d{1,9}$/.test(n) && roCheck(n.slice(0, -1)) === n.slice(-1),
         candidate: () => {
           const body = randomChar(NONZERO) + randomDigits(6)
@@ -617,6 +654,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'IČ DPH',
         label: 'Identifikačné číslo pre DPH (VAT number)',
         algorithm: 'Whole number divisible by 11',
+        pattern: /^[1-9]\d[234789]\d{7}$/,
         isValid: n => /^[1-9]\d[234789]\d{7}$/.test(n) && Number(n) % 11 === 0,
         candidate: () => {
           const body =
@@ -633,6 +671,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'DDV',
         label: 'Identifikacijska številka za DDV (VAT number)',
         algorithm: 'Weighted modulo 11 (weights 8 to 2)',
+        pattern: /^\d{8}$/,
         isValid: n => /^[1-9]\d{7}$/.test(n) && siCheck(n.slice(0, 7)) === n[7],
         candidate: () => {
           const body = randomChar(NONZERO) + randomDigits(6)
@@ -649,6 +688,7 @@ export const TAX_ID_COUNTRIES = [
           name: 'DNI',
           label: 'NIF of a Spanish citizen (DNI: 8 digits + letter)',
           algorithm: 'Number modulo 23, check letter',
+          pattern: /^\d{8}[A-Z]$/,
           isValid: n => /^\d{8}[A-Z]$/.test(n) && dniLetter(n.slice(0, 8)) === n[8],
           candidate: () => {
             const body = randomDigits(8)
@@ -662,6 +702,7 @@ export const TAX_ID_COUNTRIES = [
           name: 'NIE',
           label: 'NIF of a foreign resident (NIE: X, Y or Z + 7 digits + letter)',
           algorithm: 'X/Y/Z read as 0/1/2, number modulo 23, check letter',
+          pattern: /^[XYZ]\d{7}[A-Z]$/,
           isValid: n =>
             /^[XYZ]\d{7}[A-Z]$/.test(n) && dniLetter('XYZ'.indexOf(n[0]) + n.slice(1, 8)) === n[8],
           candidate: () => {
@@ -674,8 +715,9 @@ export const TAX_ID_COUNTRIES = [
       vatType(
         {
           name: 'CIF',
-          label: 'NIF of a company (CIF: A or B + 7 digits + check digit)',
+          label: 'NIF of a company (CIF: letter + 7 digits + check digit or letter)',
           algorithm: 'Luhn on the 7 digits, check digit or letter',
+          pattern: /^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/,
           isValid: n =>
             /^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/.test(n) && cifChecks(n.slice(1, 8)).includes(n[8]),
           candidate: () => {
@@ -694,6 +736,7 @@ export const TAX_ID_COUNTRIES = [
         name: 'Momsnr',
         label: 'Momsregistreringsnummer (organisationsnummer + 01)',
         algorithm: 'Luhn on the 10-digit organisationsnummer',
+        pattern: /^\d{12}$/,
         isValid: n => /^\d{10}01$/.test(n) && isLuhnValid(n.slice(0, 10)),
         candidate: () => {
           // Organisation numbers have a third digit of 2 or more, unlike personal identity numbers.
@@ -716,6 +759,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'CUIT',
           label: 'CUIT/CUIL (individuals: 20, 27; companies: 30)',
           algorithm: 'Weighted modulo 11 (weights 5, 4, 3, 2, 7, 6, 5, 4, 3, 2)',
+          pattern: /^\d{11}$/,
+          notations: ['99999999999'],
           isValid: n =>
             /^(20|23|24|27|30|33|34|50|51|55)\d{9}$/.test(n) && arCheck(n.slice(0, 10)) === n[10],
           candidate: () => {
@@ -737,6 +782,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'ABN',
           label: 'Australian Business Number',
           algorithm: 'Weighted modulo 89, two leading check digits',
+          pattern: /^\d{11}$/,
+          notations: ['99999999999'],
           isValid: n => {
             if (!/^\d{11}$/.test(n)) return false
             const sum = -weightedSum(n.slice(2), [3, 5, 7, 9, 11, 13, 15, 17, 19])
@@ -755,6 +802,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'TFN',
           label: 'Tax File Number (9 digits)',
           algorithm: 'Weighted modulo 11 (weights 1, 4, 3, 7, 5, 8, 6, 9, 10)',
+          pattern: /^\d{8,9}$/,
+          notations: ['999999999', '99999999'],
           isValid: n =>
             /^\d{8,9}$/.test(n) && weightedSum(n, [1, 4, 3, 7, 5, 8, 6, 9, 10]) % 11 === 0,
           candidate: () => {
@@ -769,6 +818,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'ACN',
           label: 'Australian Company Number',
           algorithm: 'Weighted modulo 10 (weights 8 to 1)',
+          pattern: /^\d{9}$/,
+          notations: ['999999999'],
           isValid: n =>
             /^\d{9}$/.test(n) &&
             String(mod(-weightedSum(n, [8, 7, 6, 5, 4, 3, 2, 1]), 10)) === n[8],
@@ -790,6 +841,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'CPF',
           label: 'Cadastro de Pessoas Físicas (individuals)',
           algorithm: 'Two modulo 11 check digits (weights 10 to 2, then 11 to 2)',
+          pattern: /^\d{11}$/,
+          notations: ['99999999999'],
           isValid: n => /^\d{11}$/.test(n) && Number(n) > 0 && cpfChecks(n) === n.slice(9),
           candidate: () => {
             const body = randomDigits(9)
@@ -804,6 +857,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'CNPJ',
           label: 'Cadastro Nacional da Pessoa Jurídica (companies, head office 0001)',
           algorithm: 'Two modulo 11 check digits (weights 2 to 9, repeating)',
+          pattern: /^\d{14}$/,
+          notations: ['99999999999999'],
           isValid: n =>
             /^\d{14}$/.test(n) && !n.startsWith('000000000000') && cnpjChecks(n) === n.slice(12),
           candidate: () => {
@@ -824,6 +879,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'BN',
           label: 'Business Number (9 digits)',
           algorithm: 'Luhn',
+          pattern: /^\d{9}$/,
+          notations: ['999999999'],
           isValid: n => /^\d{9}$/.test(n) && isLuhnValid(n),
           candidate: () => {
             const body = randomChar(NONZERO) + randomDigits(7)
@@ -843,7 +900,10 @@ export const TAX_ID_COUNTRIES = [
           name: 'RUT',
           label: 'Rol Único Tributario (8 digits, dash, check digit)',
           algorithm: 'Weighted modulo 11 (weights 2 to 7, repeating), check 0–9 or K',
-          isValid: n => /^\d{7,8}-[\dK]$/.test(n) && clCheck(n.slice(0, -2)) === n.slice(-1),
+          pattern: /^\d{7,8}-?[\dK]$/,
+          notations: ['99999999-X', '9999999-X'],
+          isValid: n =>
+            /^\d{7,8}-?[\dK]$/.test(n) && clCheck(n.replace('-', '').slice(0, -1)) === n.slice(-1),
           candidate: () => {
             const body = randomChar(NONZERO) + randomDigits(7)
             return `${body}-${clCheck(body)}`
@@ -862,7 +922,10 @@ export const TAX_ID_COUNTRIES = [
           name: 'NIT',
           label: 'Número de Identificación Tributaria (company, 9 digits, dash, check digit)',
           algorithm: 'Weighted modulo 11 (prime weights 3, 7, 13, 17, …)',
-          isValid: n => /^\d{7,15}-\d$/.test(n) && coCheck(n.slice(0, -2)) === n.slice(-1),
+          pattern: /^\d{7,15}-?\d$/,
+          notations: ['999999999-9', 'any other length from 7 to 15 digits before the dash'],
+          isValid: n =>
+            /^\d{7,15}-?\d$/.test(n) && coCheck(n.replace('-', '').slice(0, -1)) === n.slice(-1),
           candidate: () => {
             const body = randomChar('89') + randomDigits(8)
             return `${body}-${coCheck(body)}`
@@ -882,6 +945,8 @@ export const TAX_ID_COUNTRIES = [
           badge: 'CN',
           label: 'Corporate Number (13 digits, leading check digit)',
           algorithm: 'Weighted modulo 9 (weights 1, 2), check digit first',
+          pattern: /^\d{13}$/,
+          notations: ['9999999999999'],
           isValid: n => /^\d{13}$/.test(n) && jpCheck(n.slice(1)) === n[0],
           candidate: () => {
             const body = randomDigits(12)
@@ -901,6 +966,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'IRD',
           label: 'IRD number (9 digits)',
           algorithm: 'Weighted modulo 11 (weights 3, 2, 7, 6, 5, 4, 3, 2, fallback weights)',
+          pattern: /^\d{8,9}$/,
+          notations: ['999999999', '99999999'],
           isValid: n =>
             /^\d{8,9}$/.test(n) &&
             Number(n) > 10_000_000 &&
@@ -924,6 +991,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'Orgnr',
           label: 'Organisasjonsnummer (the MVA number is this + "MVA")',
           algorithm: 'Weighted modulo 11 (weights 3, 2, 7, 6, 5, 4, 3, 2)',
+          pattern: /^\d{9}$/,
+          notations: ['999999999'],
           isValid: n => /^\d{9}$/.test(n) && weightedSum(n, [3, 2, 7, 6, 5, 4, 3, 2, 1]) % 11 === 0,
           candidate: () => {
             const body = randomChar('89') + randomDigits(7)
@@ -943,6 +1012,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'RUC',
           label: 'Registro Único de Contribuyentes (companies: 20, individuals: 10)',
           algorithm: 'Weighted modulo 11 (weights 5, 4, 3, 2, 7, 6, 5, 4, 3, 2)',
+          pattern: /^\d{11}$/,
+          notations: ['99999999999'],
           isValid: n => /^(10|15|17|20)\d{9}$/.test(n) && peCheck(n.slice(0, 10)) === n[10],
           candidate: () => {
             const body = randomChoice(['10', '20']) + randomDigits(8)
@@ -962,6 +1033,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'TIN',
           label: 'Tax reference number (10 digits)',
           algorithm: 'Luhn',
+          pattern: /^\d{10}$/,
+          notations: ['9999999999'],
           isValid: n => /^[01239]\d{9}$/.test(n) && isLuhnValid(n),
           candidate: () => {
             const body = randomChar('01239') + randomDigits(8)
@@ -981,6 +1054,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'UID',
           label: 'Unternehmens-Identifikationsnummer (CHE + 9 digits; the VAT number adds MWST)',
           algorithm: 'Weighted modulo 11 (weights 5, 4, 3, 2, 7, 6, 5, 4)',
+          pattern: /^CHE\d{9}$/,
+          notations: ['CHE999999999'],
           isValid: n => /^CHE\d{9}$/.test(n) && chCheck(n.slice(3, 11)) === n[11],
           candidate: () => {
             const body = randomChar(NONZERO) + randomDigits(7)
@@ -1000,6 +1075,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'VKN',
           label: 'Vergi Kimlik Numarası (businesses, 10 digits)',
           algorithm: 'Positional powers of 2 modulo 9',
+          pattern: /^\d{10}$/,
+          notations: ['9999999999'],
           isValid: n => /^\d{10}$/.test(n) && vknCheck(n) === n[9],
           candidate: () => {
             const body = randomDigits(9)
@@ -1013,6 +1090,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'TCKN',
           label: 'T.C. Kimlik No. (individuals, 11 digits)',
           algorithm: 'Two modulo 10 check digits (weights 3, 1)',
+          pattern: /^\d{11}$/,
+          notations: ['99999999999'],
           isValid: n => /^[1-9]\d{10}$/.test(n) && tcknChecks(n) === n.slice(9),
           candidate: () => {
             const body = randomChar(NONZERO) + randomDigits(8)
@@ -1032,6 +1111,8 @@ export const TAX_ID_COUNTRIES = [
           name: 'RUT',
           label: 'Registro Único Tributario (12 digits)',
           algorithm: 'Weighted modulo 11 (weights 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2)',
+          pattern: /^\d{12}$/,
+          notations: ['999999999999'],
           isValid: n =>
             /^\d{12}$/.test(n) &&
             n.slice(0, 2) >= '01' &&

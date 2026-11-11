@@ -26,8 +26,6 @@ export interface VatCountry {
   formats: readonly VatFormat[]
   /** Why a format deviates from its plain VIES notation, and the official source for it. */
   note?: string
-  /** True when the check digit is verified too, not just the format. */
-  checkDigit?: boolean
 }
 
 export const VIES_FAQ_URL = 'https://ec.europa.eu/taxation_customs/vies/#/faq'
@@ -185,8 +183,6 @@ export const VAT_COUNTRIES = [
     name: 'Portugal',
     structure: '1 block of 9 digits',
     formats: [{ notation: '999999999' }],
-    note: 'The modulo-11 check digit is verified as well.',
-    checkDigit: true,
   },
   {
     code: 'RO',
