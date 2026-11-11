@@ -26,3 +26,9 @@ Element.prototype.scrollIntoView = noop
 Element.prototype.hasPointerCapture = () => false
 Element.prototype.releasePointerCapture = noop
 window.scrollTo = noop
+// Used by cmdk (the searchable country picker).
+window.ResizeObserver = class {
+  observe = noop
+  unobserve = noop
+  disconnect = noop
+}

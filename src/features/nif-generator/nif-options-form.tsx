@@ -1,5 +1,6 @@
 import { RefreshCwIcon } from 'lucide-react'
 import { useId, useState, type ReactNode, type SubmitEvent } from 'react'
+import { CountryCombobox } from '@/components/country-combobox'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -62,6 +63,7 @@ const VALIDITY_OPTIONS: { value: Validity; label: string; description: string }[
 const COUNTRIES_BY_NAME = [...TAX_ID_COUNTRIES]
   .map(country => ({ code: country.code, name: getTaxIdCountryName(country.code) }))
   .sort((a, b) => a.name.localeCompare(b.name))
+const COUNTRY_GROUPS = [{ countries: COUNTRIES_BY_NAME }]
 
 export function NifOptionsForm({ initialOptions, onGenerate }: NifOptionsFormProps) {
   const id = useId()
@@ -111,21 +113,12 @@ export function NifOptionsForm({ initialOptions, onGenerate }: NifOptionsFormPro
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <Label htmlFor={`${id}-country`}>Country</Label>
-            <Select value={country} onValueChange={handleCountryChange}>
-              <SelectTrigger id={`${id}-country`} className="w-full data-[size=default]:h-10">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper" className="max-h-80">
-                {COUNTRIES_BY_NAME.map(c => (
-                  <SelectItem key={c.code} value={c.code}>
-                    <span className="w-7 rounded bg-muted px-1.5 text-center font-mono text-xs">
-                      {c.code}
-                    </span>
-                    <span className="truncate">{c.name}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CountryCombobox
+              id={`${id}-country`}
+              value={country}
+              onValueChange={handleCountryChange}
+              groups={COUNTRY_GROUPS}
+            />
           </div>
 
           <div className="flex flex-col gap-2">

@@ -220,6 +220,40 @@ describe('NIF generator page', () => {
     expect(prefixed.every(n => validateVatNumber(n).status === 'valid')).toBe(true)
   })
 
+  it('searches the country list by name or code', async () => {
+    const user = await renderApp()
+
+    await user.click(screen.getByRole('combobox', { name: 'Country' }))
+    const search = await screen.findByRole('combobox', { name: 'Search countries' })
+    await user.type(search, 'port')
+    expect(screen.getByRole('option', { name: /Portugal/ })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Brazil/ })).not.toBeInTheDocument()
+
+    await user.clear(search)
+    await user.type(search, 'xyz')
+    expect(screen.getByText('No country found.')).toBeInTheDocument()
+
+    await user.clear(search)
+    await user.type(search, 'de')
+    expect(screen.getByRole('option', { name: /Germany/ })).toBeInTheDocument()
+    await user.type(search, 'utsch')
+    expect(screen.queryByRole('option')).not.toBeInTheDocument()
+  })
+
+  it('selects the highlighted country with Enter without generating', async () => {
+    const user = await renderApp()
+
+    await user.click(screen.getByRole('combobox', { name: 'Country' }))
+    await user.type(
+      await screen.findByRole('combobox', { name: 'Search countries' }),
+      'brazil{Enter}'
+    )
+
+    expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('Brazil')
+    expect(screen.queryByRole('option')).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('button', { name: /^Copy \d{11}$/ })).toHaveLength(0)
+  })
+
   it('offers every number type of the selected country', async () => {
     const user = await renderApp()
 
