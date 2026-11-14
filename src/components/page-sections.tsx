@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-/** Building blocks of the explanations below the generator on its landing pages. */
+/** Building blocks of the explanations below a tool. */
 export function About({ id, children }: { id: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="flex max-w-3xl flex-col gap-10 text-muted-foreground">
@@ -41,5 +41,18 @@ export function Faq({ items }: { items: { question: string; answer: ReactNode }[
         </div>
       ))}
     </div>
+  )
+}
+
+export function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="font-medium text-foreground underline underline-offset-4"
+    >
+      {children}
+    </a>
   )
 }

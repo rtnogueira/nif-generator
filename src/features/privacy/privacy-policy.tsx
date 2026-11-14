@@ -46,15 +46,15 @@ export function PrivacyPolicy() {
 
       <Section title="Data you enter in the tools">
         <p>
-          The tools on this site run entirely in your browser. Tax numbers you generate, validate,
-          copy or export are never sent to or stored on any server. There are no user accounts and
-          no forms that collect personal data.
+          The tools on this site run entirely in your browser. Numbers you generate, validate, copy
+          or export are never sent to or stored on any server. There are no user accounts and no
+          forms that collect personal data.
         </p>
         <p>
-          The generator keeps its options (country, number type, quantity and display options) in
-          the page address, so they can be bookmarked or shared. The address never contains the
-          generated numbers or a number you validate. If analytics is enabled (see below), the page
-          address, including these options, is part of each page view it records.
+          The generators keep their options (country, number type or columns, quantity and display
+          options) in the page address, so they can be bookmarked or shared. The address never
+          contains the generated data or a number you validate. If analytics is enabled (see below),
+          the page address, including these options, is part of each page view it records.
         </p>
       </Section>
 

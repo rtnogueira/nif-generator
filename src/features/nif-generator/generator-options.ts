@@ -1,22 +1,23 @@
-import { clampQuantity, MIN_QUANTITY } from '@/lib/nif'
 import {
-  DEFAULT_TAX_ID_COUNTRY,
-  DEFAULT_TAX_ID_TYPE,
-  displayTaxId,
-  generateTaxIds,
-  getTaxIdCountry,
-  getTaxIdType,
-  isTaxIdCountryCode,
+  generateNumbers,
+  getFamilyType,
+  type FamilyCountry,
+  type NumberFamily,
+} from '@/lib/numbers/family'
+import { clampQuantity, MIN_QUANTITY } from '@/lib/numbers/quantity'
+import {
+  displayNumber,
   isValidity,
-  isViesCountry,
-  taxIdGenerator,
+  numberGenerator,
   type GeneratedBatch,
-  type TaxIdCountryCode,
   type Validity,
-} from '@/lib/tax-id'
+} from '@/lib/numbers/variants'
+
+/** Country prefix a number can be shown with: the VIES prefix of VIES countries. */
+export const countryPrefix = (country: FamilyCountry | undefined) => country?.vat?.code
 
 export interface NifOptions {
-  country: TaxIdCountryCode
+  country: string
   typeId: string
   quantity: number
   /** Add the VIES country prefix (VIES countries only). */
@@ -26,13 +27,15 @@ export interface NifOptions {
   validity: Validity
 }
 
-export const DEFAULT_OPTIONS: NifOptions = {
-  country: DEFAULT_TAX_ID_COUNTRY,
-  typeId: DEFAULT_TAX_ID_TYPE,
-  quantity: MIN_QUANTITY,
-  withPrefix: false,
-  formatted: false,
-  validity: 'valid',
+export function defaultOptions(family: NumberFamily): NifOptions {
+  return {
+    country: family.defaultCountry,
+    typeId: family.defaultType,
+    quantity: MIN_QUANTITY,
+    withPrefix: false,
+    formatted: false,
+    validity: 'valid',
+  }
 }
 
 /** The generator's URL search params, e.g. `?country=BR&type=cpf&qty=20&format=1`. */
@@ -66,17 +69,19 @@ export function validateGeneratorSearch(search: Record<string, unknown>): Genera
  * The options a URL asks for, or null when it names no supported country. Unknown types, invalid
  * quantities and options that do not apply fall back to their defaults.
  */
-export function optionsFromSearch(search: GeneratorSearch): NifOptions | null {
-  const country = search.country?.toUpperCase()
-  if (!country || !isTaxIdCountryCode(country)) return null
-  const types = getTaxIdCountry(country).types
-  const type = types.find(t => t.id === search.type) ?? types[0]
+export function optionsFromSearch(
+  family: NumberFamily,
+  search: GeneratorSearch
+): NifOptions | null {
+  const country = family.getCountry(search.country?.toUpperCase() ?? '')
+  if (!country) return null
+  const type = country.types.find(t => t.id === search.type) ?? country.types[0]
   const quantity = Number.parseInt(search.qty ?? '', 10)
   return {
-    country,
+    country: country.code,
     typeId: type.id,
     quantity: Number.isFinite(quantity) ? clampQuantity(quantity) : MIN_QUANTITY,
-    withPrefix: isViesCountry(country) && search.prefix === '1',
+    withPrefix: Boolean(countryPrefix(country)) && search.prefix === '1',
     formatted: Boolean(type.format) && search.format === '1',
     validity: isValidity(search.validity) ? search.validity : 'valid',
   }
@@ -94,15 +99,21 @@ export function searchFromOptions(options: NifOptions): GeneratorSearch {
   }
 }
 
-export function generateBatch(options: NifOptions): GeneratedBatch | null {
+export function generateBatch(family: NumberFamily, options: NifOptions): GeneratedBatch | null {
   const { country, typeId, quantity, validity } = options
-  const type = getTaxIdType(country, typeId)
+  const type = getFamilyType(family, country, typeId)
   if (!type) return null
-  const numbers = generateTaxIds(type, quantity, taxIdGenerator(country, type, validity))
+  const prefix = countryPrefix(family.getCountry(country))
+  const numbers = generateNumbers(
+    type,
+    quantity,
+    numberGenerator(family.validate, country, type, validity)
+  )
   return {
+    family,
     country,
     type,
     validity,
-    numbers: numbers.map(number => displayTaxId(country, type, number, options)),
+    numbers: numbers.map(number => displayNumber(prefix, type, number, options)),
   }
 }

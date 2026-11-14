@@ -22,7 +22,7 @@ import {
 import { useClipboard } from '@/hooks/use-clipboard'
 import { downloadTextFile, formatNumbers, type TextFileExtension } from '@/lib/export'
 import { downloadXlsxColumn } from '@/lib/export-xlsx'
-import type { GeneratedBatch, Validity } from '@/lib/tax-id'
+import type { GeneratedBatch, Validity } from '@/lib/numbers/variants'
 
 interface NifResultsProps {
   batch: GeneratedBatch | null
@@ -38,7 +38,7 @@ const INVALID_LABELS: Partial<Record<Validity, string>> = {
 
 /** e.g. `tax-numbers-pt`, or `tax-numbers-pt-invalid-check-digit` for an invalid batch. */
 const fileName = (batch: GeneratedBatch) =>
-  `tax-numbers-${batch.country.toLowerCase()}${batch.validity === 'valid' ? '' : `-${batch.validity}`}`
+  `${batch.family.slug}-${batch.country.toLowerCase()}${batch.validity === 'valid' ? '' : `-${batch.validity}`}`
 
 export function NifResults({ batch }: NifResultsProps) {
   const { copied, copy } = useClipboard()

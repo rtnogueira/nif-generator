@@ -14,6 +14,16 @@ export type PagePath =
   | '/nif-generator'
   | '/vat-number-generator'
   | '/cpf-generator'
+  | '/iban-generator'
+  | '/iban-validator'
+  | '/id-number-generator'
+  | '/id-number-validator'
+  | '/cartao-de-cidadao-generator'
+  | '/social-security-number-generator'
+  | '/social-security-number-validator'
+  | '/niss-generator'
+  | '/person-generator'
+  | '/test-data-generator'
   | '/privacy'
 
 /** Groups of tools, in the order the menus list them. */
@@ -172,6 +182,236 @@ export const PAGES: Record<PagePath, PageMeta> = {
         'Country detection from the VAT prefix',
         'Check-digit verification for every supported number',
         'Accepts spaces, dots, dashes and suffixes such as MVA or MWST',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/iban-generator': {
+    path: '/iban-generator',
+    title: `IBAN Generator: valid test IBANs for 89 countries | ${SITE_NAME}`,
+    description:
+      'Free IBAN generator for QA testing: valid or deliberately invalid IBANs for 89 countries, with correct check digits. Copy or export to Excel, CSV or JSON.',
+    name: 'IBAN Generator',
+    tool: {
+      category: 'banking',
+      label: 'IBAN generator',
+      description: 'Valid or invalid IBANs of 89 countries for testing.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Gerador de IBAN', 'Random IBAN Generator', 'Test IBAN Generator'],
+      description:
+        'Free online tool to generate valid or deliberately invalid IBANs (International Bank Account Numbers) for QA testing and development, for every country of the IBAN registry.',
+      featureList: [
+        'IBANs for the 89 countries of the IBAN registry',
+        'Correct ISO 7064 Mod 97-10 check digits',
+        'National check digits for Belgium, Montenegro, Norway, Portugal and Spain',
+        'Deliberately invalid IBANs (wrong check digit or wrong length)',
+        'Printed form, in groups of four characters',
+        'Up to 50 unique IBANs at once',
+        'Export to Excel (.xlsx), CSV, JSON or text',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/iban-validator': {
+    path: '/iban-validator',
+    title: `IBAN Validator: check the structure and check digits | ${SITE_NAME}`,
+    description:
+      'Free IBAN validator: check the country, length, structure and check digits of an IBAN from any of the 89 countries of the IBAN registry, in your browser.',
+    name: 'IBAN Validator',
+    tool: {
+      category: 'banking',
+      label: 'IBAN validator',
+      description: 'Check the structure and check digits of an IBAN.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['IBAN Checker', 'Validador de IBAN'],
+      description:
+        'Free online tool that checks the country, length, structure and check digits of an IBAN (International Bank Account Number), for every country of the IBAN registry.',
+      featureList: [
+        'Structure of every country of the IBAN registry',
+        'ISO 7064 Mod 97-10 check digits',
+        'National check digits for Belgium, Montenegro, Norway, Portugal and Spain',
+        'Accepts IBANs written with spaces, dots or dashes',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/id-number-generator': {
+    path: '/id-number-generator',
+    title: `Identity Number Generator: Cartão de Cidadão, DNI, PESEL & more | ${SITE_NAME}`,
+    description:
+      'Free identity number generator for QA testing: valid or invalid Cartão de Cidadão, DNI, PESEL, personnummer and other national ID numbers, with a correct check digit.',
+    name: 'Identity Number Generator',
+    tool: {
+      category: 'identity',
+      label: 'Identity number generator',
+      description: 'Cartão de Cidadão, DNI, PESEL and other national ID numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['National ID Number Generator', 'ID Card Number Generator'],
+      description:
+        'Free online tool to generate valid or deliberately invalid identity card and population register numbers for QA testing and development, with a correct check digit.',
+      featureList: [
+        'Identity numbers of 22 countries, such as the Portuguese Cartão de Cidadão, the Spanish DNI and the Polish PESEL',
+        'Numbers that hold a birth date and sex, for a random adult',
+        'Deliberately invalid numbers (wrong check digit or wrong length)',
+        'Numbers in their usual written form',
+        'Export to Excel (.xlsx), CSV, JSON or text',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/id-number-validator': {
+    path: '/id-number-validator',
+    title: `Identity Number Validator: Cartão de Cidadão, DNI, PESEL & more | ${SITE_NAME}`,
+    description:
+      'Free identity number validator: check the format and check digit of a Cartão de Cidadão, DNI, NIE, PESEL, personnummer and other national ID numbers, in your browser.',
+    name: 'Identity Number Validator',
+    tool: {
+      category: 'identity',
+      label: 'Identity number validator',
+      description: 'Check the check digit of national ID numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['National ID Number Validator', 'ID Card Number Checker'],
+      description:
+        'Free online tool that checks the format and check digit of identity card and population register numbers of 22 countries.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/cartao-de-cidadao-generator': {
+    path: '/cartao-de-cidadao-generator',
+    title: `Cartão de Cidadão Number Generator (Gerador de CC) | ${SITE_NAME}`,
+    description:
+      'Generate valid Portuguese Cartão de Cidadão document numbers for testing, with the check digit computed as the official specification sets, plain or formatted.',
+    name: 'Cartão de Cidadão Generator',
+    tool: {
+      category: 'identity',
+      label: 'Cartão de Cidadão generator',
+      description: 'Portuguese citizen card document numbers.',
+    },
+    app: {
+      alternateName: ['Gerador de Cartão de Cidadão', 'Gerador de número de CC'],
+      description:
+        'Free online generator of valid or deliberately invalid Portuguese Cartão de Cidadão document numbers, for QA testing.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/social-security-number-generator': {
+    path: '/social-security-number-generator',
+    title: `Social Security Number Generator: NISS, NIR, AHV & more | ${SITE_NAME}`,
+    description:
+      'Free social security number generator for QA testing: valid or invalid Portuguese NISS, French NIR, Belgian INSZ, Swiss AHV, Canadian SIN and more, with a correct check digit.',
+    name: 'Social Security Number Generator',
+    tool: {
+      category: 'social-security',
+      label: 'Social security number generator',
+      description: 'NISS, NIR, AHV, SIN and other social security numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Social Insurance Number Generator', 'SSN Generator'],
+      description:
+        'Free online tool to generate valid or deliberately invalid social security, social insurance and health insurance numbers of 9 countries for QA testing and development.',
+      featureList: [
+        'Portuguese NISS, French NIR, Belgian INSZ, Swiss AHV number, Canadian SIN, Greek AMKA, Irish PPS number, Austrian insurance number and the NHS number',
+        'Numbers that hold a birth date and sex, for a random adult',
+        'Deliberately invalid numbers (wrong check digit or wrong length)',
+        'Export to Excel (.xlsx), CSV, JSON or text',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/social-security-number-validator': {
+    path: '/social-security-number-validator',
+    title: `Social Security Number Validator: NISS, NIR, AHV & more | ${SITE_NAME}`,
+    description:
+      'Free social security number validator: check the format and check digit of a Portuguese NISS, French NIR, Belgian INSZ, Swiss AHV number, Canadian SIN and more.',
+    name: 'Social Security Number Validator',
+    tool: {
+      category: 'social-security',
+      label: 'Social security number validator',
+      description: 'Check the check digit of social security numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Social Insurance Number Validator', 'Validador de NISS'],
+      description:
+        'Free online tool that checks the format and check digit of social security, social insurance and health insurance numbers of 9 countries.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/niss-generator': {
+    path: '/niss-generator',
+    title: `NISS Generator (Gerador de NISS): Portuguese social security numbers | ${SITE_NAME}`,
+    description:
+      'Generate valid Portuguese social security numbers (NISS, Número de Identificação de Segurança Social) for testing, with a correct check digit, or invalid ones.',
+    name: 'NISS Generator',
+    tool: {
+      category: 'social-security',
+      label: 'NISS generator',
+      description: 'Portuguese social security numbers.',
+    },
+    app: {
+      alternateName: ['Gerador de NISS', 'Gerador de número de Segurança Social'],
+      description:
+        'Free online generator of valid or deliberately invalid Portuguese social security numbers (NISS), for QA testing.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/person-generator': {
+    path: '/person-generator',
+    title: `Person Generator: fake names, birth dates & addresses | ${SITE_NAME}`,
+    description:
+      'Free person generator for test data: made-up names, birth dates and addresses for 36 countries. Choose the columns, then copy or export to Excel, CSV or JSON.',
+    name: 'Person Generator',
+    tool: {
+      category: 'data',
+      label: 'Person generator',
+      description: 'Made-up names, birth dates and addresses for testing.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Fake Name Generator', 'Random Person Generator', 'Fake Address Generator'],
+      description:
+        'Free online tool to generate made-up people for QA testing and development: names, birth dates and addresses written the way each country writes them.',
+      featureList: [
+        'Names and addresses of 36 countries',
+        'Names that match the chosen sex and birth dates within an age range',
+        'Choice of columns',
+        'Up to 1000 rows at once',
+        'Copy as a table, CSV or JSON, or export to Excel (.xlsx), CSV or JSON',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/test-data-generator': {
+    path: '/test-data-generator',
+    title: `Test Data Generator: people with tax ID, ID number & IBAN | ${SITE_NAME}`,
+    description:
+      'Free test data generator: a table of made-up people with name, birth date, address, tax number, identity number, social security number and IBAN. Export to Excel, CSV or JSON.',
+    name: 'Test Data Generator',
+    tool: {
+      category: 'data',
+      label: 'Test data generator',
+      description: 'A table of people with their tax, identity and bank numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Fake Data Generator', 'Mock Data Generator', 'Dummy Data Generator'],
+      description:
+        'Free online tool to generate a table of made-up people for QA testing and development, each with a tax number, an identity number, a social security number and an IBAN from the same country.',
+      featureList: [
+        'One person per row: name, sex, birth date and address',
+        'Tax number, identity number, social security number and IBAN of the same country, each with a correct check digit',
+        'Numbers that hold a birth date or sex match the person of the row',
+        'Choice of columns and up to 1000 rows',
+        'Copy as a table, CSV or JSON, or export to Excel (.xlsx), CSV or JSON',
       ],
     },
     sitemap: { changefreq: 'monthly', priority: 0.9 },

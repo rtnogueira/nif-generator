@@ -1,7 +1,7 @@
-import { clampQuantity } from '@/lib/nif'
+import { generateNumbers, type NumberFamily } from '@/lib/numbers/family'
 import { getVatCountry } from '@/lib/vat'
 import { TAX_ID_COUNTRIES, type TaxIdCountry, type TaxIdType } from './countries'
-import type { Validity } from './variants'
+import { getValidatorCountry, validateTaxNumber, VALIDATOR_COUNTRIES } from './validate'
 
 export { TAX_ID_COUNTRIES, type TaxIdCountry, type TaxIdType }
 
@@ -37,35 +37,31 @@ export function getTaxIdType(code: TaxIdCountryCode, typeId: string): TaxIdType 
   return getTaxIdCountry(code).types.find(type => type.id === typeId)
 }
 
-/** A batch of generated numbers, as shown in the results (formatted and prefixed as requested). */
-export interface GeneratedBatch {
-  country: TaxIdCountryCode
-  type: TaxIdType
-  validity: Validity
-  numbers: string[]
-}
-
 /**
  * Generates `count` distinct numbers (count is clamped to the supported range), with `generate`,
  * which defaults to the type's valid numbers (see `taxIdGenerator` for invalid ones).
  */
-export function generateTaxIds(
-  type: TaxIdType,
-  count: number,
-  generate: () => string = type.generate
-): string[] {
-  const unique = new Set<string>()
-  const target = clampQuantity(count)
-  while (unique.size < target) unique.add(generate())
-  return [...unique]
+export const generateTaxIds = generateNumbers
+
+/** Tax numbers as a family, for the generator and validator pages. */
+export const TAX_FAMILY: NumberFamily = {
+  id: 'tax',
+  noun: 'tax number',
+  slug: 'tax-numbers',
+  countries: VALIDATOR_COUNTRIES,
+  defaultCountry: DEFAULT_TAX_ID_COUNTRY,
+  defaultType: DEFAULT_TAX_ID_TYPE,
+  detectsCountry: true,
+  getCountry: getValidatorCountry,
+  validate: validateTaxNumber,
 }
 
+export { getExpectedFormats, type ExpectedFormat } from '@/lib/numbers/family'
+export type { GeneratedBatch } from '@/lib/numbers/variants'
 export {
-  getExpectedFormats,
   getValidatorCountry,
   validateTaxNumber,
   VALIDATOR_COUNTRIES,
-  type ExpectedFormat,
   type TaxNumberValidation,
   type ValidatorCountry,
 } from './validate'

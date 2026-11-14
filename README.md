@@ -1,8 +1,8 @@
 [![CI/CD](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml)
 
-# Tax ID Generator & Validator (NIF, EU VAT, CPF and more)
+# Test data tools: tax IDs, IBANs, identity and social security numbers, people
 
-**Free online tools to generate and validate tax identification numbers (tax IDs, or TINs) for QA testing and development: Portuguese NIFs of every type, EU VAT numbers and national tax numbers of 14 more countries.**
+**Free online tools to generate and validate test data for QA and development: tax identification numbers (Portuguese NIFs of every type, EU VAT numbers and the tax numbers of 14 more countries), IBANs, identity numbers, social security numbers, made-up people, and tables that combine them.**
 
 🔗 **Live App:** https://rtnogueira.com/
 
@@ -32,9 +32,49 @@ The former address, `/tax-number-validator`, redirects here.
 - ✅ Verifies the check digit of every kind of number the generator supports, including the 14 countries outside VIES, and names the kind of number that matched
 - ✍️ Accepts numbers as people write them: spaces, dots, dashes and slashes are ignored, and suffixes such as the Norwegian `MVA` or Swiss `MWST` are understood
 
+### IBAN generator (`/iban-generator`) and validator (`/iban-validator`)
+
+- 🏦 IBANs for the 89 countries of the SWIFT IBAN registry, with the country's structure and correct ISO 7064 Mod 97-10 check digits
+- 🔐 Check digits inside the account number are computed and verified for Belgium (with an assigned bank code), Montenegro, Norway, Portugal (NIB, so every IBAN starts with `PT50`) and Spain (CCC). For other countries the bank codes are random and national keys are not computed
+- ❌ Deliberately invalid IBANs, the printed form in groups of four, copy and export, as in the tax ID generator
+- 🛡️ The validator takes the country from the IBAN and ignores spaces, dots and dashes
+
+The structures come from python-stdnum's `iban.dat` (SWIFT IBAN Registry, release 101) and the algorithms from `stdnum.iban`; the Portuguese NIB check follows [Banco de Portugal's IBAN specification](https://www.bportugal.pt/sites/default/files/anexos/documentos-relacionados/international_bank_account_number_pt.pdf). They are tested against the registry's sample IBANs (`src/lib/iban`).
+
+### Identity number generator (`/id-number-generator`) and validator (`/id-number-validator`)
+
+- 🪪 Identity card and population register numbers of 22 countries, each with a correct check digit: the Portuguese Cartão de Cidadão, Belgian national number and eID card, Bulgarian EGN and PNF, Croatian OIB, Czech and Slovak birth numbers, Estonian isikukood, Finnish henkilötunnus, Icelandic kennitala, Indian Aadhaar and VID, Israeli identity number, Japanese My Number, Lithuanian asmens kodas, Norwegian fødselsnummer, Peruvian DNI, Polish PESEL, South African ID number, South Korean RRN, Spanish DNI and NIE, Swedish personnummer, Thai PIN, Turkish T.C. Kimlik No. and Brazilian CPF
+- 🎂 Numbers that hold a birth date or sex are generated for a random adult (or for a given person, see the test data generator)
+- 🇵🇹 A landing page for the Cartão de Cidadão: [`/cartao-de-cidadao-generator`](https://rtnogueira.com/cartao-de-cidadao-generator)
+
+Every algorithm (`src/lib/identity/countries.ts`) is ported from the python-stdnum module named next to it and tested against the numbers of its documentation and tests; the Cartão de Cidadão check also follows the [specification published by AMA](https://www.autenticacao.gov.pt/documents/20126/0/Valida%C3%A7%C3%A3o+de+N%C3%BAmero+de+Documento+do+Cart%C3%A3o+de+Cidad%C3%A3o+(1).pdf/7d5745ba-2bcc-e861-3954-bafe9f7591a0). Numbers whose check digit python-stdnum does not verify (e.g. the Danish CPR) are not included.
+
+### Social security number generator (`/social-security-number-generator`) and validator (`/social-security-number-validator`)
+
+- 🏥 Social security, social insurance and health insurance numbers of 9 countries, each with a correct check digit: the Portuguese NISS, Austrian Versicherungsnummer, Belgian INSZ/NISS, Canadian SIN, French NIR, Greek AMKA, Irish PPS number, Swiss AHV number and the NHS number
+- 🇵🇹 A landing page for the NISS: [`/niss-generator`](https://rtnogueira.com/niss-generator)
+
+The algorithms (`src/lib/social-security/countries.ts`) are ported from the python-stdnum module named next to each and tested against the numbers of its documentation and tests. The Portuguese NISS is not in python-stdnum: its check digit follows the [validators_pt](https://gist.github.com/dreispt/024dd11c160af58268e2b44019080bbf) module. Numbers without a check digit (e.g. the US SSN) are not included.
+
+### Person generator (`/person-generator`)
+
+- 🧑 Made-up people for 36 countries: first and last name matching the sex, birth date within an age range, and an address (street, postal code, city, region) written the way the country writes it
+- 🧱 Choice of columns, up to 1000 rows, options kept in the URL (e.g. `/person-generator?country=ES&rows=50&sex=female&min=30&max=40`)
+- 📋 Copy the table (tab-separated, so it pastes into a spreadsheet), or as CSV or JSON; export to Excel, CSV or JSON
+
+Names and address data come from [Faker](https://fakerjs.dev/) (`src/lib/person`), loaded per country on demand. They are realistic, not real: the street, city and postal code are drawn separately and do not belong together.
+
+### Test data generator (`/test-data-generator`)
+
+- 🗃️ One made-up person per row, with the numbers they would have in the chosen country: tax number, identity number, social security number and IBAN, each with a correct check digit. For Portugal: name, birth date, address, NIF, Cartão de Cidadão, NISS and IBAN
+- 🔗 Every value of a row is made for the same person: numbers that hold a birth date or sex (personnummer, PESEL, NIR...) hold the row's, and two columns that are one number in real life (the Belgian national number and INSZ) show the same value
+- 🧱 Choice of columns per country, up to 1000 rows, plain or formatted numbers, options kept in the URL (e.g. `/test-data-generator?country=PT&rows=100&cols=first-name,last-name,tax-2,bank-iban`)
+- 📋 Copy as a table, CSV or JSON; export to Excel, CSV or JSON (one object per row)
+
 ### Everywhere
 
 - 🔒 Everything runs in the browser; no number is sent to a server
+- 🗂️ Tools are grouped by category in the menu (`src/lib/pages.ts`)
 - 🐞 Bug reports and feature requests through GitHub issue forms, linked from the footer
 - 🌗 Light and dark mode, responsive layout
 - 🔎 Every page is prerendered at build time with its own title, description, canonical URL and structured data (`src/lib/pages.ts`), so crawlers that do not run JavaScript see the full content; the build also writes `sitemap.xml`

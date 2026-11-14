@@ -1,8 +1,16 @@
 import {
+  BadgeCheckIcon,
   BugIcon,
+  ClipboardCheckIcon,
+  HeartHandshakeIcon,
+  IdCardIcon,
+  LandmarkIcon,
   LightbulbIcon,
   ReceiptTextIcon,
+  ScanSearchIcon,
   ShieldCheckIcon,
+  TableIcon,
+  UsersIcon,
   WrenchIcon,
   type LucideIcon,
 } from 'lucide-react'
@@ -13,6 +21,14 @@ import { newIssueUrl } from '@/lib/site'
 const TOOL_ICONS: Partial<Record<PagePath, LucideIcon>> = {
   '/': ReceiptTextIcon,
   '/tax-id-validator': ShieldCheckIcon,
+  '/iban-generator': LandmarkIcon,
+  '/iban-validator': BadgeCheckIcon,
+  '/id-number-generator': IdCardIcon,
+  '/id-number-validator': ScanSearchIcon,
+  '/social-security-number-generator': HeartHandshakeIcon,
+  '/social-security-number-validator': ClipboardCheckIcon,
+  '/person-generator': UsersIcon,
+  '/test-data-generator': TableIcon,
 }
 
 /** Tools listed in the main menu, grouped by category. They come from `PAGES` in `@/lib/pages`. */

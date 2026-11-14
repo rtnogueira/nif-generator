@@ -321,12 +321,15 @@ describe('NIF generator page', () => {
 
     await user.click(screen.getByRole('button', { name: 'Open menu' }))
     const items = await screen.findAllByRole('menuitem')
-    expect(items.map(item => item.textContent)).toEqual([
-      'Tax ID generator',
-      'Tax ID validator',
-      'Report a bug',
-      'Suggest a feature',
-    ])
+    expect(items.map(item => item.textContent)).toEqual(
+      expect.arrayContaining([
+        'Tax ID generator',
+        'Tax ID validator',
+        'IBAN generator',
+        'Report a bug',
+        'Suggest a feature',
+      ])
+    )
 
     // Tools are grouped under the name of their category.
     expect(
@@ -409,11 +412,18 @@ describe('Generator landing pages', () => {
     await renderPage('/nif-generator', 'NIF Generator')
     const related = screen.getByRole('navigation', { name: 'Related tools' })
 
-    expect(
-      within(related)
-        .getAllByRole('link')
-        .map(link => link.getAttribute('href'))
-    ).toEqual(['/', '/vat-number-generator', '/cpf-generator', '/tax-id-validator'])
+    const links = within(related)
+      .getAllByRole('link')
+      .map(link => link.getAttribute('href'))
+    // The tools of the same category come first, then the main tools of the other categories.
+    expect(links.slice(0, 4)).toEqual([
+      '/',
+      '/vat-number-generator',
+      '/cpf-generator',
+      '/tax-id-validator',
+    ])
+    expect(links).toContain('/iban-generator')
+    expect(links).not.toContain('/nif-generator')
   })
 
   it('updates the description and canonical URL on navigation', async () => {

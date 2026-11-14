@@ -22,6 +22,34 @@ export function formatNumbers(format: TextFormat, header: string, numbers: reado
   }
 }
 
+export type TableFormat = 'csv' | 'tsv' | 'json'
+
+/**
+ * A table in a text format: CSV with a header row, tab-separated values (which paste into a
+ * spreadsheet as columns) or a JSON array with one object per row, keyed by the headers.
+ */
+export function formatTable(
+  format: TableFormat,
+  headers: readonly string[],
+  rows: readonly (readonly string[])[]
+): string {
+  switch (format) {
+    case 'csv':
+      return [headers, ...rows].map(row => row.map(csvField).join(',')).join('\r\n') + '\r\n'
+    case 'tsv':
+      // Tabs and line breaks inside a value would break the columns.
+      return [headers, ...rows]
+        .map(row => row.map(value => value.replace(/[\t\r\n]+/g, ' ')).join('\t'))
+        .join('\n')
+    case 'json':
+      return JSON.stringify(
+        rows.map(row => Object.fromEntries(headers.map((header, i) => [header, row[i]]))),
+        null,
+        2
+      )
+  }
+}
+
 const MIME_TYPES = {
   csv: 'text/csv',
   json: 'application/json',
