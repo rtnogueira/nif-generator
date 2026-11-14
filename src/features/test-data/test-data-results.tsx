@@ -20,6 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useClipboard } from '@/hooks/use-clipboard'
+import { trackEvent } from '@/lib/analytics'
 import type { Dataset } from '@/lib/dataset'
 import { downloadTextFile, formatTable, type TableFormat } from '@/lib/export'
 import { downloadXlsxTable } from '@/lib/export-xlsx'
@@ -50,6 +51,16 @@ export function TestDataResults({ dataset, slug, error }: TestDataResultsProps) 
   const hasResults = dataset !== null && rows.length > 0
   const copiedMessage = `Copied ${rows.length} rows`
 
+  function copyAll(format: TableFormat) {
+    copy(formatTable(format, headers, rows), copiedMessage, COPY_ALL_KEY)
+    trackEvent('copy_results', { tool: slug, scope: 'all', format })
+  }
+
+  function copyRow(row: readonly string[], index: number, key: string) {
+    copy(row.join('\t'), `Copied row ${index + 1}`, key)
+    trackEvent('copy_results', { tool: slug, scope: 'single', format: 'row' })
+  }
+
   return (
     <Card className="min-w-0 gap-0 py-0">
       <CardHeader className="flex flex-wrap items-center gap-3 border-b py-4 [.border-b]:pb-4">
@@ -66,7 +77,7 @@ export function TestDataResults({ dataset, slug, error }: TestDataResultsProps) 
                 variant="outline"
                 size="sm"
                 className="rounded-r-none"
-                onClick={() => copy(formatTable('tsv', headers, rows), copiedMessage, COPY_ALL_KEY)}
+                onClick={() => copyAll('tsv')}
               >
                 {copied === COPY_ALL_KEY ? <CheckIcon className="text-success" /> : <CopyIcon />}
                 Copy all
@@ -85,19 +96,18 @@ export function TestDataResults({ dataset, slug, error }: TestDataResultsProps) 
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Copy all as</DropdownMenuLabel>
                   {COPY_FORMATS.map(({ format, label }) => (
-                    <DropdownMenuItem
-                      key={format}
-                      onSelect={() =>
-                        copy(formatTable(format, headers, rows), copiedMessage, COPY_ALL_KEY)
-                      }
-                    >
+                    <DropdownMenuItem key={format} onSelect={() => copyAll(format)}>
                       {label}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <ExportMenu dataset={dataset} fileName={`${slug}-${dataset.country.toLowerCase()}`} />
+            <ExportMenu
+              dataset={dataset}
+              tool={slug}
+              fileName={`${slug}-${dataset.country.toLowerCase()}`}
+            />
           </CardAction>
         )}
       </CardHeader>
@@ -137,7 +147,7 @@ export function TestDataResults({ dataset, slug, error }: TestDataResultsProps) 
                         variant="ghost"
                         size="icon-sm"
                         aria-label={`Copy row ${index + 1}`}
-                        onClick={() => copy(row.join('\t'), `Copied row ${index + 1}`, key)}
+                        onClick={() => copyRow(row, index, key)}
                       >
                         {copied === key ? <CheckIcon className="text-success" /> : <CopyIcon />}
                       </Button>
@@ -155,7 +165,15 @@ export function TestDataResults({ dataset, slug, error }: TestDataResultsProps) 
   )
 }
 
-function ExportMenu({ dataset, fileName }: { dataset: Dataset; fileName: string }) {
+function ExportMenu({
+  dataset,
+  tool,
+  fileName,
+}: {
+  dataset: Dataset
+  tool: string
+  fileName: string
+}) {
   const [exporting, setExporting] = useState(false)
   const headers = dataset.columns.map(column => column.header)
 
@@ -163,6 +181,7 @@ function ExportMenu({ dataset, fileName }: { dataset: Dataset; fileName: string 
     setExporting(true)
     try {
       await downloadXlsxTable(headers, dataset.rows, fileName)
+      trackEvent('export_results', { tool, format: 'xlsx' })
     } catch {
       toast.error('Export failed, please try again')
     } finally {
@@ -184,9 +203,10 @@ function ExportMenu({ dataset, fileName }: { dataset: Dataset; fileName: string 
         {TEXT_EXPORTS.map(({ format, label }) => (
           <DropdownMenuItem
             key={format}
-            onSelect={() =>
+            onSelect={() => {
               downloadTextFile(formatTable(format, headers, dataset.rows), fileName, format)
-            }
+              trackEvent('export_results', { tool, format })
+            }}
           >
             {label}
           </DropdownMenuItem>

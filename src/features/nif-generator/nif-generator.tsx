@@ -2,6 +2,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useState, type ReactNode } from 'react'
 import { RelatedTools } from '@/components/related-tools'
 import { usePageMeta } from '@/hooks/use-page-meta'
+import { trackEvent } from '@/lib/analytics'
 import type { NumberFamily } from '@/lib/numbers/family'
 import type { GeneratedBatch } from '@/lib/numbers/variants'
 import { categoryLabel, type PagePath } from '@/lib/pages'
@@ -42,6 +43,15 @@ export function NifGenerator({ path, family, heading, intro, preset, about }: Ni
 
   function handleGenerate(options: NifOptions) {
     setBatch(generateBatch(family, options))
+    trackEvent('generate_numbers', {
+      tool: family.id,
+      country: options.country,
+      number_type: options.typeId,
+      quantity: options.quantity,
+      validity: options.validity,
+      formatted: options.formatted,
+      with_prefix: options.withPrefix,
+    })
     // Keep the URL in step, so the current options can be bookmarked or shared.
     void navigate({
       to: '.',
