@@ -1,6 +1,8 @@
 import {
   BadgeCheckIcon,
   BugIcon,
+  ClipboardCheckIcon,
+  HeartHandshakeIcon,
   IdCardIcon,
   LandmarkIcon,
   LightbulbIcon,
@@ -21,6 +23,8 @@ const TOOL_ICONS: Partial<Record<PagePath, LucideIcon>> = {
   '/iban-validator': BadgeCheckIcon,
   '/id-number-generator': IdCardIcon,
   '/id-number-validator': ScanSearchIcon,
+  '/social-security-number-generator': HeartHandshakeIcon,
+  '/social-security-number-validator': ClipboardCheckIcon,
 }
 
 /** Tools listed in the main menu, grouped by category. They come from `PAGES` in `@/lib/pages`. */

@@ -9,7 +9,12 @@ export interface NumberSource {
   /** The python-stdnum module the algorithm is ported from, e.g. `stdnum.pt.cc`. */
   stdnum?: string
   /** A document describing the algorithm, when it is not (only) in python-stdnum. */
-  document?: { title: string; url: string }
+  document?: {
+    title: string
+    url: string
+    /** Short link text; "official specification" when not set. */
+    label?: string
+  }
 }
 
 /** One kind of number of a country, e.g. the Brazilian CPF. */

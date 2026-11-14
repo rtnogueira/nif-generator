@@ -25,7 +25,9 @@ function Source({ source }: { source?: NumberSource }) {
       )}
       {source?.stdnum && source.document && ', '}
       {source?.document && (
-        <ExternalLink href={source.document.url}>official specification</ExternalLink>
+        <ExternalLink href={source.document.url}>
+          {source.document.label ?? 'official specification'}
+        </ExternalLink>
       )}
     </>
   )

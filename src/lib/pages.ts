@@ -19,6 +19,9 @@ export type PagePath =
   | '/id-number-generator'
   | '/id-number-validator'
   | '/cartao-de-cidadao-generator'
+  | '/social-security-number-generator'
+  | '/social-security-number-validator'
+  | '/niss-generator'
   | '/privacy'
 
 /** Groups of tools, in the order the menus list them. */
@@ -294,6 +297,68 @@ export const PAGES: Record<PagePath, PageMeta> = {
       alternateName: ['Gerador de Cartão de Cidadão', 'Gerador de número de CC'],
       description:
         'Free online generator of valid or deliberately invalid Portuguese Cartão de Cidadão document numbers, for QA testing.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/social-security-number-generator': {
+    path: '/social-security-number-generator',
+    title: `Social Security Number Generator: NISS, NIR, AHV & more | ${SITE_NAME}`,
+    description:
+      'Free social security number generator for QA testing: valid or invalid Portuguese NISS, French NIR, Belgian INSZ, Swiss AHV, Canadian SIN and more, with a correct check digit.',
+    name: 'Social Security Number Generator',
+    tool: {
+      category: 'social-security',
+      label: 'Social security number generator',
+      description: 'NISS, NIR, AHV, SIN and other social security numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Social Insurance Number Generator', 'SSN Generator'],
+      description:
+        'Free online tool to generate valid or deliberately invalid social security, social insurance and health insurance numbers of 9 countries for QA testing and development.',
+      featureList: [
+        'Portuguese NISS, French NIR, Belgian INSZ, Swiss AHV number, Canadian SIN, Greek AMKA, Irish PPS number, Austrian insurance number and the NHS number',
+        'Numbers that hold a birth date and sex, for a random adult',
+        'Deliberately invalid numbers (wrong check digit or wrong length)',
+        'Export to Excel (.xlsx), CSV, JSON or text',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/social-security-number-validator': {
+    path: '/social-security-number-validator',
+    title: `Social Security Number Validator: NISS, NIR, AHV & more | ${SITE_NAME}`,
+    description:
+      'Free social security number validator: check the format and check digit of a Portuguese NISS, French NIR, Belgian INSZ, Swiss AHV number, Canadian SIN and more.',
+    name: 'Social Security Number Validator',
+    tool: {
+      category: 'social-security',
+      label: 'Social security number validator',
+      description: 'Check the check digit of social security numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Social Insurance Number Validator', 'Validador de NISS'],
+      description:
+        'Free online tool that checks the format and check digit of social security, social insurance and health insurance numbers of 9 countries.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/niss-generator': {
+    path: '/niss-generator',
+    title: `NISS Generator (Gerador de NISS): Portuguese social security numbers | ${SITE_NAME}`,
+    description:
+      'Generate valid Portuguese social security numbers (NISS, Número de Identificação de Segurança Social) for testing, with a correct check digit, or invalid ones.',
+    name: 'NISS Generator',
+    tool: {
+      category: 'social-security',
+      label: 'NISS generator',
+      description: 'Portuguese social security numbers.',
+    },
+    app: {
+      alternateName: ['Gerador de NISS', 'Gerador de número de Segurança Social'],
+      description:
+        'Free online generator of valid or deliberately invalid Portuguese social security numbers (NISS), for QA testing.',
     },
     sitemap: { changefreq: 'monthly', priority: 0.9 },
   },
