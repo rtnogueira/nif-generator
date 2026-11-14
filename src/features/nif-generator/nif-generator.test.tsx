@@ -328,6 +328,11 @@ describe('NIF generator page', () => {
       'Suggest a feature',
     ])
 
+    // Tools are grouped under the name of their category.
+    expect(
+      screen.getByText('Tax IDs', { selector: '[data-slot="dropdown-menu-label"]' })
+    ).toBeVisible()
+
     await user.click(screen.getByRole('menuitem', { name: 'Tax ID validator' }))
     expect(await screen.findByRole('heading', { level: 1, name: 'Tax ID Validator' })).toBeVisible()
   })

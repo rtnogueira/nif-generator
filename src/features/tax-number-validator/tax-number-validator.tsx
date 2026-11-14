@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { RelatedTools } from '@/components/related-tools'
 import { usePageMeta } from '@/hooks/use-page-meta'
+import { categoryLabel } from '@/lib/pages'
 import { validateTaxNumber, type TaxNumberValidation } from '@/lib/tax-id'
 import { ValidationResult } from './validation-result'
 import { ValidatorAbout } from './validator-about'
@@ -17,7 +18,9 @@ export function TaxNumberValidator() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-muted-foreground">Tools</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          {categoryLabel('/tax-id-validator')}
+        </p>
         <h1 className="text-3xl font-bold tracking-tight">Tax ID Validator</h1>
         <p className="max-w-2xl text-muted-foreground">
           Check whether a tax ID (tax identification number, or TIN) has the right format and check

@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { MenuIcon } from 'lucide-react'
+import { Fragment } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -10,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useCurrentPageUrl } from '@/hooks/use-current-page-url'
-import { feedbackLinks, TOOLS } from './nav-links'
+import { feedbackLinks, TOOL_GROUPS } from './nav-links'
 
 /** Burger menu with the tools and feedback links, shown instead of `MainMenu` on phones. */
 export function MobileMenu() {
@@ -24,14 +25,18 @@ export function MobileMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel>Tools</DropdownMenuLabel>
-        {TOOLS.map(tool => (
-          <DropdownMenuItem key={tool.to} asChild>
-            <Link to={tool.to}>
-              <tool.icon />
-              {tool.label}
-            </Link>
-          </DropdownMenuItem>
+        {TOOL_GROUPS.map(group => (
+          <Fragment key={group.id}>
+            <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
+            {group.tools.map(tool => (
+              <DropdownMenuItem key={tool.to} asChild>
+                <Link to={tool.to}>
+                  <tool.icon />
+                  {tool.label}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </Fragment>
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuLabel>Feedback</DropdownMenuLabel>

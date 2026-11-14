@@ -12,8 +12,11 @@ body:
     attributes:
       label: Area
       options:
-        - Tax number generator
-        - Tax number validator
+        - Tax IDs
+        - Banking (IBAN)
+        - Identity documents
+        - Social security
+        - People and test data
         - A new country or number type
         - A new tool
         - Something else
