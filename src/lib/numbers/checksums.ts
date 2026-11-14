@@ -51,6 +51,15 @@ export function mod11_10CheckDigit(body: string): string {
   return String(mod(1 - (((mod11_10Checksum(body) || 10) * 2) % 11), 10))
 }
 
+/** ISO 7064 Mod 97, 10 over an alphanumeric string (letters count as 10–35), computed in chunks. */
+export function mod97(value: string): number {
+  const digits = [...value].map(c => String(Number.parseInt(c, 36))).join('')
+  let remainder = 0
+  for (let i = 0; i < digits.length; i += 7)
+    remainder = Number(remainder + digits.slice(i, i + 7)) % 97
+  return remainder
+}
+
 /** Zero-pads a number to two digits. */
 export function pad2(value: number): string {
   return String(value).padStart(2, '0')

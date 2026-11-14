@@ -1,16 +1,10 @@
 import { isValidNif } from '@/lib/nif'
-import { getVatCountry, normalizeVatNumber, validateVatNumber, type VatCountry } from '@/lib/vat'
-import type { TaxIdCountryCode } from '.'
+import type { FamilyCountry, NumberValidation } from '@/lib/numbers/family'
+import { getVatCountry, normalizeVatNumber, validateVatNumber } from '@/lib/vat'
 import { TAX_ID_COUNTRIES, type TaxIdType } from './countries'
 
 /** A country the validator accepts: every country the generator supports. */
-export interface ValidatorCountry {
-  code: TaxIdCountryCode
-  name: string
-  /** The VIES structure, for VIES countries. */
-  vat?: VatCountry
-  types: readonly TaxIdType[]
-}
+export type ValidatorCountry = FamilyCountry
 
 export const VALIDATOR_COUNTRIES: readonly ValidatorCountry[] = TAX_ID_COUNTRIES.map(country => {
   const vat = getVatCountry(country.code)
@@ -22,53 +16,13 @@ export const VALIDATOR_COUNTRIES: readonly ValidatorCountry[] = TAX_ID_COUNTRIES
   }
 })
 
-const COUNTRIES_BY_CODE = new Map(VALIDATOR_COUNTRIES.map(c => [c.code as string, c]))
+const COUNTRIES_BY_CODE = new Map(VALIDATOR_COUNTRIES.map(c => [c.code, c]))
 
 export function getValidatorCountry(code: string): ValidatorCountry | undefined {
   return COUNTRIES_BY_CODE.get(code)
 }
 
-export interface ExpectedFormat {
-  /** The number's name, when the country has several kinds (e.g. "CPF"). */
-  label?: string
-  /** VIES-style notations, with the prefix for VIES countries (e.g. "ATU99999999"). */
-  formats: readonly string[]
-}
-
-/** The formats a country accepts: its VIES structure, or the formats of each kind of number. */
-export function getExpectedFormats(country: ValidatorCountry): ExpectedFormat[] {
-  if (country.vat) {
-    return [{ formats: country.vat.formats.map(format => country.code + format.notation) }]
-  }
-  return country.types.map(type => ({
-    label: country.types.length > 1 ? type.name : undefined,
-    formats: type.notations ?? [],
-  }))
-}
-
-export type TaxNumberValidation =
-  | { status: 'empty' }
-  /** No country was chosen and the input does not start with a supported prefix. */
-  | { status: 'unknown-country' }
-  | { status: 'invalid-format'; country: ValidatorCountry; number: string }
-  /** The number has the shape of `types`, but fails all their checks. */
-  | {
-      status: 'invalid-check-digit'
-      country: ValidatorCountry
-      number: string
-      types: readonly TaxIdType[]
-    }
-  /**
-   * `verified` is false when only the format could be checked: the number is a kind whose check
-   * digit this site does not verify. `type` is the kind that matched, when known.
-   */
-  | {
-      status: 'valid'
-      country: ValidatorCountry
-      number: string
-      verified: boolean
-      type?: TaxIdType
-    }
+export type TaxNumberValidation = NumberValidation
 
 /** Country-specific ways of writing a number, reduced to the form its `isValid` expects. */
 const COMPACT: Partial<Record<string, (value: string) => string>> = {

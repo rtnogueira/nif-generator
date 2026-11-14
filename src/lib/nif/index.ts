@@ -1,12 +1,5 @@
-export {
-  clampQuantity,
-  generateNif,
-  generateNifs,
-  isValidNif,
-  MAX_QUANTITY,
-  MIN_QUANTITY,
-  NIF_LENGTH,
-} from './nif'
+export { clampQuantity, MAX_QUANTITY, MIN_QUANTITY } from '@/lib/numbers/quantity'
+export { generateNif, generateNifs, isValidNif, NIF_LENGTH } from './nif'
 export {
   DEFAULT_NIF_PREFIX,
   isNifPrefix,

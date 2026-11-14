@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { About, Block, Faq } from '@/components/page-sections'
 import {
   Table,
   TableBody,
@@ -7,9 +8,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { getTaxIdCountry, getTaxIdCountryName, isViesCountry, TAX_ID_COUNTRIES } from '@/lib/tax-id'
+import {
+  getTaxIdCountry,
+  getTaxIdCountryName,
+  isViesCountry,
+  TAX_FAMILY,
+  TAX_ID_COUNTRIES,
+} from '@/lib/tax-id'
 import { VIES_VALIDATION_URL } from '@/lib/vat'
-import { About, Block, Faq } from './landing-sections'
 import { NifAbout, NifTypesTable } from './nif-about'
 import type { NifGeneratorProps } from './nif-generator'
 
@@ -30,6 +36,7 @@ const NOT_REAL = {
 
 export const HOME_PAGE: NifGeneratorProps = {
   path: '/',
+  family: TAX_FAMILY,
   heading: 'Tax ID Generator',
   intro: (
     <p>
@@ -45,6 +52,7 @@ export const HOME_PAGE: NifGeneratorProps = {
 
 export const NIF_PAGE: NifGeneratorProps = {
   path: '/nif-generator',
+  family: TAX_FAMILY,
   heading: 'NIF Generator',
   intro: (
     <p>
@@ -125,6 +133,7 @@ const VIES_ROWS = TAX_ID_COUNTRIES.filter(country => isViesCountry(country.code)
 
 export const VAT_PAGE: NifGeneratorProps = {
   path: '/vat-number-generator',
+  family: TAX_FAMILY,
   heading: 'VAT Number Generator',
   preset: { country: 'DE', typeId: DE_VAT.id, withPrefix: true },
   intro: (
@@ -207,6 +216,7 @@ export const VAT_PAGE: NifGeneratorProps = {
 
 export const CPF_PAGE: NifGeneratorProps = {
   path: '/cpf-generator',
+  family: TAX_FAMILY,
   heading: 'CPF Generator',
   preset: { country: 'BR', typeId: 'cpf', formatted: true },
   intro: (

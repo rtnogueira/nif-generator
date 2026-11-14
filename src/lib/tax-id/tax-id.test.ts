@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { generateNif, MAX_QUANTITY } from '@/lib/nif'
+import {
+  luhnCheckDigit,
+  luhnChecksum,
+  mod,
+  mod11_10CheckDigit,
+  mod11_10Checksum,
+} from '@/lib/numbers/checksums'
 import { validateVatNumber, VAT_COUNTRIES } from '@/lib/vat'
 import {
   checkPosition,
@@ -16,13 +23,6 @@ import {
   VALIDITIES,
   type TaxIdCountry,
 } from '.'
-import {
-  luhnCheckDigit,
-  luhnChecksum,
-  mod,
-  mod11_10CheckDigit,
-  mod11_10Checksum,
-} from './checksums'
 
 /**
  * Real, registered VAT numbers (national part only), taken from python-stdnum's test suite

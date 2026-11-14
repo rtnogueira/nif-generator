@@ -1,19 +1,26 @@
 import { CircleCheckIcon, CircleXIcon, ScanSearchIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Card } from '@/components/ui/card'
-import type { TaxIdType, TaxNumberValidation, ValidatorCountry } from '@/lib/tax-id'
+import type { FamilyCountry, NumberFamily, NumberValidation } from '@/lib/numbers/family'
+import type { NumberType } from '@/lib/numbers/types'
 import { cn } from '@/lib/utils'
 import { VIES_VALIDATION_URL } from '@/lib/vat'
 import { ExpectedFormats } from './expected-formats'
 
 interface ValidationResultProps {
-  result: TaxNumberValidation | null
+  family: NumberFamily
+  result: NumberValidation | null
+  /** Explains how to name the country, when it could not be found. */
+  unknownCountry: ReactNode
 }
 
-export function ValidationResult({ result }: ValidationResultProps) {
+/** "a tax number", "an IBAN". */
+const withArticle = (noun: string) => `${/^[aeiou]/i.test(noun) ? 'an' : 'a'} ${noun}`
+
+export function ValidationResult(props: ValidationResultProps) {
   return (
     <Card className="min-w-0 flex-1 py-0" aria-live="polite">
-      <ResultContent result={result} />
+      <ResultContent {...props} />
     </Card>
   )
 }
@@ -30,15 +37,15 @@ const ViesLink = () => (
 )
 
 /** The kind of number that matched, e.g. "NIF · Pessoa singular" or "Partita IVA (VAT number)". */
-function describeType(type: TaxIdType) {
+function describeType(type: NumberType) {
   return type.label.includes(type.name) ? type.label : `${type.name} · ${type.label}`
 }
 
-function ResultContent({ result }: ValidationResultProps) {
+function ResultContent({ family, result, unknownCountry }: ValidationResultProps) {
   if (!result) {
     return (
       <Message icon={<ScanSearchIcon className="size-5" />} title="Nothing validated yet">
-        Enter a tax number and press Validate.
+        Enter {withArticle(family.noun)} and press Validate.
       </Message>
     )
   }
@@ -46,17 +53,15 @@ function ResultContent({ result }: ValidationResultProps) {
   switch (result.status) {
     case 'empty':
       return (
-        <Message icon={<ScanSearchIcon className="size-5" />} title="Enter a tax number">
+        <Message
+          icon={<ScanSearchIcon className="size-5" />}
+          title={`Enter ${withArticle(family.noun)}`}
+        >
           The number field is empty.
         </Message>
       )
     case 'unknown-country':
-      return (
-        <Invalid title="Country not recognised">
-          Start the number with an EU VAT prefix (such as PT, ES or DE), or pick the country from
-          the list. Numbers from outside the EU need the country picked.
-        </Invalid>
-      )
+      return <Invalid title="Country not recognised">{unknownCountry}</Invalid>
     case 'invalid-format':
       return (
         <Invalid title="Invalid format" country={result.country} number={result.number}>
@@ -83,7 +88,7 @@ function ResultContent({ result }: ValidationResultProps) {
         )
       }
       return (
-        <Valid title="Valid tax number" country={result.country} number={result.number}>
+        <Valid title={`Valid ${family.noun}`} country={result.country} number={result.number}>
           {result.type && (
             <span className="mb-1 block font-medium text-foreground">
               {describeType(result.type)}
@@ -103,7 +108,7 @@ function ResultContent({ result }: ValidationResultProps) {
 
 interface OutcomeProps {
   title: string
-  country?: ValidatorCountry
+  country?: FamilyCountry
   number?: string
   children: ReactNode
 }

@@ -13,91 +13,25 @@
  * Colombian numbers are accepted with or without the dash before the check digit.
  */
 import { generateNif, isValidNif, NIF_LENGTH, NIF_TYPES } from '@/lib/nif'
-import { randomChar, randomChoice, randomDigits, randomInt } from '@/lib/random'
 import {
   isLuhnValid,
   isMod11_10Valid,
   luhnCheckDigit,
   luhnChecksum,
   mod,
+  mod97,
   mod11_10CheckDigit,
   pad2,
   weightedSum,
-} from './checksums'
+} from '@/lib/numbers/checksums'
+import { rejectionSampler, split } from '@/lib/numbers/helpers'
+import type { NumberCountry, NumberType } from '@/lib/numbers/types'
+import { randomChar, randomChoice, randomDigits, randomInt } from '@/lib/random'
 
-export interface TaxIdType {
-  /** Unique within its country. */
-  id: string
-  /** Short name of the number (e.g. "USt-IdNr."), used as the export column header. */
-  name: string
-  /** Short tag shown next to each generated number. */
-  badge: string
-  /** Who the number identifies / which kind is generated. */
-  label: string
-  /** Plain-language summary of the check-digit algorithm. */
-  algorithm: string
-  /**
-   * Shape of the numbers the algorithm applies to (national part, uppercase, without spaces or
-   * dots). The validator only reports a wrong check digit for numbers of this shape: a number with
-   * another valid shape is a kind this site does not check (e.g. a 10-digit Czech personal DIČ).
-   */
-  pattern: RegExp
-  /**
-   * Every accepted format, for countries outside VIES (whose formats come from `@/lib/vat`):
-   * 9 = a digit, X = a digit or the letter K, anything else is literal. An entry with spaces is a
-   * description in words, for formats a notation cannot express. The first entry is the usual one.
-   */
-  notations?: readonly string[]
-  /** Index of the (first) check character, when it is not the last one. */
-  checkIndex?: number
-  /**
-   * The usual written form of a valid number (national part), as python-stdnum's `format()`
-   * writes it. Only set for types whose stdnum module has one.
-   */
-  format?: (number: string) => string
-  generate: () => string
-  isValid: (number: string) => boolean
-}
-
-export interface TaxIdCountry {
-  /** VIES prefix for VIES countries (e.g. `EL` for Greece), ISO 3166-1 alpha-2 otherwise. */
-  code: string
-  /** English name, only for countries outside VIES (VIES countries take theirs from `@/lib/vat`). */
-  name?: string
-  types: readonly TaxIdType[]
-}
+export type TaxIdType = NumberType
+export type TaxIdCountry = NumberCountry
 
 const NONZERO = '123456789'
-
-/** Splits `number` at `positions` and joins the parts with `separators` (one per split). */
-function split(
-  number: string,
-  positions: readonly number[],
-  separators: string | readonly string[]
-) {
-  let result = ''
-  let start = 0
-  positions.forEach((end, i) => {
-    result +=
-      number.slice(start, end) + (typeof separators === 'string' ? separators : separators[i])
-    start = end
-  })
-  return result + number.slice(start)
-}
-
-/**
- * Builds a generator from a candidate factory: candidates are drawn until one is valid. This
- * rejects the bodies for which an algorithm has no valid check digit (e.g. a mod-11 remainder of
- * 10), instead of mapping them to a wrong digit.
- */
-function rejectionSampler(candidate: () => string, isValid: (n: string) => boolean) {
-  return () => {
-    for (;;) {
-      const number = candidate()
-      if (isValid(number)) return number
-    }
-  }
-}
 
 interface VatTypeDefinition extends Omit<TaxIdType, 'id' | 'badge' | 'generate'> {
   /** Defaults to `name`; set a short abbreviation when the name is long. */
@@ -165,15 +99,6 @@ function ltCheck(body: string) {
 
 // --- Netherlands (stdnum.nl.btw, stdnum.nl.bsn, stdnum.iso7064.mod_97_10) ------------------------
 const bsnChecksum = (n: string) => mod(weightedSum(n, [9, 8, 7, 6, 5, 4, 3, 2]) - Number(n[8]), 11)
-/** ISO 7064 Mod 97, 10 over an alphanumeric string (letters count as 10–35), computed in chunks. */
-function mod97(value: string) {
-  const digits = [...value].map(c => String(Number.parseInt(c, 36))).join('')
-  let remainder = 0
-  for (let i = 0; i < digits.length; i += 7)
-    remainder = Number(remainder + digits.slice(i, i + 7)) % 97
-  return remainder
-}
-
 // --- Romania (stdnum.ro.cui) ---------------------------------------------------------------------
 const roCheck = (body: string) =>
   String(((10 * weightedSum(body.padStart(9, '0'), [7, 5, 3, 2, 1, 7, 5, 3, 2])) % 11) % 10)
