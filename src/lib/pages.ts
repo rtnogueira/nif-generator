@@ -14,6 +14,8 @@ export type PagePath =
   | '/nif-generator'
   | '/vat-number-generator'
   | '/cpf-generator'
+  | '/iban-generator'
+  | '/iban-validator'
   | '/privacy'
 
 /** Groups of tools, in the order the menus list them. */
@@ -172,6 +174,59 @@ export const PAGES: Record<PagePath, PageMeta> = {
         'Country detection from the VAT prefix',
         'Check-digit verification for every supported number',
         'Accepts spaces, dots, dashes and suffixes such as MVA or MWST',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/iban-generator': {
+    path: '/iban-generator',
+    title: `IBAN Generator: valid test IBANs for 89 countries | ${SITE_NAME}`,
+    description:
+      'Free IBAN generator for QA testing: valid or deliberately invalid IBANs for 89 countries, with correct check digits. Copy or export to Excel, CSV or JSON.',
+    name: 'IBAN Generator',
+    tool: {
+      category: 'banking',
+      label: 'IBAN generator',
+      description: 'Valid or invalid IBANs of 89 countries for testing.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Gerador de IBAN', 'Random IBAN Generator', 'Test IBAN Generator'],
+      description:
+        'Free online tool to generate valid or deliberately invalid IBANs (International Bank Account Numbers) for QA testing and development, for every country of the IBAN registry.',
+      featureList: [
+        'IBANs for the 89 countries of the IBAN registry',
+        'Correct ISO 7064 Mod 97-10 check digits',
+        'National check digits for Belgium, Montenegro, Norway, Portugal and Spain',
+        'Deliberately invalid IBANs (wrong check digit or wrong length)',
+        'Printed form, in groups of four characters',
+        'Up to 50 unique IBANs at once',
+        'Export to Excel (.xlsx), CSV, JSON or text',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/iban-validator': {
+    path: '/iban-validator',
+    title: `IBAN Validator: check the structure and check digits | ${SITE_NAME}`,
+    description:
+      'Free IBAN validator: check the country, length, structure and check digits of an IBAN from any of the 89 countries of the IBAN registry, in your browser.',
+    name: 'IBAN Validator',
+    tool: {
+      category: 'banking',
+      label: 'IBAN validator',
+      description: 'Check the structure and check digits of an IBAN.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['IBAN Checker', 'Validador de IBAN'],
+      description:
+        'Free online tool that checks the country, length, structure and check digits of an IBAN (International Bank Account Number), for every country of the IBAN registry.',
+      featureList: [
+        'Structure of every country of the IBAN registry',
+        'ISO 7064 Mod 97-10 check digits',
+        'National check digits for Belgium, Montenegro, Norway, Portugal and Spain',
+        'Accepts IBANs written with spaces, dots or dashes',
       ],
     },
     sitemap: { changefreq: 'monthly', priority: 0.9 },

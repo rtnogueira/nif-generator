@@ -4,7 +4,8 @@ import { PAGES, toolGroups, type PagePath } from '@/lib/pages'
 /** Links to the other tools, those of the current page's category first. */
 export function RelatedTools({ current }: { current: PagePath }) {
   const category = PAGES[current].tool?.category
-  const tools = toolGroups()
+  // Every tool of the page's category, then the main tools of the other categories.
+  const tools = toolGroups(page => page.tool?.category === category || Boolean(page.tool?.menu))
     .sort((a, b) => Number(b.id === category) - Number(a.id === category))
     .flatMap(group => group.pages)
     .filter(page => page.path !== current)

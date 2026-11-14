@@ -22,7 +22,7 @@ export function MainMenu() {
         <NavigationMenuItem>
           <NavigationMenuTrigger>Tools</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <div className="flex gap-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               {TOOL_GROUPS.map(group => (
                 <div key={group.id} className="flex w-72 flex-col gap-1">
                   <p
