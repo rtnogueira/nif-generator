@@ -2,10 +2,11 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useState, type ReactNode } from 'react'
 import { RelatedTools } from '@/components/related-tools'
 import { usePageMeta } from '@/hooks/use-page-meta'
+import type { NumberFamily } from '@/lib/numbers/family'
+import type { GeneratedBatch } from '@/lib/numbers/variants'
 import { categoryLabel, type PagePath } from '@/lib/pages'
-import type { GeneratedBatch } from '@/lib/tax-id'
 import {
-  DEFAULT_OPTIONS,
+  defaultOptions,
   generateBatch,
   optionsFromSearch,
   searchFromOptions,
@@ -17,6 +18,8 @@ import { NifResults } from './nif-results'
 
 export interface NifGeneratorProps {
   path: PagePath
+  /** The numbers the page generates. */
+  family: NumberFamily
   heading: string
   intro: ReactNode
   /** Options the form starts with when the URL has none (e.g. Brazil for the CPF page). */
@@ -26,19 +29,19 @@ export interface NifGeneratorProps {
 }
 
 /** The generator page (`/`) and its landing pages for one kind of number, e.g. `/cpf-generator`. */
-export function NifGenerator({ path, heading, intro, preset, about }: NifGeneratorProps) {
+export function NifGenerator({ path, family, heading, intro, preset, about }: NifGeneratorProps) {
   usePageMeta(path)
   const search = validateGeneratorSearch(useSearch({ strict: false }))
   const navigate = useNavigate()
   // Read once: a link with options (e.g. ?country=BR&type=cpf&qty=20) fills the form and shows a
   // batch straight away. Computed in the initializers, not an effect, so it runs once.
-  const [fromUrl] = useState(() => optionsFromSearch(search))
+  const [fromUrl] = useState(() => optionsFromSearch(family, search))
   const [batch, setBatch] = useState<GeneratedBatch | null>(() =>
-    fromUrl ? generateBatch(fromUrl) : null
+    fromUrl ? generateBatch(family, fromUrl) : null
   )
 
   function handleGenerate(options: NifOptions) {
-    setBatch(generateBatch(options))
+    setBatch(generateBatch(family, options))
     // Keep the URL in step, so the current options can be bookmarked or shared.
     void navigate({
       to: '.',
@@ -58,7 +61,8 @@ export function NifGenerator({ path, heading, intro, preset, about }: NifGenerat
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <NifOptionsForm
-          initialOptions={fromUrl ?? { ...DEFAULT_OPTIONS, ...preset }}
+          family={family}
+          initialOptions={fromUrl ?? { ...defaultOptions(family), ...preset }}
           onGenerate={handleGenerate}
         />
         <NifResults batch={batch} />

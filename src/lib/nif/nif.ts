@@ -1,9 +1,8 @@
+import { clampQuantity } from '@/lib/numbers/quantity'
 import { randomDigits } from '@/lib/random'
 import type { NifPrefix } from './nif-types'
 
 export const NIF_LENGTH = 9
-export const MIN_QUANTITY = 1
-export const MAX_QUANTITY = 50
 
 const BODY_LENGTH = NIF_LENGTH - 1
 
@@ -33,9 +32,4 @@ export function generateNifs(prefix: NifPrefix, count: number): string[] {
 export function isValidNif(nif: string): boolean {
   if (!/^\d{9}$/.test(nif)) return false
   return checkDigit(nif.slice(0, BODY_LENGTH)) === Number(nif[BODY_LENGTH])
-}
-
-export function clampQuantity(value: number): number {
-  if (!Number.isFinite(value)) return MIN_QUANTITY
-  return Math.min(MAX_QUANTITY, Math.max(MIN_QUANTITY, Math.trunc(value)))
 }

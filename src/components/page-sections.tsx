@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-/** Building blocks of the explanations below the generator on its landing pages. */
+/** Building blocks of the explanations below a tool. */
 export function About({ id, children }: { id: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="flex max-w-3xl flex-col gap-10 text-muted-foreground">

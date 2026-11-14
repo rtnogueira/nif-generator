@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { getExpectedFormats, type ValidatorCountry } from '@/lib/tax-id'
+import { getExpectedFormats, type FamilyCountry } from '@/lib/numbers/family'
 
 /** A notation such as "99999999-X", as opposed to a description in words. */
 const isNotation = (format: string) => !format.includes(' ')
@@ -19,7 +19,7 @@ export function FormatList({ formats }: { formats: readonly string[] }) {
 }
 
 /** Lists a country's formats, e.g. "BE0999999999 or BE1999999999", or "CPF 99999999999 or …". */
-export function ExpectedFormats({ country }: { country: ValidatorCountry }) {
+export function ExpectedFormats({ country }: { country: FamilyCountry }) {
   return getExpectedFormats(country).map(({ label, formats }, index) => (
     <Fragment key={label ?? index}>
       {index > 0 && ' or '}

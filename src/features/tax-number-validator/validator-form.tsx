@@ -1,16 +1,11 @@
 import { ShieldCheckIcon } from 'lucide-react'
 import { useId, useState, type SubmitEvent } from 'react'
-import { CountryCombobox } from '@/components/country-combobox'
+import { CountryCombobox, type CountryOptionGroup } from '@/components/country-combobox'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  getExpectedFormats,
-  getValidatorCountry,
-  VALIDATOR_COUNTRIES,
-  type ValidatorCountry,
-} from '@/lib/tax-id'
+import { getExpectedFormats, type NumberFamily } from '@/lib/numbers/family'
 import { ExpectedFormats } from './expected-formats'
 
 /** Select value meaning "take the country from the number's prefix". */
@@ -23,23 +18,42 @@ export interface ValidatorInput {
 }
 
 interface ValidatorFormProps {
+  family: NumberFamily
+  /** Under the form's title: how to enter a number. */
+  hint: string
+  /** Example shown in the empty field when no country is picked. */
+  placeholder: string
   onValidate: (input: ValidatorInput) => void
 }
 
-const byName = (a: ValidatorCountry, b: ValidatorCountry) => a.name.localeCompare(b.name)
-const VIES_COUNTRIES = VALIDATOR_COUNTRIES.filter(c => c.vat).sort(byName)
-const OTHER_COUNTRIES = VALIDATOR_COUNTRIES.filter(c => !c.vat).sort(byName)
-const COUNTRY_GROUPS = [
-  { heading: 'EU VAT (VIES)', countries: VIES_COUNTRIES },
-  { heading: 'Other countries', countries: OTHER_COUNTRIES },
-]
 const EXTRA_OPTIONS = [{ value: AUTO_DETECT, label: 'Detect from prefix' }]
+const COUNTRY_GROUPS = new Map<NumberFamily, CountryOptionGroup[]>()
 
-export function ValidatorForm({ onValidate }: ValidatorFormProps) {
+/** The family's countries by name, with the VIES countries in a group of their own. */
+function countryGroups(family: NumberFamily): CountryOptionGroup[] {
+  let groups = COUNTRY_GROUPS.get(family)
+  if (!groups) {
+    const countries = [...family.countries].sort((a, b) => a.name.localeCompare(b.name))
+    const vies = countries.filter(c => c.vat)
+    groups =
+      vies.length > 0
+        ? [
+            { heading: 'EU VAT (VIES)', countries: vies },
+            { heading: 'Other countries', countries: countries.filter(c => !c.vat) },
+          ]
+        : [{ countries }]
+    COUNTRY_GROUPS.set(family, groups)
+  }
+  return groups
+}
+
+export function ValidatorForm({ family, hint, placeholder, onValidate }: ValidatorFormProps) {
   const id = useId()
-  const [country, setCountry] = useState(AUTO_DETECT)
+  const [country, setCountry] = useState(
+    family.detectsCountry ? AUTO_DETECT : family.defaultCountry
+  )
   const [number, setNumber] = useState('')
-  const selected = getValidatorCountry(country)
+  const selected = family.getCountry(country)
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -49,10 +63,8 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
   return (
     <Card className="w-full gap-0 lg:max-w-sm">
       <CardHeader>
-        <CardTitle>Tax number</CardTitle>
-        <CardDescription>
-          Pick a country, or type an EU VAT number with its country prefix.
-        </CardDescription>
+        <CardTitle>{family.noun.charAt(0).toUpperCase() + family.noun.slice(1)}</CardTitle>
+        <CardDescription>{hint}</CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -62,10 +74,10 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
               id={`${id}-country`}
               value={country}
               onValueChange={value =>
-                (value === AUTO_DETECT || getValidatorCountry(value)) && setCountry(value)
+                (value === AUTO_DETECT || family.getCountry(value)) && setCountry(value)
               }
-              groups={COUNTRY_GROUPS}
-              extraOptions={EXTRA_OPTIONS}
+              groups={countryGroups(family)}
+              extraOptions={family.detectsCountry ? EXTRA_OPTIONS : undefined}
             />
           </div>
 
@@ -75,7 +87,7 @@ export function ValidatorForm({ onValidate }: ValidatorFormProps) {
               id={`${id}-number`}
               value={number}
               onChange={event => setNumber(event.target.value)}
-              placeholder={selected ? getExpectedFormats(selected)[0].formats[0] : 'PT123456789'}
+              placeholder={selected ? getExpectedFormats(selected)[0].formats[0] : placeholder}
               autoComplete="off"
               autoCapitalize="characters"
               spellCheck={false}
