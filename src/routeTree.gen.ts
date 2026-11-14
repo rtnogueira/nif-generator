@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CpfGeneratorRouteImport } from './routes/cpf-generator'
+import { Route as IbanGeneratorRouteImport } from './routes/iban-generator'
+import { Route as IbanValidatorRouteImport } from './routes/iban-validator'
 import { Route as NifGeneratorRouteImport } from './routes/nif-generator'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TaxIdValidatorRouteImport } from './routes/tax-id-validator'
@@ -25,6 +27,16 @@ const IndexRoute = IndexRouteImport.update({
 const CpfGeneratorRoute = CpfGeneratorRouteImport.update({
   id: '/cpf-generator',
   path: '/cpf-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IbanGeneratorRoute = IbanGeneratorRouteImport.update({
+  id: '/iban-generator',
+  path: '/iban-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IbanValidatorRoute = IbanValidatorRouteImport.update({
+  id: '/iban-validator',
+  path: '/iban-validator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NifGeneratorRoute = NifGeneratorRouteImport.update({
@@ -56,6 +68,8 @@ const VatNumberGeneratorRoute = VatNumberGeneratorRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cpf-generator': typeof CpfGeneratorRoute
+  '/iban-generator': typeof IbanGeneratorRoute
+  '/iban-validator': typeof IbanValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
   '/privacy': typeof PrivacyRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
@@ -65,6 +79,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cpf-generator': typeof CpfGeneratorRoute
+  '/iban-generator': typeof IbanGeneratorRoute
+  '/iban-validator': typeof IbanValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
   '/privacy': typeof PrivacyRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
@@ -75,6 +91,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cpf-generator': typeof CpfGeneratorRoute
+  '/iban-generator': typeof IbanGeneratorRoute
+  '/iban-validator': typeof IbanValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
   '/privacy': typeof PrivacyRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
@@ -86,6 +104,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cpf-generator'
+    | '/iban-generator'
+    | '/iban-validator'
     | '/nif-generator'
     | '/privacy'
     | '/tax-id-validator'
@@ -95,6 +115,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/cpf-generator'
+    | '/iban-generator'
+    | '/iban-validator'
     | '/nif-generator'
     | '/privacy'
     | '/tax-id-validator'
@@ -104,6 +126,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/cpf-generator'
+    | '/iban-generator'
+    | '/iban-validator'
     | '/nif-generator'
     | '/privacy'
     | '/tax-id-validator'
@@ -114,6 +138,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CpfGeneratorRoute: typeof CpfGeneratorRoute
+  IbanGeneratorRoute: typeof IbanGeneratorRoute
+  IbanValidatorRoute: typeof IbanValidatorRoute
   NifGeneratorRoute: typeof NifGeneratorRoute
   PrivacyRoute: typeof PrivacyRoute
   TaxIdValidatorRoute: typeof TaxIdValidatorRoute
@@ -135,6 +161,20 @@ declare module '@tanstack/react-router' {
       path: '/cpf-generator'
       fullPath: '/cpf-generator'
       preLoaderRoute: typeof CpfGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/iban-generator': {
+      id: '/iban-generator'
+      path: '/iban-generator'
+      fullPath: '/iban-generator'
+      preLoaderRoute: typeof IbanGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/iban-validator': {
+      id: '/iban-validator'
+      path: '/iban-validator'
+      fullPath: '/iban-validator'
+      preLoaderRoute: typeof IbanValidatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nif-generator': {
@@ -178,6 +218,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CpfGeneratorRoute: CpfGeneratorRoute,
+  IbanGeneratorRoute: IbanGeneratorRoute,
+  IbanValidatorRoute: IbanValidatorRoute,
   NifGeneratorRoute: NifGeneratorRoute,
   PrivacyRoute: PrivacyRoute,
   TaxIdValidatorRoute: TaxIdValidatorRoute,

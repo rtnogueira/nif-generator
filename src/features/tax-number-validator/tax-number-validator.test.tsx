@@ -28,7 +28,14 @@ describe('Tax ID validator page', () => {
       within(related)
         .getAllByRole('link')
         .map(link => link.getAttribute('href'))
-    ).toEqual(['/', '/nif-generator', '/vat-number-generator', '/cpf-generator'])
+    ).toEqual([
+      '/',
+      '/nif-generator',
+      '/vat-number-generator',
+      '/cpf-generator',
+      '/iban-generator',
+      '/iban-validator',
+    ])
     expect(document.title).toBe('Tax ID Validator: Check EU VAT, NIF, CPF & more | rtnogueira')
   })
 

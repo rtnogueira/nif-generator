@@ -1,5 +1,7 @@
 import {
+  BadgeCheckIcon,
   BugIcon,
+  LandmarkIcon,
   LightbulbIcon,
   ReceiptTextIcon,
   ShieldCheckIcon,
@@ -13,6 +15,8 @@ import { newIssueUrl } from '@/lib/site'
 const TOOL_ICONS: Partial<Record<PagePath, LucideIcon>> = {
   '/': ReceiptTextIcon,
   '/tax-id-validator': ShieldCheckIcon,
+  '/iban-generator': LandmarkIcon,
+  '/iban-validator': BadgeCheckIcon,
 }
 
 /** Tools listed in the main menu, grouped by category. They come from `PAGES` in `@/lib/pages`. */

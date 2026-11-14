@@ -324,6 +324,8 @@ describe('NIF generator page', () => {
     expect(items.map(item => item.textContent)).toEqual([
       'Tax ID generator',
       'Tax ID validator',
+      'IBAN generator',
+      'IBAN validator',
       'Report a bug',
       'Suggest a feature',
     ])
@@ -413,7 +415,14 @@ describe('Generator landing pages', () => {
       within(related)
         .getAllByRole('link')
         .map(link => link.getAttribute('href'))
-    ).toEqual(['/', '/vat-number-generator', '/cpf-generator', '/tax-id-validator'])
+    ).toEqual([
+      '/',
+      '/vat-number-generator',
+      '/cpf-generator',
+      '/tax-id-validator',
+      '/iban-generator',
+      '/iban-validator',
+    ])
   })
 
   it('updates the description and canonical URL on navigation', async () => {

@@ -32,9 +32,19 @@ The former address, `/tax-number-validator`, redirects here.
 - ✅ Verifies the check digit of every kind of number the generator supports, including the 14 countries outside VIES, and names the kind of number that matched
 - ✍️ Accepts numbers as people write them: spaces, dots, dashes and slashes are ignored, and suffixes such as the Norwegian `MVA` or Swiss `MWST` are understood
 
+### IBAN generator (`/iban-generator`) and validator (`/iban-validator`)
+
+- 🏦 IBANs for the 89 countries of the SWIFT IBAN registry, with the country's structure and correct ISO 7064 Mod 97-10 check digits
+- 🔐 Check digits inside the account number are computed and verified for Belgium (with an assigned bank code), Montenegro, Norway, Portugal (NIB, so every IBAN starts with `PT50`) and Spain (CCC). For other countries the bank codes are random and national keys are not computed
+- ❌ Deliberately invalid IBANs, the printed form in groups of four, copy and export, as in the tax ID generator
+- 🛡️ The validator takes the country from the IBAN and ignores spaces, dots and dashes
+
+The structures come from python-stdnum's `iban.dat` (SWIFT IBAN Registry, release 101) and the algorithms from `stdnum.iban`; the Portuguese NIB check follows [Banco de Portugal's IBAN specification](https://www.bportugal.pt/sites/default/files/anexos/documentos-relacionados/international_bank_account_number_pt.pdf). They are tested against the registry's sample IBANs (`src/lib/iban`).
+
 ### Everywhere
 
 - 🔒 Everything runs in the browser; no number is sent to a server
+- 🗂️ Tools are grouped by category in the menu (`src/lib/pages.ts`)
 - 🐞 Bug reports and feature requests through GitHub issue forms, linked from the footer
 - 🌗 Light and dark mode, responsive layout
 - 🔎 Every page is prerendered at build time with its own title, description, canonical URL and structured data (`src/lib/pages.ts`), so crawlers that do not run JavaScript see the full content; the build also writes `sitemap.xml`

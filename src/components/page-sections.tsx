@@ -43,3 +43,16 @@ export function Faq({ items }: { items: { question: string; answer: ReactNode }[
     </div>
   )
 }
+
+export function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="font-medium text-foreground underline underline-offset-4"
+    >
+      {children}
+    </a>
+  )
+}
