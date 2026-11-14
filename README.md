@@ -56,6 +56,14 @@ Every algorithm (`src/lib/identity/countries.ts`) is ported from the python-stdn
 
 The algorithms (`src/lib/social-security/countries.ts`) are ported from the python-stdnum module named next to each and tested against the numbers of its documentation and tests. The Portuguese NISS is not in python-stdnum: its check digit follows the [validators_pt](https://gist.github.com/dreispt/024dd11c160af58268e2b44019080bbf) module. Numbers without a check digit (e.g. the US SSN) are not included.
 
+### Person generator (`/person-generator`)
+
+- 🧑 Made-up people for 36 countries: first and last name matching the sex, birth date within an age range, and an address (street, postal code, city, region) written the way the country writes it
+- 🧱 Choice of columns, up to 1000 rows, options kept in the URL (e.g. `/person-generator?country=ES&rows=50&sex=female&min=30&max=40`)
+- 📋 Copy the table (tab-separated, so it pastes into a spreadsheet), or as CSV or JSON; export to Excel, CSV or JSON
+
+Names and address data come from [Faker](https://fakerjs.dev/) (`src/lib/person`), loaded per country on demand. They are realistic, not real: the street, city and postal code are drawn separately and do not belong together.
+
 ### Everywhere
 
 - 🔒 Everything runs in the browser; no number is sent to a server

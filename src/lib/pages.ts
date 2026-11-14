@@ -22,6 +22,7 @@ export type PagePath =
   | '/social-security-number-generator'
   | '/social-security-number-validator'
   | '/niss-generator'
+  | '/person-generator'
   | '/privacy'
 
 /** Groups of tools, in the order the menus list them. */
@@ -359,6 +360,32 @@ export const PAGES: Record<PagePath, PageMeta> = {
       alternateName: ['Gerador de NISS', 'Gerador de número de Segurança Social'],
       description:
         'Free online generator of valid or deliberately invalid Portuguese social security numbers (NISS), for QA testing.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/person-generator': {
+    path: '/person-generator',
+    title: `Person Generator: fake names, birth dates & addresses | ${SITE_NAME}`,
+    description:
+      'Free person generator for test data: made-up names, birth dates and addresses for 36 countries. Choose the columns, then copy or export to Excel, CSV or JSON.',
+    name: 'Person Generator',
+    tool: {
+      category: 'data',
+      label: 'Person generator',
+      description: 'Made-up names, birth dates and addresses for testing.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Fake Name Generator', 'Random Person Generator', 'Fake Address Generator'],
+      description:
+        'Free online tool to generate made-up people for QA testing and development: names, birth dates and addresses written the way each country writes them.',
+      featureList: [
+        'Names and addresses of 36 countries',
+        'Names that match the chosen sex and birth dates within an age range',
+        'Choice of columns',
+        'Up to 1000 rows at once',
+        'Copy as a table, CSV or JSON, or export to Excel (.xlsx), CSV or JSON',
+      ],
     },
     sitemap: { changefreq: 'monthly', priority: 0.9 },
   },
