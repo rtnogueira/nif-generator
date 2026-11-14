@@ -18,6 +18,7 @@ import { Route as IdNumberGeneratorRouteImport } from './routes/id-number-genera
 import { Route as IdNumberValidatorRouteImport } from './routes/id-number-validator'
 import { Route as NifGeneratorRouteImport } from './routes/nif-generator'
 import { Route as NissGeneratorRouteImport } from './routes/niss-generator'
+import { Route as PersonGeneratorRouteImport } from './routes/person-generator'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SocialSecurityNumberGeneratorRouteImport } from './routes/social-security-number-generator'
 import { Route as SocialSecurityNumberValidatorRouteImport } from './routes/social-security-number-validator'
@@ -71,6 +72,11 @@ const NissGeneratorRoute = NissGeneratorRouteImport.update({
   path: '/niss-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PersonGeneratorRoute = PersonGeneratorRouteImport.update({
+  id: '/person-generator',
+  path: '/person-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/id-number-validator': typeof IdNumberValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
   '/niss-generator': typeof NissGeneratorRoute
+  '/person-generator': typeof PersonGeneratorRoute
   '/privacy': typeof PrivacyRoute
   '/social-security-number-generator': typeof SocialSecurityNumberGeneratorRoute
   '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/id-number-validator': typeof IdNumberValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
   '/niss-generator': typeof NissGeneratorRoute
+  '/person-generator': typeof PersonGeneratorRoute
   '/privacy': typeof PrivacyRoute
   '/social-security-number-generator': typeof SocialSecurityNumberGeneratorRoute
   '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/id-number-validator': typeof IdNumberValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
   '/niss-generator': typeof NissGeneratorRoute
+  '/person-generator': typeof PersonGeneratorRoute
   '/privacy': typeof PrivacyRoute
   '/social-security-number-generator': typeof SocialSecurityNumberGeneratorRoute
   '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/id-number-validator'
     | '/nif-generator'
     | '/niss-generator'
+    | '/person-generator'
     | '/privacy'
     | '/social-security-number-generator'
     | '/social-security-number-validator'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/id-number-validator'
     | '/nif-generator'
     | '/niss-generator'
+    | '/person-generator'
     | '/privacy'
     | '/social-security-number-generator'
     | '/social-security-number-validator'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/id-number-validator'
     | '/nif-generator'
     | '/niss-generator'
+    | '/person-generator'
     | '/privacy'
     | '/social-security-number-generator'
     | '/social-security-number-validator'
@@ -220,6 +232,7 @@ export interface RootRouteChildren {
   IdNumberValidatorRoute: typeof IdNumberValidatorRoute
   NifGeneratorRoute: typeof NifGeneratorRoute
   NissGeneratorRoute: typeof NissGeneratorRoute
+  PersonGeneratorRoute: typeof PersonGeneratorRoute
   PrivacyRoute: typeof PrivacyRoute
   SocialSecurityNumberGeneratorRoute: typeof SocialSecurityNumberGeneratorRoute
   SocialSecurityNumberValidatorRoute: typeof SocialSecurityNumberValidatorRoute
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NissGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/person-generator': {
+      id: '/person-generator'
+      path: '/person-generator'
+      fullPath: '/person-generator'
+      preLoaderRoute: typeof PersonGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -348,6 +368,7 @@ const rootRouteChildren: RootRouteChildren = {
   IdNumberValidatorRoute: IdNumberValidatorRoute,
   NifGeneratorRoute: NifGeneratorRoute,
   NissGeneratorRoute: NissGeneratorRoute,
+  PersonGeneratorRoute: PersonGeneratorRoute,
   PrivacyRoute: PrivacyRoute,
   SocialSecurityNumberGeneratorRoute: SocialSecurityNumberGeneratorRoute,
   SocialSecurityNumberValidatorRoute: SocialSecurityNumberValidatorRoute,

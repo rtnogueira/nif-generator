@@ -9,6 +9,7 @@ import {
   ReceiptTextIcon,
   ScanSearchIcon,
   ShieldCheckIcon,
+  UsersIcon,
   WrenchIcon,
   type LucideIcon,
 } from 'lucide-react'
@@ -25,6 +26,7 @@ const TOOL_ICONS: Partial<Record<PagePath, LucideIcon>> = {
   '/id-number-validator': ScanSearchIcon,
   '/social-security-number-generator': HeartHandshakeIcon,
   '/social-security-number-validator': ClipboardCheckIcon,
+  '/person-generator': UsersIcon,
 }
 
 /** Tools listed in the main menu, grouped by category. They come from `PAGES` in `@/lib/pages`. */
