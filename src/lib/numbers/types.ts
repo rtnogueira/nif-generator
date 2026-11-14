@@ -56,5 +56,11 @@ export interface NumberCountry {
   code: string
   /** English name, only for countries outside VIES (VIES countries take theirs from `@/lib/vat`). */
   name?: string
+  /**
+   * Reduces an input to the form `isValid` expects, for countries whose numbers have significant
+   * punctuation (e.g. the century sign of a Finnish identity code). Defaults to dropping spaces,
+   * dots, dashes and slashes.
+   */
+  compact?: (input: string) => string
   types: readonly NumberType[]
 }

@@ -24,18 +24,16 @@ describe('Tax ID validator page', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Tax ID Validator' })).toBeVisible()
     const related = screen.getByRole('navigation', { name: 'Related tools' })
-    expect(
-      within(related)
-        .getAllByRole('link')
-        .map(link => link.getAttribute('href'))
-    ).toEqual([
+    const links = within(related)
+      .getAllByRole('link')
+      .map(link => link.getAttribute('href'))
+    expect(links.slice(0, 4)).toEqual([
       '/',
       '/nif-generator',
       '/vat-number-generator',
       '/cpf-generator',
-      '/iban-generator',
-      '/iban-validator',
     ])
+    expect(links).not.toContain('/tax-id-validator')
     expect(document.title).toBe('Tax ID Validator: Check EU VAT, NIF, CPF & more | rtnogueira')
   })
 

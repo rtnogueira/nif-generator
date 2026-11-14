@@ -41,6 +41,14 @@ The former address, `/tax-number-validator`, redirects here.
 
 The structures come from python-stdnum's `iban.dat` (SWIFT IBAN Registry, release 101) and the algorithms from `stdnum.iban`; the Portuguese NIB check follows [Banco de Portugal's IBAN specification](https://www.bportugal.pt/sites/default/files/anexos/documentos-relacionados/international_bank_account_number_pt.pdf). They are tested against the registry's sample IBANs (`src/lib/iban`).
 
+### Identity number generator (`/id-number-generator`) and validator (`/id-number-validator`)
+
+- 🪪 Identity card and population register numbers of 22 countries, each with a correct check digit: the Portuguese Cartão de Cidadão, Belgian national number and eID card, Bulgarian EGN and PNF, Croatian OIB, Czech and Slovak birth numbers, Estonian isikukood, Finnish henkilötunnus, Icelandic kennitala, Indian Aadhaar and VID, Israeli identity number, Japanese My Number, Lithuanian asmens kodas, Norwegian fødselsnummer, Peruvian DNI, Polish PESEL, South African ID number, South Korean RRN, Spanish DNI and NIE, Swedish personnummer, Thai PIN, Turkish T.C. Kimlik No. and Brazilian CPF
+- 🎂 Numbers that hold a birth date or sex are generated for a random adult (or for a given person, see the test data generator)
+- 🇵🇹 A landing page for the Cartão de Cidadão: [`/cartao-de-cidadao-generator`](https://rtnogueira.com/cartao-de-cidadao-generator)
+
+Every algorithm (`src/lib/identity/countries.ts`) is ported from the python-stdnum module named next to it and tested against the numbers of its documentation and tests; the Cartão de Cidadão check also follows the [specification published by AMA](https://www.autenticacao.gov.pt/documents/20126/0/Valida%C3%A7%C3%A3o+de+N%C3%BAmero+de+Documento+do+Cart%C3%A3o+de+Cidad%C3%A3o+(1).pdf/7d5745ba-2bcc-e861-3954-bafe9f7591a0). Numbers whose check digit python-stdnum does not verify (e.g. the Danish CPR) are not included.
+
 ### Everywhere
 
 - 🔒 Everything runs in the browser; no number is sent to a server

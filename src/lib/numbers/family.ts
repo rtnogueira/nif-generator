@@ -12,6 +12,8 @@ export interface FamilyCountry {
   name: string
   /** The VIES structure, for VIES countries of the tax family: their numbers take a prefix. */
   vat?: VatCountry
+  /** See `NumberCountry.compact`. */
+  compact?: (input: string) => string
   types: readonly NumberType[]
 }
 
@@ -74,11 +76,14 @@ interface FamilyDefinition {
 
 /** A family whose numbers are validated by shape (`pattern`) and then check digit (`isValid`). */
 export function createFamily(definition: FamilyDefinition): NumberFamily {
-  const countries: FamilyCountry[] = definition.countries.map(({ code, name, types }) => ({
-    code,
-    name,
-    types,
-  }))
+  const countries: FamilyCountry[] = definition.countries.map(
+    ({ code, name, types, compact: compactCountry }) => ({
+      code,
+      name,
+      compact: compactCountry,
+      types,
+    })
+  )
   const byCode = new Map(countries.map(country => [country.code, country]))
   const getCountry = (code: string) => byCode.get(code)
   const defaultCountry = getCountry(definition.defaultCountry)
@@ -94,10 +99,11 @@ export function createFamily(definition: FamilyDefinition): NumberFamily {
     detectsCountry: Boolean(definition.detectCountry),
     getCountry,
     validate(input, countryCode) {
-      const number = compact(input)
-      if (!number) return { status: 'empty' }
-      const country = getCountry(countryCode ?? definition.detectCountry?.(number) ?? '')
+      const compacted = compact(input)
+      if (!compacted) return { status: 'empty' }
+      const country = getCountry(countryCode ?? definition.detectCountry?.(compacted) ?? '')
       if (!country) return { status: 'unknown-country' }
+      const number = country.compact ? country.compact(input.trim().toUpperCase()) : compacted
       const types = country.types.filter(type => type.pattern.test(number))
       if (types.length === 0) return { status: 'invalid-format', country, number }
       const type = types.find(t => t.isValid(number))

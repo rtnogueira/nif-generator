@@ -60,6 +60,45 @@ export function mod97(value: string): number {
   return remainder
 }
 
+// The multiplication and permutation tables of the Verhoeff algorithm (stdnum.verhoeff).
+const VERHOEFF_MULTIPLICATION = [
+  '0123456789',
+  '1234067895',
+  '2340178956',
+  '3401289567',
+  '4012395678',
+  '5987604321',
+  '6598710432',
+  '7659821043',
+  '8765932104',
+  '9876543210',
+]
+const VERHOEFF_PERMUTATION = [
+  '0123456789',
+  '1576283094',
+  '5803796142',
+  '8916043527',
+  '9453126870',
+  '4286573901',
+  '2793806415',
+  '7046913258',
+]
+
+/** Verhoeff checksum: 0 for a valid number. */
+export function verhoeffChecksum(digits: string): number {
+  let check = 0
+  for (let i = 0; i < digits.length; i++) {
+    const digit = Number(digits[digits.length - 1 - i])
+    check = Number(VERHOEFF_MULTIPLICATION[check][Number(VERHOEFF_PERMUTATION[i % 8][digit])])
+  }
+  return check
+}
+
+/** Digit that makes `body + digit` valid under the Verhoeff algorithm. */
+export function verhoeffCheckDigit(body: string): string {
+  return String(VERHOEFF_MULTIPLICATION[verhoeffChecksum(body + '0')].indexOf('0'))
+}
+
 /** Zero-pads a number to two digits. */
 export function pad2(value: number): string {
   return String(value).padStart(2, '0')
