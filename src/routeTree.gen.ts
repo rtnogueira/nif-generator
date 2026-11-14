@@ -24,6 +24,7 @@ import { Route as SocialSecurityNumberGeneratorRouteImport } from './routes/soci
 import { Route as SocialSecurityNumberValidatorRouteImport } from './routes/social-security-number-validator'
 import { Route as TaxIdValidatorRouteImport } from './routes/tax-id-validator'
 import { Route as TaxNumberValidatorRouteImport } from './routes/tax-number-validator'
+import { Route as TestDataGeneratorRouteImport } from './routes/test-data-generator'
 import { Route as VatNumberGeneratorRouteImport } from './routes/vat-number-generator'
 
 const IndexRoute = IndexRouteImport.update({
@@ -104,6 +105,11 @@ const TaxNumberValidatorRoute = TaxNumberValidatorRouteImport.update({
   path: '/tax-number-validator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestDataGeneratorRoute = TestDataGeneratorRouteImport.update({
+  id: '/test-data-generator',
+  path: '/test-data-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VatNumberGeneratorRoute = VatNumberGeneratorRouteImport.update({
   id: '/vat-number-generator',
   path: '/vat-number-generator',
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
+  '/test-data-generator': typeof TestDataGeneratorRoute
   '/vat-number-generator': typeof VatNumberGeneratorRoute
 }
 export interface FileRoutesByTo {
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
+  '/test-data-generator': typeof TestDataGeneratorRoute
   '/vat-number-generator': typeof VatNumberGeneratorRoute
 }
 export interface FileRoutesById {
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
+  '/test-data-generator': typeof TestDataGeneratorRoute
   '/vat-number-generator': typeof VatNumberGeneratorRoute
 }
 export interface FileRouteTypes {
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/social-security-number-validator'
     | '/tax-id-validator'
     | '/tax-number-validator'
+    | '/test-data-generator'
     | '/vat-number-generator'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/social-security-number-validator'
     | '/tax-id-validator'
     | '/tax-number-validator'
+    | '/test-data-generator'
     | '/vat-number-generator'
   id:
     | '__root__'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/social-security-number-validator'
     | '/tax-id-validator'
     | '/tax-number-validator'
+    | '/test-data-generator'
     | '/vat-number-generator'
   fileRoutesById: FileRoutesById
 }
@@ -238,6 +250,7 @@ export interface RootRouteChildren {
   SocialSecurityNumberValidatorRoute: typeof SocialSecurityNumberValidatorRoute
   TaxIdValidatorRoute: typeof TaxIdValidatorRoute
   TaxNumberValidatorRoute: typeof TaxNumberValidatorRoute
+  TestDataGeneratorRoute: typeof TestDataGeneratorRoute
   VatNumberGeneratorRoute: typeof VatNumberGeneratorRoute
 }
 
@@ -348,6 +361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TaxNumberValidatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/test-data-generator': {
+      id: '/test-data-generator'
+      path: '/test-data-generator'
+      fullPath: '/test-data-generator'
+      preLoaderRoute: typeof TestDataGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vat-number-generator': {
       id: '/vat-number-generator'
       path: '/vat-number-generator'
@@ -374,6 +394,7 @@ const rootRouteChildren: RootRouteChildren = {
   SocialSecurityNumberValidatorRoute: SocialSecurityNumberValidatorRoute,
   TaxIdValidatorRoute: TaxIdValidatorRoute,
   TaxNumberValidatorRoute: TaxNumberValidatorRoute,
+  TestDataGeneratorRoute: TestDataGeneratorRoute,
   VatNumberGeneratorRoute: VatNumberGeneratorRoute,
 }
 export const routeTree = rootRouteImport

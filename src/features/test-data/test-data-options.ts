@@ -23,6 +23,8 @@ export interface TestDataOptions {
   sex: SexOption
   minAge: number
   maxAge: number
+  /** Write numbers in their usual form, where they have one. */
+  formatted: boolean
 }
 
 /** The test data pages' URL search params, e.g. `?country=PT&rows=20&cols=first-name,iban`. */
@@ -33,9 +35,10 @@ export interface TestDataSearch {
   sex?: string
   min?: string
   max?: string
+  format?: string
 }
 
-const SEARCH_KEYS = ['country', 'rows', 'cols', 'sex', 'min', 'max'] as const
+const SEARCH_KEYS = ['country', 'rows', 'cols', 'sex', 'min', 'max', 'format'] as const
 
 /** Keeps the known params, as strings; anything else in the URL is dropped. Never throws. */
 export function validateTestDataSearch(search: Record<string, unknown>): TestDataSearch {
@@ -68,6 +71,7 @@ export function defaultOptions(groups: readonly ColumnGroupId[]): TestDataOption
     sex: 'any',
     minAge: DEFAULT_MIN_AGE,
     maxAge: DEFAULT_MAX_AGE,
+    formatted: false,
   }
 }
 
@@ -95,6 +99,7 @@ export function optionsFromSearch(
     columns: asked.length > 0 ? asked : defaultColumns(country, groups),
     sex: isSex(search.sex) ? search.sex : 'any',
     ...ages,
+    formatted: search.format === '1',
   }
 }
 
@@ -107,5 +112,6 @@ export function searchFromOptions(options: TestDataOptions): TestDataSearch {
     sex: options.sex === 'any' ? undefined : options.sex,
     min: options.minAge === DEFAULT_MIN_AGE ? undefined : String(options.minAge),
     max: options.maxAge === DEFAULT_MAX_AGE ? undefined : String(options.maxAge),
+    format: options.formatted ? '1' : undefined,
   }
 }

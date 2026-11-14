@@ -1,8 +1,8 @@
 [![CI/CD](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rtnogueira/nif-generator/actions/workflows/ci-cd.yml)
 
-# Tax ID Generator & Validator (NIF, EU VAT, CPF and more)
+# Test data tools: tax IDs, IBANs, identity and social security numbers, people
 
-**Free online tools to generate and validate tax identification numbers (tax IDs, or TINs) for QA testing and development: Portuguese NIFs of every type, EU VAT numbers and national tax numbers of 14 more countries.**
+**Free online tools to generate and validate test data for QA and development: tax identification numbers (Portuguese NIFs of every type, EU VAT numbers and the tax numbers of 14 more countries), IBANs, identity numbers, social security numbers, made-up people, and tables that combine them.**
 
 🔗 **Live App:** https://rtnogueira.com/
 
@@ -63,6 +63,13 @@ The algorithms (`src/lib/social-security/countries.ts`) are ported from the pyth
 - 📋 Copy the table (tab-separated, so it pastes into a spreadsheet), or as CSV or JSON; export to Excel, CSV or JSON
 
 Names and address data come from [Faker](https://fakerjs.dev/) (`src/lib/person`), loaded per country on demand. They are realistic, not real: the street, city and postal code are drawn separately and do not belong together.
+
+### Test data generator (`/test-data-generator`)
+
+- 🗃️ One made-up person per row, with the numbers they would have in the chosen country: tax number, identity number, social security number and IBAN, each with a correct check digit. For Portugal: name, birth date, address, NIF, Cartão de Cidadão, NISS and IBAN
+- 🔗 Every value of a row is made for the same person: numbers that hold a birth date or sex (personnummer, PESEL, NIR...) hold the row's, and two columns that are one number in real life (the Belgian national number and INSZ) show the same value
+- 🧱 Choice of columns per country, up to 1000 rows, plain or formatted numbers, options kept in the URL (e.g. `/test-data-generator?country=PT&rows=100&cols=first-name,last-name,tax-2,bank-iban`)
+- 📋 Copy as a table, CSV or JSON; export to Excel, CSV or JSON (one object per row)
 
 ### Everywhere
 

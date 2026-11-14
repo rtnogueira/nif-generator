@@ -13,7 +13,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { QuantityInput } from '@/features/nif-generator/quantity-input'
-import { COLUMN_GROUPS, MAX_ROWS, MIN_ROWS, type ColumnGroupId } from '@/lib/dataset'
+import {
+  COLUMN_GROUPS,
+  hasFormattedNumbers,
+  MAX_ROWS,
+  MIN_ROWS,
+  type ColumnGroupId,
+} from '@/lib/dataset'
 import { clampAges, MAX_AGE, MIN_AGE, PERSON_LOCALES, SEXES, type SexOption } from '@/lib/person'
 import { defaultColumns, offeredColumns, type TestDataOptions } from './test-data-options'
 
@@ -37,8 +43,10 @@ export function TestDataForm({ groups, initialOptions, busy, onGenerate }: TestD
   const [sex, setSex] = useState<SexOption>(initialOptions.sex)
   const [minAge, setMinAge] = useState(String(initialOptions.minAge))
   const [maxAge, setMaxAge] = useState(String(initialOptions.maxAge))
+  const [formatted, setFormatted] = useState(initialOptions.formatted)
 
   const offered = offeredColumns(country, groups)
+  const canFormat = hasFormattedNumbers(country, groups)
 
   function handleCountryChange(value: string) {
     if (!PERSON_LOCALES.some(locale => locale.code === value)) return
@@ -63,7 +71,7 @@ export function TestDataForm({ groups, initialOptions, busy, onGenerate }: TestD
     const ages = clampAges(Number.parseInt(minAge, 10), Number.parseInt(maxAge, 10))
     setMinAge(String(ages.minAge))
     setMaxAge(String(ages.maxAge))
-    onGenerate({ country, rows, columns, sex, ...ages })
+    onGenerate({ country, rows, columns, sex, ...ages, formatted: canFormat && formatted })
   }
 
   return (
@@ -173,6 +181,24 @@ export function TestDataForm({ groups, initialOptions, busy, onGenerate }: TestD
               </fieldset>
             )
           })}
+
+          {canFormat && (
+            <div className="flex items-start gap-2.5">
+              <input
+                id={`${id}-formatted`}
+                type="checkbox"
+                checked={formatted}
+                onChange={event => setFormatted(event.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-primary"
+              />
+              <div className="flex flex-col gap-1">
+                <Label htmlFor={`${id}-formatted`}>Formatted numbers</Label>
+                <p className="text-xs text-muted-foreground">
+                  Write numbers the usual way, e.g. an IBAN in groups of four characters.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center gap-3">
             <Button
