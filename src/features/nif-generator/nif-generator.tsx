@@ -2,7 +2,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useState, type ReactNode } from 'react'
 import { RelatedTools } from '@/components/related-tools'
 import { usePageMeta } from '@/hooks/use-page-meta'
-import type { PagePath } from '@/lib/pages'
+import { categoryLabel, type PagePath } from '@/lib/pages'
 import type { GeneratedBatch } from '@/lib/tax-id'
 import {
   DEFAULT_OPTIONS,
@@ -51,7 +51,7 @@ export function NifGenerator({ path, heading, intro, preset, about }: NifGenerat
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-muted-foreground">Tools</p>
+        <p className="text-sm font-medium text-muted-foreground">{categoryLabel(path)}</p>
         <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
         <div className="flex max-w-2xl flex-col gap-2 text-muted-foreground">{intro}</div>
       </div>

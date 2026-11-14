@@ -1,21 +1,31 @@
-import { BugIcon, LightbulbIcon, ReceiptTextIcon, ShieldCheckIcon } from 'lucide-react'
+import {
+  BugIcon,
+  LightbulbIcon,
+  ReceiptTextIcon,
+  ShieldCheckIcon,
+  WrenchIcon,
+  type LucideIcon,
+} from 'lucide-react'
+import { toolGroups, type PagePath } from '@/lib/pages'
 import { newIssueUrl } from '@/lib/site'
 
-/** Tools listed in the main menu. Add an entry here when a new tool route is created. */
-export const TOOLS = [
-  {
-    to: '/',
-    label: 'Tax ID generator',
-    description: 'Valid or invalid NIFs, EU VAT and other tax IDs for testing.',
-    icon: ReceiptTextIcon,
-  },
-  {
-    to: '/tax-id-validator',
-    label: 'Tax ID validator',
-    description: 'Check the check digit of NIFs, EU VAT and other tax IDs.',
-    icon: ShieldCheckIcon,
-  },
-] as const
+/** Menu icon of each tool. Add an entry here when a tool is added to `PAGES` with `menu: true`. */
+const TOOL_ICONS: Partial<Record<PagePath, LucideIcon>> = {
+  '/': ReceiptTextIcon,
+  '/tax-id-validator': ShieldCheckIcon,
+}
+
+/** Tools listed in the main menu, grouped by category. They come from `PAGES` in `@/lib/pages`. */
+export const TOOL_GROUPS = toolGroups(page => Boolean(page.tool?.menu)).map(group => ({
+  id: group.id,
+  label: group.label,
+  tools: group.pages.map(page => ({
+    to: page.path,
+    label: page.tool?.label ?? page.name,
+    description: page.tool?.description ?? '',
+    icon: TOOL_ICONS[page.path] ?? WrenchIcon,
+  })),
+}))
 
 /** GitHub issue forms, with `page` (the page the visitor is on) filled in. */
 export function feedbackLinks(page: string) {

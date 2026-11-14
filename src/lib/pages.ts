@@ -16,6 +16,17 @@ export type PagePath =
   | '/cpf-generator'
   | '/privacy'
 
+/** Groups of tools, in the order the menus list them. */
+export const CATEGORIES = [
+  { id: 'tax', label: 'Tax IDs' },
+  { id: 'banking', label: 'Banking' },
+  { id: 'identity', label: 'Identity documents' },
+  { id: 'social-security', label: 'Social security' },
+  { id: 'data', label: 'People & test data' },
+] as const
+
+export type CategoryId = (typeof CATEGORIES)[number]['id']
+
 export interface PageMeta {
   path: PagePath
   /** Full `<title>`, ending with the site name. */
@@ -30,6 +41,15 @@ export interface PageMeta {
     description: string
     featureList?: string[]
   }
+  /** For tools: how the menus and the related tools list the page. */
+  tool?: {
+    category: CategoryId
+    label: string
+    /** One line shown under the label. */
+    description: string
+    /** Listed in the main menu, not only among the related tools. */
+    menu?: boolean
+  }
   sitemap: { changefreq: 'monthly' | 'yearly'; priority: number }
 }
 
@@ -42,6 +62,12 @@ export const PAGES: Record<PagePath, PageMeta> = {
     description:
       'Free tax ID generator for QA testing: valid or invalid Portuguese NIFs, EU VAT numbers, CPF, CNPJ, ABN and other TINs. Copy or export to Excel, CSV or JSON.',
     name: 'Tax ID Generator',
+    tool: {
+      category: 'tax',
+      label: 'Tax ID generator',
+      description: 'Valid or invalid NIFs, EU VAT and other tax IDs for testing.',
+      menu: true,
+    },
     app: {
       alternateName: [
         'Tax Number Generator',
@@ -66,12 +92,72 @@ export const PAGES: Record<PagePath, PageMeta> = {
     },
     sitemap: { changefreq: 'monthly', priority: 1 },
   },
+  '/nif-generator': {
+    path: '/nif-generator',
+    title: `NIF Generator (Gerador de NIF): Portuguese tax numbers | ${SITE_NAME}`,
+    description:
+      'Generate valid Portuguese NIFs (número de contribuinte) for testing: individuals, companies (NIPC), non-residents and every other type, with a correct check digit.',
+    name: 'NIF Generator',
+    tool: {
+      category: 'tax',
+      label: 'NIF generator',
+      description: 'Portuguese NIFs of every type.',
+    },
+    app: {
+      alternateName: ['Gerador de NIF', 'Portuguese NIF Generator', 'NIPC Generator'],
+      description:
+        'Free online generator of valid or deliberately invalid Portuguese NIFs (número de identificação fiscal) of every taxpayer type, for QA testing.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/vat-number-generator': {
+    path: '/vat-number-generator',
+    title: `EU VAT Number Generator: all 27 EU countries & UK | ${SITE_NAME}`,
+    description:
+      'Generate random, valid EU VAT numbers for testing, with a correct check digit and optional country prefix: Germany, France, Italy, Spain, all 27 EU countries and the UK.',
+    name: 'VAT Number Generator',
+    tool: {
+      category: 'tax',
+      label: 'VAT number generator',
+      description: 'All 27 EU member states, Northern Ireland and the UK.',
+    },
+    app: {
+      alternateName: ['EU VAT Number Generator', 'VAT ID Generator', 'Random VAT Number Generator'],
+      description:
+        'Free online generator of valid or deliberately invalid VAT identification numbers for every EU member state, Northern Ireland and the United Kingdom, for QA testing.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/cpf-generator': {
+    path: '/cpf-generator',
+    title: `CPF Generator: valid Brazilian CPF & CNPJ numbers | ${SITE_NAME}`,
+    description:
+      'Generate valid Brazilian CPF and CNPJ numbers for testing, plain or formatted (000.000.000-00), with both check digits computed. Gerador de CPF for QA and developers.',
+    name: 'CPF Generator',
+    tool: {
+      category: 'tax',
+      label: 'CPF generator',
+      description: 'Brazilian CPF and CNPJ numbers.',
+    },
+    app: {
+      alternateName: ['Gerador de CPF', 'CNPJ Generator', 'Gerador de CNPJ'],
+      description:
+        'Free online generator of valid or deliberately invalid Brazilian CPF and CNPJ numbers, plain or formatted, for QA testing.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
   '/tax-id-validator': {
     path: '/tax-id-validator',
     title: `Tax ID Validator: Check EU VAT, NIF, CPF & more | ${SITE_NAME}`,
     description:
       'Free tax ID validator: check the format and check digit of EU VAT numbers from all 27 member states and the UK, Portuguese NIFs, CPF, CNPJ, ABN and more.',
     name: 'Tax ID Validator',
+    tool: {
+      category: 'tax',
+      label: 'Tax ID validator',
+      description: 'Check the check digit of NIFs, EU VAT and other tax IDs.',
+      menu: true,
+    },
     app: {
       alternateName: [
         'Tax Number Validator',
@@ -90,45 +176,6 @@ export const PAGES: Record<PagePath, PageMeta> = {
     },
     sitemap: { changefreq: 'monthly', priority: 0.9 },
   },
-  '/nif-generator': {
-    path: '/nif-generator',
-    title: `NIF Generator (Gerador de NIF): Portuguese tax numbers | ${SITE_NAME}`,
-    description:
-      'Generate valid Portuguese NIFs (número de contribuinte) for testing: individuals, companies (NIPC), non-residents and every other type, with a correct check digit.',
-    name: 'NIF Generator',
-    app: {
-      alternateName: ['Gerador de NIF', 'Portuguese NIF Generator', 'NIPC Generator'],
-      description:
-        'Free online generator of valid or deliberately invalid Portuguese NIFs (número de identificação fiscal) of every taxpayer type, for QA testing.',
-    },
-    sitemap: { changefreq: 'monthly', priority: 0.9 },
-  },
-  '/vat-number-generator': {
-    path: '/vat-number-generator',
-    title: `EU VAT Number Generator: all 27 EU countries & UK | ${SITE_NAME}`,
-    description:
-      'Generate random, valid EU VAT numbers for testing, with a correct check digit and optional country prefix: Germany, France, Italy, Spain, all 27 EU countries and the UK.',
-    name: 'VAT Number Generator',
-    app: {
-      alternateName: ['EU VAT Number Generator', 'VAT ID Generator', 'Random VAT Number Generator'],
-      description:
-        'Free online generator of valid or deliberately invalid VAT identification numbers for every EU member state, Northern Ireland and the United Kingdom, for QA testing.',
-    },
-    sitemap: { changefreq: 'monthly', priority: 0.9 },
-  },
-  '/cpf-generator': {
-    path: '/cpf-generator',
-    title: `CPF Generator: valid Brazilian CPF & CNPJ numbers | ${SITE_NAME}`,
-    description:
-      'Generate valid Brazilian CPF and CNPJ numbers for testing, plain or formatted (000.000.000-00), with both check digits computed. Gerador de CPF for QA and developers.',
-    name: 'CPF Generator',
-    app: {
-      alternateName: ['Gerador de CPF', 'CNPJ Generator', 'Gerador de CNPJ'],
-      description:
-        'Free online generator of valid or deliberately invalid Brazilian CPF and CNPJ numbers, plain or formatted, for QA testing.',
-    },
-    sitemap: { changefreq: 'monthly', priority: 0.9 },
-  },
   '/privacy': {
     path: '/privacy',
     title: `Privacy Policy | ${SITE_NAME}`,
@@ -137,6 +184,22 @@ export const PAGES: Record<PagePath, PageMeta> = {
     name: 'Privacy Policy',
     sitemap: { changefreq: 'yearly', priority: 0.3 },
   },
+}
+
+/** The tools of each category that has any, in menu order. */
+export function toolGroups(include: (page: PageMeta) => boolean = () => true) {
+  return CATEGORIES.map(category => ({
+    ...category,
+    pages: Object.values(PAGES).filter(
+      page => page.tool?.category === category.id && include(page)
+    ),
+  })).filter(group => group.pages.length > 0)
+}
+
+/** Label of the category a tool page belongs to, shown above its heading. */
+export function categoryLabel(path: PagePath): string {
+  const id = PAGES[path].tool?.category
+  return CATEGORIES.find(category => category.id === id)?.label ?? 'Tools'
 }
 
 export const pageUrl = (path: PagePath) => `${SITE_URL}${path}`
