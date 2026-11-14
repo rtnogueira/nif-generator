@@ -17,7 +17,10 @@ import { Route as IbanValidatorRouteImport } from './routes/iban-validator'
 import { Route as IdNumberGeneratorRouteImport } from './routes/id-number-generator'
 import { Route as IdNumberValidatorRouteImport } from './routes/id-number-validator'
 import { Route as NifGeneratorRouteImport } from './routes/nif-generator'
+import { Route as NissGeneratorRouteImport } from './routes/niss-generator'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SocialSecurityNumberGeneratorRouteImport } from './routes/social-security-number-generator'
+import { Route as SocialSecurityNumberValidatorRouteImport } from './routes/social-security-number-validator'
 import { Route as TaxIdValidatorRouteImport } from './routes/tax-id-validator'
 import { Route as TaxNumberValidatorRouteImport } from './routes/tax-number-validator'
 import { Route as VatNumberGeneratorRouteImport } from './routes/vat-number-generator'
@@ -63,11 +66,28 @@ const NifGeneratorRoute = NifGeneratorRouteImport.update({
   path: '/nif-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NissGeneratorRoute = NissGeneratorRouteImport.update({
+  id: '/niss-generator',
+  path: '/niss-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SocialSecurityNumberGeneratorRoute =
+  SocialSecurityNumberGeneratorRouteImport.update({
+    id: '/social-security-number-generator',
+    path: '/social-security-number-generator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SocialSecurityNumberValidatorRoute =
+  SocialSecurityNumberValidatorRouteImport.update({
+    id: '/social-security-number-validator',
+    path: '/social-security-number-validator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TaxIdValidatorRoute = TaxIdValidatorRouteImport.update({
   id: '/tax-id-validator',
   path: '/tax-id-validator',
@@ -93,7 +113,10 @@ export interface FileRoutesByFullPath {
   '/id-number-generator': typeof IdNumberGeneratorRoute
   '/id-number-validator': typeof IdNumberValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
+  '/niss-generator': typeof NissGeneratorRoute
   '/privacy': typeof PrivacyRoute
+  '/social-security-number-generator': typeof SocialSecurityNumberGeneratorRoute
+  '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
   '/vat-number-generator': typeof VatNumberGeneratorRoute
@@ -107,7 +130,10 @@ export interface FileRoutesByTo {
   '/id-number-generator': typeof IdNumberGeneratorRoute
   '/id-number-validator': typeof IdNumberValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
+  '/niss-generator': typeof NissGeneratorRoute
   '/privacy': typeof PrivacyRoute
+  '/social-security-number-generator': typeof SocialSecurityNumberGeneratorRoute
+  '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
   '/vat-number-generator': typeof VatNumberGeneratorRoute
@@ -122,7 +148,10 @@ export interface FileRoutesById {
   '/id-number-generator': typeof IdNumberGeneratorRoute
   '/id-number-validator': typeof IdNumberValidatorRoute
   '/nif-generator': typeof NifGeneratorRoute
+  '/niss-generator': typeof NissGeneratorRoute
   '/privacy': typeof PrivacyRoute
+  '/social-security-number-generator': typeof SocialSecurityNumberGeneratorRoute
+  '/social-security-number-validator': typeof SocialSecurityNumberValidatorRoute
   '/tax-id-validator': typeof TaxIdValidatorRoute
   '/tax-number-validator': typeof TaxNumberValidatorRoute
   '/vat-number-generator': typeof VatNumberGeneratorRoute
@@ -138,7 +167,10 @@ export interface FileRouteTypes {
     | '/id-number-generator'
     | '/id-number-validator'
     | '/nif-generator'
+    | '/niss-generator'
     | '/privacy'
+    | '/social-security-number-generator'
+    | '/social-security-number-validator'
     | '/tax-id-validator'
     | '/tax-number-validator'
     | '/vat-number-generator'
@@ -152,7 +184,10 @@ export interface FileRouteTypes {
     | '/id-number-generator'
     | '/id-number-validator'
     | '/nif-generator'
+    | '/niss-generator'
     | '/privacy'
+    | '/social-security-number-generator'
+    | '/social-security-number-validator'
     | '/tax-id-validator'
     | '/tax-number-validator'
     | '/vat-number-generator'
@@ -166,7 +201,10 @@ export interface FileRouteTypes {
     | '/id-number-generator'
     | '/id-number-validator'
     | '/nif-generator'
+    | '/niss-generator'
     | '/privacy'
+    | '/social-security-number-generator'
+    | '/social-security-number-validator'
     | '/tax-id-validator'
     | '/tax-number-validator'
     | '/vat-number-generator'
@@ -181,7 +219,10 @@ export interface RootRouteChildren {
   IdNumberGeneratorRoute: typeof IdNumberGeneratorRoute
   IdNumberValidatorRoute: typeof IdNumberValidatorRoute
   NifGeneratorRoute: typeof NifGeneratorRoute
+  NissGeneratorRoute: typeof NissGeneratorRoute
   PrivacyRoute: typeof PrivacyRoute
+  SocialSecurityNumberGeneratorRoute: typeof SocialSecurityNumberGeneratorRoute
+  SocialSecurityNumberValidatorRoute: typeof SocialSecurityNumberValidatorRoute
   TaxIdValidatorRoute: typeof TaxIdValidatorRoute
   TaxNumberValidatorRoute: typeof TaxNumberValidatorRoute
   VatNumberGeneratorRoute: typeof VatNumberGeneratorRoute
@@ -245,11 +286,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NifGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/niss-generator': {
+      id: '/niss-generator'
+      path: '/niss-generator'
+      fullPath: '/niss-generator'
+      preLoaderRoute: typeof NissGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social-security-number-generator': {
+      id: '/social-security-number-generator'
+      path: '/social-security-number-generator'
+      fullPath: '/social-security-number-generator'
+      preLoaderRoute: typeof SocialSecurityNumberGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social-security-number-validator': {
+      id: '/social-security-number-validator'
+      path: '/social-security-number-validator'
+      fullPath: '/social-security-number-validator'
+      preLoaderRoute: typeof SocialSecurityNumberValidatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tax-id-validator': {
@@ -285,7 +347,10 @@ const rootRouteChildren: RootRouteChildren = {
   IdNumberGeneratorRoute: IdNumberGeneratorRoute,
   IdNumberValidatorRoute: IdNumberValidatorRoute,
   NifGeneratorRoute: NifGeneratorRoute,
+  NissGeneratorRoute: NissGeneratorRoute,
   PrivacyRoute: PrivacyRoute,
+  SocialSecurityNumberGeneratorRoute: SocialSecurityNumberGeneratorRoute,
+  SocialSecurityNumberValidatorRoute: SocialSecurityNumberValidatorRoute,
   TaxIdValidatorRoute: TaxIdValidatorRoute,
   TaxNumberValidatorRoute: TaxNumberValidatorRoute,
   VatNumberGeneratorRoute: VatNumberGeneratorRoute,

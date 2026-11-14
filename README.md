@@ -49,6 +49,13 @@ The structures come from python-stdnum's `iban.dat` (SWIFT IBAN Registry, releas
 
 Every algorithm (`src/lib/identity/countries.ts`) is ported from the python-stdnum module named next to it and tested against the numbers of its documentation and tests; the Cartão de Cidadão check also follows the [specification published by AMA](https://www.autenticacao.gov.pt/documents/20126/0/Valida%C3%A7%C3%A3o+de+N%C3%BAmero+de+Documento+do+Cart%C3%A3o+de+Cidad%C3%A3o+(1).pdf/7d5745ba-2bcc-e861-3954-bafe9f7591a0). Numbers whose check digit python-stdnum does not verify (e.g. the Danish CPR) are not included.
 
+### Social security number generator (`/social-security-number-generator`) and validator (`/social-security-number-validator`)
+
+- 🏥 Social security, social insurance and health insurance numbers of 9 countries, each with a correct check digit: the Portuguese NISS, Austrian Versicherungsnummer, Belgian INSZ/NISS, Canadian SIN, French NIR, Greek AMKA, Irish PPS number, Swiss AHV number and the NHS number
+- 🇵🇹 A landing page for the NISS: [`/niss-generator`](https://rtnogueira.com/niss-generator)
+
+The algorithms (`src/lib/social-security/countries.ts`) are ported from the python-stdnum module named next to each and tested against the numbers of its documentation and tests. The Portuguese NISS is not in python-stdnum: its check digit follows the [validators_pt](https://gist.github.com/dreispt/024dd11c160af58268e2b44019080bbf) module. Numbers without a check digit (e.g. the US SSN) are not included.
+
 ### Everywhere
 
 - 🔒 Everything runs in the browser; no number is sent to a server

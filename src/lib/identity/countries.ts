@@ -19,43 +19,21 @@ import {
   verhoeffChecksum,
   weightedSum,
 } from '@/lib/numbers/checksums'
-import { rejectionSampler, split } from '@/lib/numbers/helpers'
-import { dateParts, isDate, randomPersonSeed, randomWithParity } from '@/lib/numbers/person'
+import {
+  ddmmyy,
+  defineType as idType,
+  isMale,
+  pad3,
+  yymmdd,
+  type TypeDefinition as IdTypeDefinition,
+} from '@/lib/numbers/define'
+import { split } from '@/lib/numbers/helpers'
+import { dateParts, isDate, randomWithParity } from '@/lib/numbers/person'
 import type { NumberCountry, NumberType, PersonSeed } from '@/lib/numbers/types'
 import { randomChar, randomDigits, randomInt } from '@/lib/random'
 import { getTaxIdType } from '@/lib/tax-id'
 
 const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-const pad3 = (value: number) => String(value).padStart(3, '0')
-const isMale = (person: PersonSeed) => person.sex === 'male'
-/** yymmdd, with an offset added to the month where a number encodes the century or sex there. */
-const yymmdd = (person: PersonSeed, monthOffset = 0) => {
-  const { yy, month, day } = dateParts(person.birthDate)
-  return pad2(yy) + pad2(month + monthOffset) + pad2(day)
-}
-const ddmmyy = (person: PersonSeed) => {
-  const { yy, month, day } = dateParts(person.birthDate)
-  return pad2(day) + pad2(month) + pad2(yy)
-}
-
-interface IdTypeDefinition extends Omit<NumberType, 'badge' | 'generate' | 'source'> {
-  badge?: string
-  /** The python-stdnum module the algorithm is ported from. */
-  stdnum: string
-  document?: { title: string; url: string }
-  /** A number for `person`, or '' when the draw has no valid check digit. */
-  candidate: (person: PersonSeed) => string
-}
-
-function idType({ candidate, stdnum, document, ...definition }: IdTypeDefinition): NumberType {
-  const generate = rejectionSampler(candidate, definition.isValid)
-  return {
-    ...definition,
-    badge: definition.badge ?? definition.name,
-    source: { stdnum, document },
-    generate: person => generate(person ?? randomPersonSeed()),
-  }
-}
 
 /** A kind of number already listed as a tax number, which is also its country's identity number. */
 function fromTaxIds(
@@ -86,14 +64,20 @@ function ccCheckDigit(body: string): string {
 /** The two check digits of a national number, for a birth year before or from 2000. */
 const nnCheck = (body: string, from2000: boolean) =>
   pad2(97 - (Number((from2000 ? '2' : '') + body) % 97))
-function isValidNn(number: string): boolean {
+/** True when the check digits of a national (or BIS) number are right for either century. */
+export function hasValidNnCheck(number: string): boolean {
   if (!/^\d{11}$/.test(number) || Number(number) <= 0) return false
   const body = number.slice(0, 9)
   const check = number.slice(9)
   // The check digits of people born from 2000 are computed with a 2 in front of the number.
   const from2000 = Number(number.slice(0, 2)) + 2000 <= new Date().getUTCFullYear()
-  if (check !== nnCheck(body, false) && !(from2000 && check === nnCheck(body, true))) return false
-  return Number(number.slice(2, 4)) <= 12
+  return check === nnCheck(body, false) || (from2000 && check === nnCheck(body, true))
+}
+const isValidNn = (number: string) => hasValidNnCheck(number) && Number(number.slice(2, 4)) <= 12
+/** A national number for `person`: the day's counter is odd for men and even for women. */
+export function nnCandidate(person: PersonSeed): string {
+  const body = yymmdd(person) + pad3(randomWithParity(1, 997, isMale(person)))
+  return body + nnCheck(body, dateParts(person.birthDate).year >= 2000)
 }
 const eidCheck = (body: string) => pad2(Number(body) % 97 || 97)
 
@@ -339,11 +323,7 @@ export const IDENTITY_COUNTRIES: readonly (NumberCountry & { name: string })[] =
         format: n => `${split(n.slice(0, 6), [2, 4], '.')}-${split(n.slice(6), [3], '.')}`,
         encodes: ['birthDate', 'sex'],
         isValid: isValidNn,
-        candidate: person => {
-          // The day's counter is odd for men and even for women.
-          const body = yymmdd(person) + pad3(randomWithParity(1, 997, isMale(person)))
-          return body + nnCheck(body, dateParts(person.birthDate).year >= 2000)
-        },
+        candidate: nnCandidate,
       }),
       idType({
         id: 'eid',
