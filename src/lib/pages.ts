@@ -16,6 +16,9 @@ export type PagePath =
   | '/cpf-generator'
   | '/iban-generator'
   | '/iban-validator'
+  | '/id-number-generator'
+  | '/id-number-validator'
+  | '/cartao-de-cidadao-generator'
   | '/privacy'
 
 /** Groups of tools, in the order the menus list them. */
@@ -228,6 +231,69 @@ export const PAGES: Record<PagePath, PageMeta> = {
         'National check digits for Belgium, Montenegro, Norway, Portugal and Spain',
         'Accepts IBANs written with spaces, dots or dashes',
       ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/id-number-generator': {
+    path: '/id-number-generator',
+    title: `Identity Number Generator: Cartão de Cidadão, DNI, PESEL & more | ${SITE_NAME}`,
+    description:
+      'Free identity number generator for QA testing: valid or invalid Cartão de Cidadão, DNI, PESEL, personnummer and other national ID numbers, with a correct check digit.',
+    name: 'Identity Number Generator',
+    tool: {
+      category: 'identity',
+      label: 'Identity number generator',
+      description: 'Cartão de Cidadão, DNI, PESEL and other national ID numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['National ID Number Generator', 'ID Card Number Generator'],
+      description:
+        'Free online tool to generate valid or deliberately invalid identity card and population register numbers for QA testing and development, with a correct check digit.',
+      featureList: [
+        'Identity numbers of 22 countries, such as the Portuguese Cartão de Cidadão, the Spanish DNI and the Polish PESEL',
+        'Numbers that hold a birth date and sex, for a random adult',
+        'Deliberately invalid numbers (wrong check digit or wrong length)',
+        'Numbers in their usual written form',
+        'Export to Excel (.xlsx), CSV, JSON or text',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/id-number-validator': {
+    path: '/id-number-validator',
+    title: `Identity Number Validator: Cartão de Cidadão, DNI, PESEL & more | ${SITE_NAME}`,
+    description:
+      'Free identity number validator: check the format and check digit of a Cartão de Cidadão, DNI, NIE, PESEL, personnummer and other national ID numbers, in your browser.',
+    name: 'Identity Number Validator',
+    tool: {
+      category: 'identity',
+      label: 'Identity number validator',
+      description: 'Check the check digit of national ID numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['National ID Number Validator', 'ID Card Number Checker'],
+      description:
+        'Free online tool that checks the format and check digit of identity card and population register numbers of 22 countries.',
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/cartao-de-cidadao-generator': {
+    path: '/cartao-de-cidadao-generator',
+    title: `Cartão de Cidadão Number Generator (Gerador de CC) | ${SITE_NAME}`,
+    description:
+      'Generate valid Portuguese Cartão de Cidadão document numbers for testing, with the check digit computed as the official specification sets, plain or formatted.',
+    name: 'Cartão de Cidadão Generator',
+    tool: {
+      category: 'identity',
+      label: 'Cartão de Cidadão generator',
+      description: 'Portuguese citizen card document numbers.',
+    },
+    app: {
+      alternateName: ['Gerador de Cartão de Cidadão', 'Gerador de número de CC'],
+      description:
+        'Free online generator of valid or deliberately invalid Portuguese Cartão de Cidadão document numbers, for QA testing.',
     },
     sitemap: { changefreq: 'monthly', priority: 0.9 },
   },

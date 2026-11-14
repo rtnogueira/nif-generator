@@ -1,9 +1,11 @@
 import {
   BadgeCheckIcon,
   BugIcon,
+  IdCardIcon,
   LandmarkIcon,
   LightbulbIcon,
   ReceiptTextIcon,
+  ScanSearchIcon,
   ShieldCheckIcon,
   WrenchIcon,
   type LucideIcon,
@@ -17,6 +19,8 @@ const TOOL_ICONS: Partial<Record<PagePath, LucideIcon>> = {
   '/tax-id-validator': ShieldCheckIcon,
   '/iban-generator': LandmarkIcon,
   '/iban-validator': BadgeCheckIcon,
+  '/id-number-generator': IdCardIcon,
+  '/id-number-validator': ScanSearchIcon,
 }
 
 /** Tools listed in the main menu, grouped by category. They come from `PAGES` in `@/lib/pages`. */
