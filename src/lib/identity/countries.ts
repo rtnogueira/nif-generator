@@ -770,7 +770,9 @@ export const IDENTITY_COUNTRIES: readonly (NumberCountry & { name: string })[] =
         candidate: person => {
           // The third digit of the serial is odd for men and even for women.
           const body = yymmdd(person) + randomDigits(2) + randomWithParity(0, 9, isMale(person))
-          return `${body.slice(0, 6)}-${body.slice(6)}${luhnCheckDigit(body)}`
+          // A plus replaces the dash from the year the person turns 100.
+          const turned100 = new Date().getUTCFullYear() - dateParts(person.birthDate).year >= 100
+          return `${body.slice(0, 6)}${turned100 ? '+' : '-'}${body.slice(6)}${luhnCheckDigit(body)}`
         },
       }),
     ],

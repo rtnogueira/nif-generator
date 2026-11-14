@@ -9,6 +9,7 @@ import {
   ReceiptTextIcon,
   ScanSearchIcon,
   ShieldCheckIcon,
+  TableIcon,
   UsersIcon,
   WrenchIcon,
   type LucideIcon,
@@ -27,6 +28,7 @@ const TOOL_ICONS: Partial<Record<PagePath, LucideIcon>> = {
   '/social-security-number-generator': HeartHandshakeIcon,
   '/social-security-number-validator': ClipboardCheckIcon,
   '/person-generator': UsersIcon,
+  '/test-data-generator': TableIcon,
 }
 
 /** Tools listed in the main menu, grouped by category. They come from `PAGES` in `@/lib/pages`. */

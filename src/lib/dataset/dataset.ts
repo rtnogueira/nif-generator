@@ -1,5 +1,5 @@
 import { getPersonLocale, loadPersonGenerator, type PersonOptions } from '@/lib/person'
-import { datasetColumns, type DatasetColumn } from './columns'
+import { datasetColumns, type DatasetColumn, type RowContext } from './columns'
 
 export const MIN_ROWS = 1
 export const MAX_ROWS = 1000
@@ -36,14 +36,15 @@ export async function buildDataset(
   countryCode: string,
   columnIds: readonly string[],
   count: number,
-  options: PersonOptions
+  options: PersonOptions & { formatted?: boolean }
 ): Promise<Dataset> {
   if (!getPersonLocale(countryCode)) throw new Error(`No test data for ${countryCode}`)
   const generatePerson = await loadPersonGenerator(countryCode)
   const columns = selectColumns(countryCode, columnIds)
   const rows = Array.from({ length: clampRows(count) }, () => {
     const person = generatePerson(options)
-    return columns.map(column => column.value(person))
+    const row: RowContext = { formatted: options.formatted ?? false, numbers: new Map() }
+    return columns.map(column => column.value(person, row))
   })
   return { country: countryCode, columns, rows }
 }

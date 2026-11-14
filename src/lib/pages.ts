@@ -23,6 +23,7 @@ export type PagePath =
   | '/social-security-number-validator'
   | '/niss-generator'
   | '/person-generator'
+  | '/test-data-generator'
   | '/privacy'
 
 /** Groups of tools, in the order the menus list them. */
@@ -384,6 +385,32 @@ export const PAGES: Record<PagePath, PageMeta> = {
         'Names that match the chosen sex and birth dates within an age range',
         'Choice of columns',
         'Up to 1000 rows at once',
+        'Copy as a table, CSV or JSON, or export to Excel (.xlsx), CSV or JSON',
+      ],
+    },
+    sitemap: { changefreq: 'monthly', priority: 0.9 },
+  },
+  '/test-data-generator': {
+    path: '/test-data-generator',
+    title: `Test Data Generator: people with tax ID, ID number & IBAN | ${SITE_NAME}`,
+    description:
+      'Free test data generator: a table of made-up people with name, birth date, address, tax number, identity number, social security number and IBAN. Export to Excel, CSV or JSON.',
+    name: 'Test Data Generator',
+    tool: {
+      category: 'data',
+      label: 'Test data generator',
+      description: 'A table of people with their tax, identity and bank numbers.',
+      menu: true,
+    },
+    app: {
+      alternateName: ['Fake Data Generator', 'Mock Data Generator', 'Dummy Data Generator'],
+      description:
+        'Free online tool to generate a table of made-up people for QA testing and development, each with a tax number, an identity number, a social security number and an IBAN from the same country.',
+      featureList: [
+        'One person per row: name, sex, birth date and address',
+        'Tax number, identity number, social security number and IBAN of the same country, each with a correct check digit',
+        'Numbers that hold a birth date or sex match the person of the row',
+        'Choice of columns and up to 1000 rows',
         'Copy as a table, CSV or JSON, or export to Excel (.xlsx), CSV or JSON',
       ],
     },

@@ -1,4 +1,10 @@
-export { COLUMN_GROUPS, datasetColumns, type ColumnGroupId, type DatasetColumn } from './columns'
+export {
+  COLUMN_GROUPS,
+  datasetColumns,
+  hasFormattedNumbers,
+  type ColumnGroupId,
+  type DatasetColumn,
+} from './columns'
 export {
   buildDataset,
   clampRows,

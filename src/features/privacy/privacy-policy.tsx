@@ -51,10 +51,10 @@ export function PrivacyPolicy() {
           forms that collect personal data.
         </p>
         <p>
-          The generator keeps its options (country, number type, quantity and display options) in
-          the page address, so they can be bookmarked or shared. The address never contains the
-          generated numbers or a number you validate. If analytics is enabled (see below), the page
-          address, including these options, is part of each page view it records.
+          The generators keep their options (country, number type or columns, quantity and display
+          options) in the page address, so they can be bookmarked or shared. The address never
+          contains the generated data or a number you validate. If analytics is enabled (see below),
+          the page address, including these options, is part of each page view it records.
         </p>
       </Section>
 

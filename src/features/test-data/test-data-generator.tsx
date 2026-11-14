@@ -47,9 +47,9 @@ export function TestDataGenerator({
   // Only the latest request may show its result: the data of a country loads asynchronously.
   const latest = useRef(0)
 
-  function load({ country, columns, rows, sex, minAge, maxAge }: TestDataOptions) {
+  function load({ country, columns, rows, ...options }: TestDataOptions) {
     const request = ++latest.current
-    buildDataset(country, columns, rows, { sex, minAge, maxAge }).then(
+    buildDataset(country, columns, rows, options).then(
       result => {
         if (request !== latest.current) return
         setDataset(result)
