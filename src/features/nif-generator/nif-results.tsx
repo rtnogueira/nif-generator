@@ -20,6 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useClipboard } from '@/hooks/use-clipboard'
+import { trackEvent } from '@/lib/analytics'
 import { downloadTextFile, formatNumbers, type TextFileExtension } from '@/lib/export'
 import { downloadXlsxColumn } from '@/lib/export-xlsx'
 import type { GeneratedBatch, Validity } from '@/lib/numbers/variants'
@@ -46,6 +47,17 @@ export function NifResults({ batch }: NifResultsProps) {
   const hasResults = batch !== null && nifs.length > 0
   const allNifs = nifs.join('\n')
   const invalidLabel = batch && INVALID_LABELS[batch.validity]
+  const tool = batch?.family.id ?? ''
+
+  function copyAll(text: string, format: string) {
+    copy(text, `Copied ${nifs.length} numbers`, COPY_ALL_KEY)
+    trackEvent('copy_results', { tool, scope: 'all', format })
+  }
+
+  function copyOne(nif: string, message: string) {
+    copy(nif, message)
+    trackEvent('copy_results', { tool, scope: 'single', format: 'value' })
+  }
 
   return (
     <Card className="min-w-0 flex-1 gap-0 py-0">
@@ -64,7 +76,7 @@ export function NifResults({ batch }: NifResultsProps) {
                 variant="outline"
                 size="sm"
                 className="rounded-r-none"
-                onClick={() => copy(allNifs, `Copied ${nifs.length} numbers`, COPY_ALL_KEY)}
+                onClick={() => copyAll(allNifs, 'lines')}
               >
                 {copied === COPY_ALL_KEY ? <CheckIcon className="text-success" /> : <CopyIcon />}
                 Copy all
@@ -83,24 +95,12 @@ export function NifResults({ batch }: NifResultsProps) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Copy all as</DropdownMenuLabel>
                   <DropdownMenuItem
-                    onSelect={() =>
-                      copy(
-                        formatNumbers('comma', '', nifs),
-                        `Copied ${nifs.length} numbers`,
-                        COPY_ALL_KEY
-                      )
-                    }
+                    onSelect={() => copyAll(formatNumbers('comma', '', nifs), 'comma')}
                   >
                     Comma-separated list
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onSelect={() =>
-                      copy(
-                        formatNumbers('json', '', nifs),
-                        `Copied ${nifs.length} numbers`,
-                        COPY_ALL_KEY
-                      )
-                    }
+                    onSelect={() => copyAll(formatNumbers('json', '', nifs), 'json')}
                   >
                     JSON array
                   </DropdownMenuItem>
@@ -133,7 +133,7 @@ export function NifResults({ batch }: NifResultsProps) {
                   nif={nif}
                   badge={batch.type.badge}
                   copied={copied === nif}
-                  onCopy={copy}
+                  onCopy={copyOne}
                 />
               ))}
             </TableBody>
@@ -194,6 +194,7 @@ function ExportMenu({ batch }: { batch: GeneratedBatch }) {
     setExporting(true)
     try {
       await downloadXlsxColumn(batch.type.name, batch.numbers, fileName(batch))
+      trackEvent('export_results', { tool: batch.family.id, format: 'xlsx' })
     } catch {
       toast.error('Export failed, please try again')
     } finally {
@@ -204,6 +205,7 @@ function ExportMenu({ batch }: { batch: GeneratedBatch }) {
   function exportText(extension: TextFileExtension) {
     const content = formatNumbers(TEXT_FORMATS[extension], batch.type.name, batch.numbers)
     downloadTextFile(content, fileName(batch), extension)
+    trackEvent('export_results', { tool: batch.family.id, format: extension })
   }
 
   return (

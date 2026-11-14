@@ -2,6 +2,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { RelatedTools } from '@/components/related-tools'
 import { usePageMeta } from '@/hooks/use-page-meta'
+import { trackEvent } from '@/lib/analytics'
 import { buildDataset, type ColumnGroupId, type Dataset } from '@/lib/dataset'
 import { categoryLabel, type PagePath } from '@/lib/pages'
 import { TestDataForm } from './test-data-form'
@@ -74,6 +75,14 @@ export function TestDataGenerator({
   function handleGenerate(options: TestDataOptions) {
     setBusy(true)
     load(options)
+    trackEvent('generate_table', {
+      tool: slug,
+      country: options.country,
+      rows: options.rows,
+      column_count: options.columns.length,
+      columns: options.columns.join(','),
+      formatted: options.formatted,
+    })
     // Keep the URL in step, so the current options can be bookmarked or shared.
     void navigate({
       to: '.',

@@ -95,8 +95,11 @@ export function PrivacyPolicy() {
 
       <Section title="Analytics">
         <p>
-          The site may use Google Analytics to understand, in aggregate, how visitors use it (for
-          example, which pages are visited and from which countries). Google Analytics uses cookies
+          The site may use Google Analytics to understand, in aggregate, how visitors use it: which
+          pages are visited and from which countries, and how the tools are used (for example, that
+          numbers of a given country and kind were generated, that a number was found valid or
+          invalid, or that results were copied or exported, and in which format). These records
+          never contain a generated value or a number you validate. Google Analytics uses cookies
           and collects information such as your approximate location, device and browser type. IP
           addresses are not logged or stored. You can opt out with the{' '}
           <ExternalLink href="https://tools.google.com/dlpage/gaoptout">

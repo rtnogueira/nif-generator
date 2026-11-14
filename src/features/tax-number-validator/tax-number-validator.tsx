@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { RelatedTools } from '@/components/related-tools'
 import { usePageMeta } from '@/hooks/use-page-meta'
+import { trackEvent } from '@/lib/analytics'
 import type { NumberFamily, NumberValidation } from '@/lib/numbers/family'
 import { categoryLabel, type PagePath } from '@/lib/pages'
 import { ValidationResult } from './validation-result'
@@ -37,7 +38,10 @@ export function NumberValidator({
   const [result, setResult] = useState<NumberValidation | null>(null)
 
   function handleValidate({ country, number }: ValidatorInput) {
-    setResult(family.validate(number, country === AUTO_DETECT ? undefined : country))
+    const validation = family.validate(number, country === AUTO_DETECT ? undefined : country)
+    setResult(validation)
+    // Only the outcome is recorded, never the number.
+    trackEvent('validate_number', { tool: family.id, country, result: validation.status })
   }
 
   return (
